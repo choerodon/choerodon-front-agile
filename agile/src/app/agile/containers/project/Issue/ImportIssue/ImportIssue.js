@@ -238,7 +238,7 @@ class ImportIssue extends Component {
             : ''
           }
           <span className="c7n-importIssue-text">
-            {'导入模板错误，请勿修改模板结构。'}
+            {'导入模板错误，或无数据。'}
           </span>
         </div>
       );

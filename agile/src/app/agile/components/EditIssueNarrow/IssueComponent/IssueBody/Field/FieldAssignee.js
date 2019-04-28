@@ -75,23 +75,26 @@ const { Text, Edit } = TextEditToggle;
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
         });
     }
   };
 
   render() {
-    const { selectLoading, originUsers, newAssigneeId } = this.state;
+    const { selectLoading, originUsers } = this.state;
     const { store } = this.props;
     const issue = store.getIssue;
-    const { assigneeId, assigneeName, assigneeImageUrl } = issue;
+    const {
+      assigneeId, assigneeImageUrl,
+      assigneeLoginName, assigneeRealName,
+    } = issue;
     const targetUser = _.find(originUsers, { id: assigneeId, enabled: true });
     if (!targetUser && assigneeId) {
       originUsers.unshift({
         id: assigneeId,
-        loginName: '',
-        realName: assigneeName,
+        loginName: assigneeLoginName,
+        realName: assigneeRealName,
         imageUrl: assigneeImageUrl,
         enabled: true,
       });
@@ -113,12 +116,12 @@ const { Text, Edit } = TextEditToggle;
           >
             <Text>
               {
-                assigneeId && assigneeName ? (
+                assigneeId ? (
                   <UserHead
                     user={{
                       id: assigneeId,
-                      loginName: '',
-                      realName: assigneeName,
+                      loginName: assigneeLoginName,
+                      realName: assigneeRealName,
                       avatar: assigneeImageUrl,
                     }}
                   />

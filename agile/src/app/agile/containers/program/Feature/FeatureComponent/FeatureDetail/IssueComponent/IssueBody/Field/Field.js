@@ -8,7 +8,6 @@ import {
 import { injectIntl } from 'react-intl';
 import { updateFieldValue } from '../../../../../../../../api/NewIssueApi';
 import TextEditToggle from '../../../../../../../../components/TextEditToggle';
-import FieldBlank from '../../../../CreateFeature/FieldBlank';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -83,9 +82,8 @@ const { Text, Edit } = TextEditToggle;
 
   renderField = () => {
     const { field } = this.props;
-    const { fieldValue } = this.state;
     const {
-      fieldOptions, fieldType, required,
+      fieldOptions, fieldType, required, value,
     } = field;
     if (fieldType === 'radio') {
       if (fieldOptions && fieldOptions.length > 0) {
@@ -108,7 +106,12 @@ const { Text, Edit } = TextEditToggle;
         );
       } else {
         return (
-          <FieldBlank />
+          <Radio.Group
+            className="fieldWith"
+            onChange={e => this.handleChange(e)}
+          >
+            <span style={{ color: '#D50000' }}>暂无选项，请联系管理员</span>
+          </Radio.Group>
         );
       }
     } else if (field.fieldType === 'checkbox') {
@@ -139,7 +142,12 @@ const { Text, Edit } = TextEditToggle;
         );
       } else {
         return (
-          <FieldBlank />
+          <Checkbox.Group
+            className="fieldWith"
+            onChange={e => this.handleChange(e)}
+          >
+            <span style={{ color: '#D50000' }}>暂无选项，请联系管理员</span>
+          </Checkbox.Group>
         );
       }
     } else if (field.fieldType === 'time') {
@@ -169,7 +177,7 @@ const { Text, Edit } = TextEditToggle;
           onChange={e => this.handleChange(e)}
         >
           {field.fieldOptions && field.fieldOptions.length > 0
-          && field.fieldOptions.map(item => (
+          && field.fieldOptions.filter(option => option.enabled || option.id === value).map(item => (
             <Option
               value={item.id}
               key={item.id}
@@ -188,7 +196,7 @@ const { Text, Edit } = TextEditToggle;
           onChange={e => this.handleChange(e)}
         >
           {field.fieldOptions && field.fieldOptions.length > 0
-          && field.fieldOptions.map(item => (
+          && field.fieldOptions.filter(option => option.enabled || (value && value.indexOf(option.id) !== -1)).map(item => (
             <Option
               value={item.id}
               key={item.id}
@@ -209,6 +217,7 @@ const { Text, Edit } = TextEditToggle;
     } else if (field.fieldType === 'text') {
       return (
         <TextArea
+          autosize
           className="fieldWith"
           onChange={e => this.handleChange(e)}
         />

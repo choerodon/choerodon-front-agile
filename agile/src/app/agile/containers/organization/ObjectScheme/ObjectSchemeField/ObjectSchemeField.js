@@ -47,17 +47,30 @@ class ObjectSchemeField extends Component {
       isCheck: false,
       dateDisable: false,
       spinning: true,
+      fieldContext: [],
     };
   }
 
   componentDidMount() {
     this.initCurrentMenuType();
+    this.loadContext();
     this.loadFieldById();
   }
 
   initCurrentMenuType = () => {
     const { ObjectSchemeStore } = this.props;
     ObjectSchemeStore.initCurrentMenuType(AppState.currentMenuType);
+  };
+
+  loadContext = () => {
+    const { ObjectSchemeStore } = this.props;
+    ObjectSchemeStore.loadLookupValue('object_scheme_field_context').then((res) => {
+      if (!res.failed) {
+        this.setState({
+          fieldContext: res.lookupValues,
+        });
+      }
+    });
   };
 
   loadFieldById = () => {
@@ -124,12 +137,13 @@ class ObjectSchemeField extends Component {
         const postData = {
           ...field,
           name: data.name,
-          defaultValue: String(data.defaultValue),
+          context: data.context,
+          defaultValue: String(data.defaultValue || ''),
           extraConfig: !!data.check,
         };
         if (singleList.indexOf(field.fieldType) !== -1) {
           postData.fieldOptions = fieldOptions.map((o) => {
-            if (o.tempKey === data.defaultValue || o.id === data.defaultValue) {
+            if (data.defaultValue && (o.tempKey === data.defaultValue || o.id === data.defaultValue)) {
               return { ...o, isDefault: true };
             } else {
               return { ...o, isDefault: false };
@@ -174,7 +188,7 @@ class ObjectSchemeField extends Component {
     });
   };
 
-  onTreeCreate = (value) => {
+  onTreeCreate = (code, value) => {
     const { fieldOptions } = this.state;
     this.setState({
       fieldOptions: [
@@ -182,6 +196,7 @@ class ObjectSchemeField extends Component {
         {
           enabled: true,
           status: 'add',
+          code,
           value,
           tempKey: randomString(5),
         },
@@ -212,18 +227,19 @@ class ObjectSchemeField extends Component {
 
   checkName = (rule, value, callback) => {
     const { ObjectSchemeStore, intl } = this.props;
+    const field = ObjectSchemeStore.getField;
     const name = ObjectSchemeStore.getField ? ObjectSchemeStore.getField.name : false;
     if ((name && value === name) || !value) {
       callback();
     } else {
-      ObjectSchemeStore.checkName(value)
+      ObjectSchemeStore.checkName(value, field.schemeCode)
         .then((data) => {
           if (data) {
             callback(intl.formatMessage({ id: 'field.name.exist' }));
           } else {
             callback();
           }
-        }).catch((error) => {
+        }).catch(() => {
           callback();
         });
     }
@@ -238,7 +254,8 @@ class ObjectSchemeField extends Component {
     } = menu;
     const field = ObjectSchemeStore.getField;
     const {
-      fieldOptions, submitting, defaultValue, isCheck, dateDisable, spinning,
+      fieldOptions, submitting, defaultValue, isCheck,
+      dateDisable, spinning, fieldContext,
     } = this.state;
 
     return (
@@ -281,6 +298,35 @@ class ObjectSchemeField extends Component {
                     disabled
                     label={<FormattedMessage id="field.type" />}
                   />,
+                )}
+              </FormItem>
+              <FormItem
+                {...formItemLayout}
+                className="issue-sidebar-form"
+              >
+                {getFieldDecorator('context', {
+                  rules: [{
+                    required: true,
+                    message: '显示范围为必填项！',
+                  }],
+                  initialValue: field.context && field.context.slice(),
+                })(
+                  <Select
+                    style={{ width: 520 }}
+                    label={<FormattedMessage id="field.context" />}
+                    dropdownMatchSelectWidth
+                    size="default"
+                    mode="multiple"
+                  >
+                    {fieldContext.map(ctx => (
+                      <Option
+                        value={ctx.valueCode}
+                        key={ctx.valueCode}
+                      >
+                        {ctx.name}
+                      </Option>
+                    ))}
+                  </Select>,
                 )}
               </FormItem>
               {

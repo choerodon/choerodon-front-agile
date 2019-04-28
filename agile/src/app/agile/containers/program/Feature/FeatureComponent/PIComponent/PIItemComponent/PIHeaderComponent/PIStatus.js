@@ -64,15 +64,15 @@ const { AppState } = stores;
     const { finishSprintVisible } = this.state;
     // TODO: 内部接口逻辑
     return (
-      <div className="c7n-backlog-sprintTitleSide">
+      <div className="c7n-feature-sprintTitleSide">
         {statusCode === 'doing' ? (
           <React.Fragment>
-            <p className="c7n-backlog-sprintStatus">
+            <p className="c7n-feature-sprintStatus">
               {'活跃'}
             </p>
             <div style={{ display: 'flex' }}>
               <p
-                className="c7n-backlog-closeSprint"
+                className="c7n-feature-closeSprint"
                 role="none"
                 onClick={this.handleFinish}
               >
@@ -82,13 +82,13 @@ const { AppState } = stores;
           </React.Fragment>
         ) : (
           <React.Fragment>
-            <p className="c7n-backlog-sprintStatus2">
+            <p className="c7n-feature-sprintStatus2">
               {'未开始'}
             </p>
             <div style={{ display: 'flex' }}>
               <p
-                className={classnames('c7n-backlog-closeSprint', {
-                  'c7n-backlog-canCloseSprint': store.getHasActivePI || !data.subFeatureDTOList || data.subFeatureDTOList.length === 0 || index !== 0,
+                className={classnames('c7n-feature-closeSprint', {
+                  'c7n-feature-canCloseSprint': store.getHasActivePI || !data.subFeatureDTOList || data.subFeatureDTOList.length === 0 || index !== 0,
                 })}
                 role="none"
                 onClick={this.handleOpen}

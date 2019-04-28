@@ -20,7 +20,7 @@ import SwithChart from '../../Component/switchChart';
 
 const { AppState } = stores;
 const { RangePicker } = DatePicker;
-const {Option} = Select;
+const { Option } = Select;
 let backUrl;
 
 @observer
@@ -43,7 +43,7 @@ class AccumulationHome extends Component {
     });
 
     AccumulationStore.axiosGetFilterList().then((data) => {
-      const newData = _.clone(data.content);
+      const newData = _.clone(data);
       for (let index = 0, len = newData.length; index < len; index += 1) {
         newData[index].check = false;
       }
@@ -103,7 +103,7 @@ class AccumulationHome extends Component {
       AccumulationStore.setColumnData(data2);
       AccumulationStore.axiosGetProjectInfo().then((res) => {
         AccumulationStore.setProjectInfo(res);
-        AccumulationStore.setStartDate(moment(res.creationDate.split(' ')[0]));
+        AccumulationStore.setStartDate(moment().subtract(2, 'months'));
         AccumulationStore.setEndDate(moment());
         if (type) {
           // eslint-disable-next-line no-return-assign
@@ -122,7 +122,7 @@ class AccumulationHome extends Component {
     const columnData = AccumulationStore.getColumnData;
     const endDate = AccumulationStore.getEndDate && `${AccumulationStore.getEndDate.format('YYYY-MM-DD')} 23:59:59`;
     const filterList = AccumulationStore.getFilterList;
-    const startDate = AccumulationStore.getStartDate && AccumulationStore.getStartDate.format('YYYY-MM-DD HH:mm:ss');
+    const startDate = AccumulationStore.getStartDate && AccumulationStore.getStartDate.format('YYYY-MM-DD 00:00:00');
     const columnIds = [];
     const quickFilterIds = [];
     let boardId;
@@ -490,7 +490,7 @@ class AccumulationHome extends Component {
               // value={[moment(AccumulationStore.getProjectInfo.creationDate), moment()]}
               value={[AccumulationStore.getStartDate && moment(AccumulationStore.getStartDate), AccumulationStore.getEndDate && moment(AccumulationStore.getEndDate)]}
               allowClear={false}
-              disabledDate={(current) => current && (current < moment(AccumulationStore.getProjectInfo.creationDate).subtract(1, 'days').endOf('day')|| current > moment().endOf('day'))}
+              disabledDate={current => current && (current < moment(AccumulationStore.getProjectInfo.creationDate).subtract(1, 'days').endOf('day') || current > moment().endOf('day'))}
               onChange={(date, dateString) => {
                 AccumulationStore.setStartDate(moment(dateString[0]));
                 AccumulationStore.setEndDate(moment(dateString[1]));

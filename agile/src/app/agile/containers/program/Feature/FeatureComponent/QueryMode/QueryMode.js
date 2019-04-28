@@ -65,6 +65,10 @@ class QueryMode extends Component {
     this.loadFeatures();
   }
 
+  componentWillUnmount() {   
+    FeatureStore.setClickIssueDetail({});
+  }
+  
   refresh=() => {
     this.loadFeatures();
   }

@@ -1,5 +1,6 @@
 .issue-dragList {
   &-content {
+    background: white !important;
     padding: 20px;
     width: 520px;
     display: flex;
@@ -8,7 +9,7 @@
     border-radius: 2px;
   }
   &-card {
-    background: #FFFFFF;
+    background: #FFF;
     border-radius: 4px;
     width: 480px;
     & .ant-card-body {
@@ -22,6 +23,7 @@
       min-height: 0;
     }
     & .ant-card-head-title {
+      font-size: 14px;
       line-height: 40px;
       padding: 0;
     }
@@ -33,6 +35,8 @@
     float: right;
   }
   &-text {
+    width: 35%;
+    display: inline-block;
     line-height: 24px;
   }
   &-addBtn {
@@ -45,11 +49,15 @@
     height: 34px;
   }
   &-input {
-    width: 75%;
+    width: 35%;
     display: inline-block;
   }
   &-add {
     margin-right: 10px;
+  }
+
+  .ant-input-length-info {
+    display: none;
   }
 }
 

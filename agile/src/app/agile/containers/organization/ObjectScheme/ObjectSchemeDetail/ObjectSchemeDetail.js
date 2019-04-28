@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Table, Spin, Tooltip, Button, Checkbox, Modal,
+  Table, Spin, Tooltip, Button, Checkbox, Modal, Icon,
 } from 'choerodon-ui';
 import {
   Page, Header, Content, stores,
@@ -59,7 +59,7 @@ class ObjectSchemeDetail extends Component {
       width: '25%',
     },
     {
-      title: '显示层级',
+      title: '显示范围',
       dataIndex: 'contextName',
       width: '25%',
     },
@@ -75,7 +75,7 @@ class ObjectSchemeDetail extends Component {
       render: (required, record) => (
         <div>
           <Checkbox
-            defaultChecked={record.required}
+            checked={record.required}
             disabled={record.system || (AppState.currentMenuType.type === 'project' && !record.projectId)}
             onChange={() => this.onRequiredChange(record)}
           />
@@ -193,25 +193,28 @@ class ObjectSchemeDetail extends Component {
         <Header
           title="编辑方案"
           backPath={`/agile/objectScheme?type=${type}&id=${id}&name=${encodeURIComponent(orgName)}&organizationId=${organizationId}`}
-        />
+        >
+          <Button
+            className="leftBtn"
+            funcType="flat"
+            onClick={() => {
+              this.setState({
+                addVisible: true,
+              });
+            }}
+          >
+            <Icon type="playlist_add icon" />
+            <span>添加字段</span>
+          </Button>
+          <Button funcType="flat" onClick={this.loadScheme}>
+            <Icon type="refresh icon" />
+            <span>刷新</span>
+          </Button>
+        </Header>
         <Content
           title={name}
         >
           <Spin spinning={loading}>
-            <div style={{ marginBottom: 10 }}>
-              <Button
-                type="primary"
-                icon="add"
-                funcType="flat"
-                onClick={() => {
-                  this.setState({
-                    addVisible: true,
-                  });
-                }}
-              >
-                {'添加字段'}
-              </Button>
-            </div>
             <Table
               pagination={false}
               rowKey={record => record.id}

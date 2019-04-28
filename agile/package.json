@@ -8,6 +8,7 @@
   "scripts": {
     "start": "choerodon-front-boot start --config ../config.js",
     "build": "choerodon-front-boot build --config ../config.js",
+    "linux_build": "node --max_old_space_size=2048 node_modules/choerodon-front-boot/bin/choerodon-front-boot-build --config ./config.js",
     "lint": "npm run lint:es && npm run lint:style",
     "lint:es": "eslint src/**/*.js ../config.js",
     "lint:style": "stylelint src/**/*.scss --syntax scss",
@@ -19,7 +20,7 @@
   "dependencies": {
     "bizcharts": "^3.1.10",
     "canvas2image": "^1.0.5",
-    "choerodon-front-boot": "^0.10.4",
+    "choerodon-front-boot": "0.10.10",
     "echarts": "^4.1.0",
     "echarts-for-react": "^2.0.14",
     "file-saver": "^1.3.8",
@@ -29,7 +30,7 @@
     "moment-range": "^4.0.2",
     "quill-delta-to-html": "^0.8.4",
     "rc-progress": "^2.2.6",
-    "react-beautiful-dnd": "^10.0.0",
+    "react-beautiful-dnd": "9.0.2",
     "react-dnd": "^5.0.0",
     "react-dnd-html5-backend": "^5.0.1",
     "react-fast-compare": "^2.0.4",

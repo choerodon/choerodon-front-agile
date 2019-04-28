@@ -12,6 +12,13 @@ export function getPIList(artId) {
 /**
  * 获取PI列表
  */
+export function getPISelect() {
+  return axios.get(`/agile//v1/projects/${AppState.currentMenuType.id}/pi/unfinished`);
+}
+
+/**
+ * 获取PI列表
+ */
 export function getAllPIList() {
   return axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/pi/all`);
 }

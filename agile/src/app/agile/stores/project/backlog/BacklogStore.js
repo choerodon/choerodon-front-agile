@@ -55,7 +55,7 @@ class BacklogStore {
   }
 
   @computed get getWorkLogs() {
-    return this.workLogs;
+    return this.workLogs.slice();
   }
 
   @action setDataLogs(data) {
@@ -106,6 +106,8 @@ class BacklogStore {
 
   @observable epicList = [];
 
+  @observable featureList = [];
+
   @observable epicMap = observable.map();
 
   @observable selectedIssueId = [];
@@ -139,6 +141,8 @@ class BacklogStore {
   @observable chosenVersion = 'all';
 
   @observable chosenEpic = 'all';
+
+  @observable chosenFeature = 'all';
 
   @observable onlyMe = false;
 
@@ -475,8 +479,25 @@ class BacklogStore {
     this.chosenEpic = data;
   }
 
+  @computed get getChosenFeature() {
+    return this.chosenFeature;
+  }
+
+  @action setChosenFeature(data) {
+    if (data === 'all') {
+      this.filterSelected = false;
+    }
+    this.spinIf = true;
+    this.addToFeatureFilter(data);
+    this.chosenFeature = data;
+  }
+
   @action setEpicData(data) {
     this.epicList = data;
+  }
+
+  @action setFeatureData(data) {
+    this.featureList = data;
   }
 
   axiosGetEpic() {
@@ -752,12 +773,10 @@ class BacklogStore {
       } else {
         return destinationArr[destinationIndex - 1];
       }
+    } else if (destinationIndex === 0 && destinationArr.length) {
+      return destinationArr[destinationIndex];
     } else {
-      if (destinationIndex === 0 && destinationArr.length) {
-        return destinationArr[destinationIndex];
-      } else {
-        return destinationArr[destinationIndex - 1];
-      }
+      return destinationArr[destinationIndex - 1];
     }
   };
 
@@ -790,8 +809,10 @@ class BacklogStore {
         this.issueMap.set(destinationId, destinationArr);
       }
     }
-    this.multiSelected = observable.map();
-    axios.post(`agile/v1/projects/${AppState.currentMenuType.id}/issues/to_sprint/${destinationId}`, {
+    // this.multiSelected = observable.map();
+    // this.clickIssueDetail = {};
+    this.onBlurClick();
+    return axios.post(`agile/v1/projects/${AppState.currentMenuType.id}/issues/to_sprint/${destinationId}`, {
       before: destinationIndex === 0,
       issueIds: modifiedArr,
       outsetIssueId: prevIssue ? prevIssue.issueId : 0,
@@ -833,6 +854,10 @@ class BacklogStore {
     return this.epicList;
   }
 
+  @computed get getFeatureData() {
+    return this.featureList;
+  }
+
   @action updateEpic(epic) {
     const updateIndex = this.epicList.findIndex(item => epic.issueId === item.issueId);
     this.epicList[updateIndex].name = epic.name;
@@ -853,11 +878,9 @@ class BacklogStore {
     this.handleEpicDrap(req).then(
       action('fetchSuccess', (res) => {
         if (!res.message) {
-          this.epicList[destinationIndex] = {
-            ...movedItem,
-            epicSequence: res.epicSequence,
-            objectVersionNumber: res.objectVersionNumber,
-          };
+          this.axiosGetEpic().then((epics) => {
+            this.setEpicData(epics);
+          });          
         } else {
           this.epicList.splice(destinationIndex, 1);
           this.epicList.splice(sourceIndex, 0, movedItem);
@@ -871,7 +894,7 @@ class BacklogStore {
   }
 
   @action setVersionData(data) {
-    this.versionData = data;
+    this.versionData = data.sort((a, b) => b.sequence - a.sequence);
   }
 
   @computed get getVersionData() {
@@ -899,17 +922,15 @@ class BacklogStore {
     const req = {
       beforeSequence: destinationIndex !== 0 ? this.versionData[destinationIndex - 1].sequence : null,
       afterSequence: destinationIndex !== (this.versionData.length - 1) ? this.versionData[destinationIndex + 1].sequence : null,
-      epicId: versionId,
+      versionId,
       objectVersionNumber,
     };
-    this.handleEpicDrap(req).then(
-      action('fetchSuccess', (res) => {
+    this.handleVersionDrap(req).then(
+      action('fetchSuccess', (res) => {        
         if (!res.message) {
-          this.versionData[destinationIndex] = {
-            ...movedItem,
-            sequence: res.sequence,
-            objectVersionNumber: res.objectVersionNumber,
-          };
+          this.axiosGetVersion().then((versions) => {
+            this.setVersionData(versions);
+          });
         } else {
           this.versionData.splice(destinationIndex, 1);
           this.versionData.splice(sourceIndex, 0, movedItem);
@@ -929,6 +950,20 @@ class BacklogStore {
     } else {
       delete this.filter.advancedSearchArgs.noEpic;
       delete this.filter.advancedSearchArgs.epicId;
+    }
+  }
+
+  @action addToFeatureFilter(data) {
+    this.filterSelected = true;
+    if (data === 'unset') {
+      delete this.filter.advancedSearchArgs.featureId;
+      this.filter.advancedSearchArgs.noFeature = 'true';
+    } else if (typeof data === 'number') {
+      delete this.filter.advancedSearchArgs.noFeature;
+      this.filter.advancedSearchArgs.featureId = data;
+    } else {
+      delete this.filter.advancedSearchArgs.noFeature;
+      delete this.filter.advancedSearchArgs.featureId;
     }
   }
 
@@ -986,6 +1021,10 @@ class BacklogStore {
     if (moreChecked.length) {
       this.filterSelected = true;
     }
+    // 如果一个都没选，则不显示清空
+    if (!onlyMeChecked && !onlyStoryChecked && !moreChecked.length) {
+      this.filterSelected = false;
+    }
   }
 
   @action toggleIssueDrag(data) {
@@ -998,7 +1037,13 @@ class BacklogStore {
 
   @action onBlurClick() {
     this.multiSelected = observable.map();
-    // this.clickIssueDetail = {};
+    if (this.clickIssueDetail && this.clickIssueDetail.issueId) {
+      this.multiSelected.set(this.clickIssueDetail.issueId, this.clickIssueDetail);
+    }
+  }
+
+  @action clearMultiSelected() {
+    this.multiSelected = observable.map();
   }
 
   @action setCreatedSprint(data) {

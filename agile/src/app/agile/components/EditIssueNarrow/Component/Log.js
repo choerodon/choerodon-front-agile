@@ -68,7 +68,7 @@ class Log extends Component {
   }
 
   render() {
-    const { worklog, isWide } = this.props;
+    const { worklog, isWide, hasPermission } = this.props;
     const { editLog, editLogId, expand } = this.state;
     const deltaEdit = text2Delta(editLog);
     return (
@@ -142,19 +142,23 @@ class Log extends Component {
                 });
               }}
             />
-            <Popconfirm
-              title="确认要删除该工作日志吗?"
-              placement="left"
-              onConfirm={this.confirm.bind(this, worklog.logId)}
-              onCancel={this.cancel}
-              okText="删除"
-              cancelText="取消"
-              okType="danger"
-            >
-              <Icon
-                type="delete_forever mlr-3 pointer"
-              />
-            </Popconfirm>
+            {hasPermission
+              ? (
+                <Popconfirm
+                  title="确认要删除该工作日志吗?"
+                  placement="left"
+                  onConfirm={this.confirm.bind(this, worklog.logId)}
+                  onCancel={this.cancel}
+                  okText="删除"
+                  cancelText="取消"
+                  okType="danger"
+                >
+                  <Icon
+                    type="delete_forever mlr-3 pointer"
+                  />
+                </Popconfirm>
+              ) : ''
+            }
           </div>
         </div>
         <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginTop: '10px' }}>

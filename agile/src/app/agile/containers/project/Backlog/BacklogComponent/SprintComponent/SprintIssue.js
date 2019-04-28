@@ -64,19 +64,19 @@ class SprintIssue extends Component {
                   {item.epicName}
                 </span>
               </Tooltip>
-            ) : ''}
+            ) : ''}            
+          </div>
+          <div className={classnames('line-two-right')}>
             {item.assigneeId && (
               <UserHead
                 user={{
                   id: item.assigneeId,
-                  loginName: '',
-                  realName: item.assigneeName,
+                  loginName: item.assigneeLoginName,
+                  realName: item.assigneeRealName,
                   avatar: item.imageUrl,
                 }}
               />
             )}
-          </div>
-          <div className={classnames('line-two-right')}>
             <Tooltip title={`状态: ${item.statusMapDTO ? item.statusMapDTO.name : ''}`}>
               <div className="c7n-backlog-IssueCard-right-status">
                 <StatusTag

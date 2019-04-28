@@ -55,7 +55,7 @@ class ScrumBoardStore {
   }
 
   @computed get getWorkLogs() {
-    return this.workLogs;
+    return this.workLogs.slice();
   }
 
   @action setDataLogs(data) {
@@ -689,7 +689,7 @@ class ScrumBoardStore {
   }
 
   axiosAddColumn(categoryCode, data) {
-    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column?categoryCode=${categoryCode}`, data);
+    return axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/board_column?categoryCode=${categoryCode}&applyType=agile`, data);
   }
 
   axiosAddStatus(data) {
@@ -811,7 +811,9 @@ class ScrumBoardStore {
   }
 
   @action setWorkDate(data) {
-    this.calanderCouldUse = true;
+    if (data.sprintId) {
+      this.calanderCouldUse = true;
+    }
     this.workDate = data;
   }
 

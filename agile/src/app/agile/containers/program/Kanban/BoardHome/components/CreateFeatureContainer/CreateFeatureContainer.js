@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import CreateFeature from '../../../../../../components/CreateFeature';
+import CreateFeature from '../../../../Feature/FeatureComponent/CreateFeature';
 import KanbanStore from '../../../../../../stores/program/Kanban/KanbanStore';
 
 @observer

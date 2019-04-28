@@ -20,6 +20,23 @@ const defaultList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
   }
 
   componentDidMount() {
+    const { store, field } = this.props;
+    const issue = store.getIssue;
+    const { fieldCode } = field;
+    const { [fieldCode]: value } = issue;
+    this.setState({
+      newValue: value ? String(value) : undefined,
+    });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { store, field } = nextProps;
+    const issue = store.getIssue;
+    const { fieldCode } = field;
+    const { [fieldCode]: value } = issue;
+    this.setState({
+      newValue: value ? String(value) : undefined,
+    });
   }
 
   handleChange = (value) => {
@@ -50,16 +67,16 @@ const defaultList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
       store, onUpdate, reloadIssue, field,
     } = this.props;
     const issue = store.getIssue;
-    const { code } = field;
+    const { fieldCode } = field;
 
     const {
-      issueId, objectVersionNumber, [code]: oldValue,
+      issueId, objectVersionNumber, [fieldCode]: oldValue,
     } = issue;
     if (oldValue !== newValue) {
       const obj = {
         issueId,
         objectVersionNumber,
-        [code]: newValue === '' ? null : newValue,
+        [fieldCode]: newValue === '' ? null : newValue,
       };
       updateIssue(obj)
         .then(() => {
@@ -67,7 +84,7 @@ const defaultList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
         });
     }
@@ -77,14 +94,14 @@ const defaultList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
     const { newValue } = this.state;
     const { store, field } = this.props;
     const issue = store.getIssue;
-    const { code, name } = field;
-    const { [code]: value } = issue;
+    const { fieldCode, fieldName } = field;
+    const { [fieldCode]: value } = issue;
 
     return (
       <div className="line-start mt-10">
         <div className="c7n-property-wrapper">
           <span className="c7n-property">
-            {`${name}：`}
+            {`${fieldName}：`}
           </span>
         </div>
         <div className="c7n-value-wrapper" style={{ width: 'auto' }}>
@@ -93,7 +110,7 @@ const defaultList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
           >
             <Text>
               <div>
-                {value ? `${value} ${code === 'storyPoint' ? '点' : '小时'}` : '无'}
+                {value ? `${value} ${fieldCode === 'storyPoints' ? '点' : '小时'}` : '无'}
               </div>
             </Text>
             <Edit>

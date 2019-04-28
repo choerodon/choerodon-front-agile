@@ -55,7 +55,7 @@ const { Text, Edit } = TextEditToggle;
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
         });
     }
@@ -76,16 +76,6 @@ const { Text, Edit } = TextEditToggle;
           </span>
         </div>
         <div className="c7n-value-wrapper">
-          {
-            closeSprint.length ? (
-              <div>
-                <span>已结束冲刺：</span>
-                <span>
-                  {_.map(closeSprint, 'sprintName').join(' , ')}
-                </span>
-              </div>
-            ) : null
-          }
           <TextEditToggle
             formKey="sprint"
             onSubmit={this.updateIssueSprint}
@@ -111,7 +101,7 @@ const { Text, Edit } = TextEditToggle;
                                 fontSize: '13px',
                                 lineHeight: '20px',
                                 display: 'inline-block',
-                                marginTop: 5,
+                                marginTop: closeSprint.length ? 5 : 0,
                               }}
                             >
                               {activeSprint.sprintName}

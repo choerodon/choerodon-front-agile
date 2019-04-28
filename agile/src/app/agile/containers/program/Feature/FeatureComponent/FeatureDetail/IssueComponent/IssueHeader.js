@@ -6,6 +6,7 @@ import {
 import IssueNumber from './IssueNumber';
 import { FieldStoryPoint, FieldText } from './IssueBody/Field';
 import { deleteIssue } from '../../../../../../api/NewIssueApi';
+import VisibleStore from '../../../../../../stores/common/visible/VisibleStore';
 import './IssueComponent.scss';
 
 const { confirm } = Modal;
@@ -54,23 +55,23 @@ const { confirm } = Modal;
     const { store } = this.props;
     const issue = store.getIssue;
     if (e.key === '0') {
-      store.setWorkLogShow(true);
+      VisibleStore.setWorkLogShow(true);
     } else if (e.key === '1') {
       this.handleDeleteIssue(issue.issueId);
     } else if (e.key === '2') {
-      store.setCreateSubTaskShow(true);
+      VisibleStore.setCreateSubTaskShow(true);
     } else if (e.key === '3') {
-      store.setCopyIssueShow(true);
+      VisibleStore.setCopyIssueShow(true);
     } else if (e.key === '4') {
-      store.setTransformSubIssueShow(true);
+      VisibleStore.setTransformSubIssueShow(true);
     } else if (e.key === '5') {
-      store.setTransformFromSubIssueShow(true);
+      VisibleStore.setTransformFromSubIssueShow(true);
     } else if (e.key === '6') {
-      store.setCreateBranchShow(true);
+      VisibleStore.setCreateBranchShow(true);
     } else if (e.key === '7') {
-      store.setAssigneeShow(true);
+      VisibleStore.setAssigneeShow(true);
     } else if (e.key === '8') {
-      store.setChangeParentShow(true);
+      VisibleStore.setChangeParentShow(true);
     }
   };
 
@@ -83,7 +84,7 @@ const { confirm } = Modal;
     const issue = store.getIssue;
     const {
       parentIssueId, typeCode, parentIssueNum, issueNum,
-      issueId, createdById,
+      issueId, createdBy,
     } = issue;
 
     const getMenu = () => (
@@ -91,7 +92,7 @@ const { confirm } = Modal;
         {
           <Menu.Item
             key="1"
-            disabled={loginUserId !== createdById && !hasPermission}
+            disabled={loginUserId !== createdBy && !hasPermission}
           >
             {'删除'}
           </Menu.Item>
@@ -141,7 +142,11 @@ const { confirm } = Modal;
             </div>
             {/* 主题 */}
             <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start', width: '360px' }}>
-              <FieldText {...this.props} showTitle={false} field={{ code: 'summary', name: '概要' }} />
+              <FieldText
+                {...this.props}
+                showTitle={false}
+                field={{ fieldCode: 'summary', fieldName: '概要', textStyle: { fontSize: 20, fontWeight: 500, width: '100%' } }}
+              />
               <div style={{ flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>
                 <Dropdown overlay={getMenu()} trigger={['click']}>
                   <Button icon="more_vert" />
@@ -151,16 +156,9 @@ const { confirm } = Modal;
             {/* 故事点 */}
             <div className="line-start">
               {
-                issueId && ['story', 'feature'].indexOf(typeCode) !== -1 ? (
+                issueId && typeCode === 'feature' ? (
                   <div style={{ display: 'flex', marginRight: 25 }}>
-                    <FieldStoryPoint {...this.props} field={{ code: 'storyPoints', name: '故事点' }} />
-                  </div>
-                ) : null
-              }
-              {
-                issueId && ['issue_epic'].indexOf(typeCode) !== -1 ? (
-                  <div style={{ display: 'flex' }}>
-                    <FieldStoryPoint {...this.props} field={{ code: 'estimateTime', name: '预估时间' }} />
+                    <FieldStoryPoint {...this.props} field={{ fieldCode: 'storyPoints', fieldName: '故事点' }} />
                   </div>
                 ) : null
               }

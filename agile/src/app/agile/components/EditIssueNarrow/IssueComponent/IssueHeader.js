@@ -4,7 +4,7 @@ import {
   Dropdown, Icon, Menu, Button, Modal,
 } from 'choerodon-ui';
 import IssueNumber from './IssueNumber';
-import { FieldStoryPoint, FieldText } from './IssueBody/Field';
+import { FieldStoryPoint, FieldSummary } from './IssueBody/Field';
 import { deleteIssue } from '../../../api/NewIssueApi';
 import './IssueComponent.scss';
 import VisibleStore from '../../../stores/common/visible/VisibleStore';
@@ -81,13 +81,13 @@ const { confirm } = Modal;
   render() {
     const {
       resetIssue, backUrl, onCancel, loginUserId, hasPermission,
-      store, AppState,
+      store, AppState, type = 'narrow', reloadIssue,
     } = this.props;
     const urlParams = AppState.currentMenuType;
     const issue = store.getIssue;
     const {
       parentIssueId, typeCode, parentIssueNum, issueNum,
-      issueId, createdById, subIssueDTOList = [],
+      issueId, createdBy, subIssueDTOList = [],
     } = issue;
 
     const getMenu = () => (
@@ -98,7 +98,7 @@ const { confirm } = Modal;
         {
           <Menu.Item
             key="1"
-            disabled={loginUserId !== createdById && !hasPermission}
+            disabled={loginUserId !== createdBy && !hasPermission}
           >
             {'删除'}
           </Menu.Item>
@@ -156,23 +156,20 @@ const { confirm } = Modal;
         <div className="c7n-header-editIssue">
           <div className="c7n-content-editIssue" style={{ overflowY: 'hidden' }}>
             <div
-              className="line-justify"
-              style={{
-                height: '28px',
-                alignItems: 'center',
-                marginTop: '10px',
-                marginBottom: '3px',
-              }}
+              className={`line-justify ${type === 'narrow' ? 'issue-header-narrow' : 'issue-header-wide'}`}
             >
               {/* 问题编号 */}
               <IssueNumber
                 parentIssueId={parentIssueId}
                 resetIssue={resetIssue}
+                reloadIssue={reloadIssue}
                 urlParams={urlParams}
                 backUrl={backUrl}
                 typeCode={typeCode}
                 parentIssueNum={parentIssueNum}
                 issueNum={issueNum}
+                issueId={issueId}
+                type={type}
               />
               {/* 隐藏 */}
               <div
@@ -189,8 +186,12 @@ const { confirm } = Modal;
               </div>
             </div>
             {/* 主题 */}
-            <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start' }}>
-              <FieldText {...this.props} showTitle={false} field={{ code: 'summary', name: '概要' }} />
+            <div className="line-justify" style={{ margin: '10px 0', alignItems: 'flex-start' }}>
+              <FieldSummary
+                {...this.props}
+                showTitle={false}
+                field={{ fieldCode: 'summary', fieldName: '概要' }}
+              />
               <div style={{ flexShrink: 0, color: 'rgba(0, 0, 0, 0.65)' }}>
                 <Dropdown overlay={getMenu()} trigger={['click']}>
                   <Button icon="more_vert" />
@@ -202,14 +203,14 @@ const { confirm } = Modal;
               {
                 issueId && ['story', 'feature'].indexOf(typeCode) !== -1 ? (
                   <div style={{ display: 'flex', marginRight: 25 }}>
-                    <FieldStoryPoint {...this.props} field={{ code: 'storyPoints', name: '故事点' }} />
+                    <FieldStoryPoint {...this.props} field={{ fieldCode: 'storyPoints', fieldName: '故事点' }} />
                   </div>
                 ) : null
               }
               {
                 issueId && ['issue_epic', 'feature'].indexOf(typeCode) === -1 ? (
                   <div style={{ display: 'flex' }}>
-                    <FieldStoryPoint {...this.props} field={{ code: 'estimateTime', name: '预估时间' }} />
+                    <FieldStoryPoint {...this.props} field={{ fieldCode: 'remainingTime', fieldName: '预估时间' }} />
                   </div>
                 ) : null
               }

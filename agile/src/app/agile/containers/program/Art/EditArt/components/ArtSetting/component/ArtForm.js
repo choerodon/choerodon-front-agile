@@ -79,6 +79,14 @@ class ArtForm extends Component {
     });
   }
 
+  checkPiCodePrefix = (rule, value, callback) => {
+    if (/^[a-z]*?$/i.test(value)) {
+      callback();
+    } else {
+      callback('前缀只允许字母');
+    }
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form;
     // eslint-disable-next-line no-shadow
@@ -103,7 +111,7 @@ class ArtForm extends Component {
                   required: true,
                   message: '请选择日期!',
                 }],
-                normalize: value => moment(value),
+                normalize: value => value && moment(value),
               })(
                 <DatePicker
                   allowClear={false}
@@ -121,10 +129,11 @@ class ArtForm extends Component {
                     required: true,
                     message: '请选择PI生成个数',
                   }],
+                  initialValue: 3,
                 })(
-                  <Select style={{ width: 500, marginBottom: 15 }} label="PI生成个数">
+                  <Select style={{ width: 500, marginBottom: 15 }} label="PI生成个数" disabled>
                     {
-                      [1, 2, 3, 4, 5, 6, 7, 8].map(value => <Option key={value} value={value}>{value}</Option>)
+                      [3, 4, 5, 6, 7, 8].map(value => <Option key={value} value={value}>{value}</Option>)
                     }
                   </Select>,
                 )
@@ -141,7 +150,7 @@ class ArtForm extends Component {
                 })(
                   <Select style={{ width: 180 }} label="迭代数" placeholder="请输入ART中每个PI的迭代数">
                     {
-                      [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
+                      [2, 3, 4].map(value => <Option value={value}>{value}</Option>)
                     }
                   </Select>,
 
@@ -155,20 +164,21 @@ class ArtForm extends Component {
                 })(
                   <Select style={{ width: 300 }} label="迭代时长（周）" placeholder="请选择每个迭代的工作周数">
                     {
-                  [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
-                }
+                      [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
+                    }
                   </Select>,
                 )}
               </FormItem>
             </div>
-           
+
             <FormItem>
               {getFieldDecorator('ipWeeks', {
                 rules: [{
-                  required: true, message: '请选择日期!',
+                  required: true, message: '请选择IP时长!',
                 }],
+                initialValue: 1,
               })(
-                <Select style={{ width: 500 }} label="IP时长（周）" placeholder="请选择IP时长">
+                <Select style={{ width: 500 }} label="IP时长（周）" placeholder="请选择IP时长" disabled>
                   {
                     [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
                   }
@@ -182,9 +192,11 @@ class ArtForm extends Component {
               {getFieldDecorator('piCodePrefix', {
                 rules: [{
                   required: true, message: '请输入PI前缀',
+                }, {
+                  validator: this.checkPiCodePrefix,
                 }],
               })(
-                <Input style={{ width: 500 }} label="PI前缀" placeholder="请输入PI前缀" />,
+                <Input style={{ width: 500 }} label="PI前缀" maxLength={10} placeholder="请输入PI前缀" />,
               )}
             </FormItem>
             <FormItem>
@@ -192,24 +204,24 @@ class ArtForm extends Component {
                 rules: [{
                   required: true, message: '请输入PI起始编号',
                 }],
-                normalize: value => (value ? value.toString().replace(/[^\d]/g, '') : value),
+                normalize: value => (value ? value.toString().replace(/[^\d]|^0/g, '') : value),
               })(
                 <Input style={{ width: 500 }} label="PI起始编号" maxLength={3} placeholder="请输入PI起始编号" />,
               )}
             </FormItem>
           </TabPane>
           {data.statusCode !== 'todo' && (
-          <TabPane tab="PI列表" key="4">
-            <PIList 
-              name={initValue.name}
-              data={data}
-              artId={initValue.id}
-              PiList={PiList}
-              onGetPIList={onGetPIList}
-              onGetArtInfo={onGetArtInfo}
-              onDeletePI={onDeletePI}
-            />
-          </TabPane>
+            <TabPane tab="PI列表" key="4">
+              <PIList
+                name={initValue.name}
+                data={data}
+                artId={initValue.id}
+                PiList={PiList}
+                onGetPIList={onGetPIList}
+                onGetArtInfo={onGetArtInfo}
+                onDeletePI={onDeletePI}
+              />
+            </TabPane>
           )}
         </Tabs>
         <Divider />

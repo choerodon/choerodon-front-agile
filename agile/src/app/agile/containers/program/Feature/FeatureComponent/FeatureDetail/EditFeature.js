@@ -6,7 +6,7 @@ import { withRouter } from 'react-router-dom';
 import { Spin } from 'choerodon-ui';
 import './EditFeature.scss';
 import {
-  loadDatalogs, loadLinkIssues, loadIssue, getFieldAndValue,
+  loadDatalogs, loadLinkIssues, loadIssue, getFieldAndValue, loadWikies,
 } from '../../../../../api/NewIssueApi';
 import CopyIssue from '../../../../../components/CopyIssue';
 import IssueSidebar from './IssueComponent/IssueSidebar';
@@ -75,24 +75,23 @@ let hasPermission;
         });
       });
       axios.all([
+        loadWikies(id),
         loadDatalogs(id),
         loadLinkIssues(id),
       ])
-        .then(axios.spread((dataLogs, linkIssues) => {
-          store.initIssueAttribute(dataLogs, linkIssues);
+        .then(axios.spread((wiki, dataLogs, linkIssues) => {
+          store.initIssueAttribute(wiki, dataLogs, linkIssues);
         }));
     });
   };
 
   handleCopyIssue = () => {
-    const { onUpdate, reloadIssue } = this.props;
+    const { onUpdate } = this.props;
     VisibleStore.setCopyIssueShow(false);
     if (onUpdate) {
       onUpdate();
     }
-    if (reloadIssue) {
-      reloadIssue();
-    }
+    this.loadIssueDetail();
   };
 
   render() {
@@ -102,6 +101,7 @@ let hasPermission;
       onCancel,
       style,
       onUpdate,
+      onDeleteIssue,
     } = this.props;
     const {
       issueLoading,
@@ -150,6 +150,7 @@ let hasPermission;
             loginUserId={loginUserId}
             hasPermission={hasPermission}
             onUpdate={onUpdate}
+            onDeleteIssue={onDeleteIssue}
           />
           <IssueBody
             store={store}
@@ -170,6 +171,7 @@ let hasPermission;
               visible={copyIssueShow}
               onCancel={() => VisibleStore.setCopyIssueShow(false)}
               onOk={this.handleCopyIssue.bind(this)}
+              applyType="program"
             />
           ) : null
         }

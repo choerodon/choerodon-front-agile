@@ -6,6 +6,7 @@ import {
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 import FeatureItem from './FeatureItem';
+import { getFeaturesInProject } from '../../../../../api/FeatureApi';
 import './Feature.scss';
 
 @observer
@@ -17,24 +18,25 @@ class Feature extends Component {
     };
   }
 
-  componentWillMount() {
-    this.epicRefresh();
+  componentDidMount() {    
+    this.featureRefresh();
   }
 
-  epicRefresh = () => {
-    Promise.all([BacklogStore.axiosGetEpic(), BacklogStore.axiosGetColorLookupValue()]).then(([epicList, lookupValues]) => {
-      BacklogStore.initEpicList(epicList, lookupValues);
+  featureRefresh = () => {
+    getFeaturesInProject().then((data) => {
+      BacklogStore.setFeatureData(data);
+    }).catch((error3) => {
     });
   };
 
   /**
-   *点击epicItem的事件
+   *点击featureItem的事件
    *
    * @param {*} type
-   * @memberof Epic
+   * @memberof 
    */
-  handleClickEpic =(type) => {
-    BacklogStore.setChosenEpic(type);
+  handleClickFeature = (type) => {
+    BacklogStore.setChosenFeature(type);
     BacklogStore.axiosGetSprint().then((res) => {
       BacklogStore.setSprintData(res);
     }).catch(() => {
@@ -72,7 +74,7 @@ class Feature extends Component {
               }}
               role="none"
               onClick={() => {
-                this.handleClickEpic('all');
+                this.handleClickFeature('all');
               }}
             >
               所有问题
@@ -85,7 +87,7 @@ class Feature extends Component {
                 BacklogStore.moveEpic(sourceIndex, destinationIndex);
               }}
             >
-              <Droppable droppableId="epic">
+              <Droppable droppableId="feature">
                 {(provided, snapshot) => (
                   <div
                     ref={provided.innerRef}
@@ -95,7 +97,7 @@ class Feature extends Component {
                     }}
                   >
                     <FeatureItem
-                      clickEpic={this.handleClickEpic}
+                      clickFeature={this.handleClickFeature}
                       draggableIds={draggableIds}
                       refresh={refresh}
                       issueRefresh={issueRefresh}
@@ -108,43 +110,43 @@ class Feature extends Component {
             <div
               className="c7n-backlog-epicItems-last"
               style={{
-                background: BacklogStore.getChosenEpic === 'unset' ? 'rgba(140, 158, 255, 0.08)' : '',
+                background: BacklogStore.getChosenFeature === 'unset' ? 'rgba(140, 158, 255, 0.08)' : '',
               }}
               role="none"
               onClick={() => {
-                this.handleClickEpic('unset');
+                this.handleClickFeature('unset');
               }}
-              onMouseEnter={(e) => {
-                if (BacklogStore.isDragging) {
-                  BacklogStore.toggleIssueDrag(true);
-                  e.currentTarget.style.border = '2px dashed green';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (BacklogStore.isDragging) {
-                  BacklogStore.toggleIssueDrag(false);
-                  e.currentTarget.style.border = 'none';
-                }
-              }}
-              onMouseUp={(e) => {
-                if (BacklogStore.getIsDragging) {
-                  BacklogStore.toggleIssueDrag(false);
-                  e.currentTarget.style.border = 'none';
-                  BacklogStore.axiosUpdateIssuesToEpic(
-                    0, BacklogStore.getIssueWithEpicOrVersion,
-                  ).then(() => {
-                    issueRefresh();
-                    refresh();
-                  }).catch(() => {
-                    issueRefresh();
-                    refresh();
-                  });
-                }
-              }}
+            // onMouseEnter={(e) => {
+            //   if (BacklogStore.isDragging) {
+            //     BacklogStore.toggleIssueDrag(true);
+            //     e.currentTarget.style.border = '2px dashed green';
+            //   }
+            // }}
+            // onMouseLeave={(e) => {
+            //   if (BacklogStore.isDragging) {
+            //     BacklogStore.toggleIssueDrag(false);
+            //     e.currentTarget.style.border = 'none';
+            //   }
+            // }}
+            // onMouseUp={(e) => {
+            //   if (BacklogStore.getIsDragging) {
+            //     BacklogStore.toggleIssueDrag(false);
+            //     e.currentTarget.style.border = 'none';
+            //     BacklogStore.axiosUpdateIssuesToEpic(
+            //       0, BacklogStore.getIssueWithEpicOrVersion,
+            //     ).then(() => {
+            //       issueRefresh();
+            //       refresh();
+            //     }).catch(() => {
+            //       issueRefresh();
+            //       refresh();
+            //     });
+            //   }
+            // }}
             >
-              未指定史诗的问题
+              未指定特性的问题
             </div>
-          </div>         
+          </div>
         </div>
       </div>
     ) : null;

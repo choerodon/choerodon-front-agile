@@ -68,7 +68,7 @@ class SprintCommonStore {
   }
 
   @computed get getWorkLogs() {
-    return this.workLogs;
+    return this.workLogs.slice();
   }
 
   @action setDataLogs(data) {
@@ -770,6 +770,7 @@ class SprintCommonStore {
       epic: [],
       label: [],
       version: [],
+      issueIds: [],
     }, [], {
       summary: '',
       issueNum: '',
@@ -831,7 +832,7 @@ class SprintCommonStore {
     const filterAdvancedSearchArgs = _.pick(filter.advancedSearchArgs, ['issueTypeId', 'priorityId', 'statusId']);
     const filterAssigneeFilterIds = filter.assigneeFilterIds || [];
     const filterOtherAssignee = filter.otherArgs.assigneeId || [];
-    const filterSearchArgs = _.pick(filter.searchArgs, ['issueNum', 'summary', 'reporter', 'component', 'epic', 'version', 'sprint', 'label']);
+    const filterSearchArgs = _.pick(filter.searchArgs, ['issueNum', 'summary', 'reporter', 'component', 'epic', 'version', 'sprint', 'label', 'createStartDate', 'createEndDate']);
     const filterOtherArgs = _.pick(filter.otherArgs, ['component', 'epic', 'version', 'sprint', 'label']);
     const filterContents = filter.contents || [];
     const filterCreateStartDate = filter.searchArgs.createStartDate;

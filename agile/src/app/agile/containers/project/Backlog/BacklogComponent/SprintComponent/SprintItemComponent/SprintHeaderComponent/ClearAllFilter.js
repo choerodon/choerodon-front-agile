@@ -2,15 +2,13 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import classnames from 'classnames';
 import BacklogStore from '../../../../../../../stores/project/backlog/BacklogStore';
+import { QuickSearchEvent } from '../../../../../../../components/QuickSearch';
 
 @inject('AppState', 'HeaderStore')
 @observer class ClearAllFilter extends Component {
   clearFilter(e) {
     e.stopPropagation();
-    BacklogStore.hideQuickSearch();
-    setTimeout(() => {
-      BacklogStore.showQuickSearch();
-    }, 10);
+    QuickSearchEvent.emit('clearQuickSearchSelect');
     BacklogStore.clearSprintFilter();
   }
 

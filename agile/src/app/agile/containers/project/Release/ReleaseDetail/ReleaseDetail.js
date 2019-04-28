@@ -335,22 +335,30 @@ class ReleaseDetail extends Component {
       },
       {
         width: '15%',
+        title: '模块',
+        dataIndex: 'issueComponentBriefDTOS',
+        key: 'issueComponentBriefDTOS',
+        render: (text, record) => (
+          <Tooltip mouseEnterDelay={0.5} title={`模块：${_.map(record.issueComponentBriefDTOS, 'name').join(',')}`}>
+            <span className="textDisplayOneColumn" style={{ minWidth: 100 }}>{_.map(record.issueComponentBriefDTOS, 'name').join(',')}</span>
+          </Tooltip>
+        ),
+        hidden: true,
+      },
+      {
+        width: '15%',
         title: '经办人',
         dataIndex: 'assigneeName',
         key: 'assigneeName',
         render: (text, record) => (text ? (
-          <Tooltip mouseEnterDelay={0.5} title={`经办人： ${text}`}>
-            <div>
-              <UserHead
-                user={{
-                  id: record.assigneeId,
-                  loginName: '',
-                  realName: text,
-                  avatar: record.assigneeImageUrl,
-                }}
-              />
-            </div>
-          </Tooltip>
+          <UserHead
+            user={{
+              id: record.assigneeId,
+              loginName: record.assigneeLoginName,
+              realName: record.assigneeRealName,
+              avatar: record.assigneeImageUrl,
+            }}
+          />
 
         ) : ''),
         filters: filterMap.get('assigneeName'),
@@ -400,7 +408,7 @@ class ReleaseDetail extends Component {
                 {`版本 ${ReleaseStore.getVersionDetail.name}`}
               </div>
             </Tooltip>
-)}
+          )}
           backPath={`/agile/release?type=${urlParams.type}&id=${urlParams.id}&name=${encodeURIComponent(urlParams.name)}&organizationId=${urlParams.organizationId}`}
         >
 

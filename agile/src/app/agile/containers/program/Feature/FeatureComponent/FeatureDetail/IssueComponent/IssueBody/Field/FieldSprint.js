@@ -55,7 +55,7 @@ const { Text, Edit } = TextEditToggle;
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
         });
     }
@@ -111,7 +111,7 @@ const { Text, Edit } = TextEditToggle;
                                 fontSize: '13px',
                                 lineHeight: '20px',
                                 display: 'inline-block',
-                                marginTop: 5,
+                                marginTop: closeSprint.length ? 5 : 0,
                               }}
                             >
                               {activeSprint.sprintName}

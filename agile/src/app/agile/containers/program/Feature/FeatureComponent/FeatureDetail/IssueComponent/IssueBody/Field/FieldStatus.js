@@ -25,6 +25,10 @@ const { Text, Edit } = TextEditToggle;
     this.loadIssueStatus();
   }
 
+  componentWillReceiveProps() {
+    this.loadIssueStatus();
+  }
+
   loadIssueStatus = () => {
     const { store } = this.props;
     const issue = store.getIssue;
@@ -32,13 +36,21 @@ const { Text, Edit } = TextEditToggle;
       issueTypeDTO = {},
       issueId,
       statusId,
+      activePi = {},
     } = issue;
     const typeId = issueTypeDTO.id;
     loadStatus(statusId, issueId, typeId, 'program').then((res) => {
-      this.setState({
-        originStatus: res,
-        selectLoading: false,
-      });
+      if (activePi && activePi.id) {
+        this.setState({
+          originStatus: res,
+          selectLoading: false,
+        });
+      } else {
+        this.setState({
+          originStatus: res.filter(item => item.statusDTO && ['prepare', 'todo'].indexOf(item.statusDTO.type) !== -1),
+          selectLoading: false,
+        });
+      }
     });
   };
 
@@ -54,7 +66,7 @@ const { Text, Edit } = TextEditToggle;
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
           this.setState({
             transformId: undefined,

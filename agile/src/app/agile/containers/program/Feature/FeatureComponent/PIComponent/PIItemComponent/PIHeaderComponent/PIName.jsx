@@ -15,7 +15,7 @@ import EasyEdit from '../../../../../../../components/EasyEdit/EasyEdit';
       expand, piName, toggleSprint,
     } = this.props;
     return (
-      <div className="c7n-backlog-sprintName">
+      <div className="c7n-feature-sprintName">
         <Icon
           style={{ fontSize: 20, cursor: 'pointer' }}
           type={expand ? 'baseline-arrow_drop_down' : 'baseline-arrow_right'}

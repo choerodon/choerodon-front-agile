@@ -57,9 +57,9 @@ import '../PI.scss';
     } = this.state;
 
     return (
-      <div className="c7n-backlog-sprintTop">
-        <div className="c7n-backlog-springTitle">
-          <div className="c7n-backlog-sprintTitleSide" style={{ flex: 1 }}>
+      <div className="c7n-feature-sprintTop">
+        <div className="c7n-feature-springTitle">
+          <div className="c7n-feature-sprintTitleSide" style={{ flex: 1 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <SprintName
                 type="sprint"
@@ -71,10 +71,14 @@ import '../PI.scss';
               <SprintVisibleIssue
                 issueCount={issueCount}
               />
-              <PILastDays
-                startDate={startDate}
-                endDate={endDate}
-              />
+              {data.statusCode === 'doing'
+                ? (
+                  <PILastDays
+                    startDate={startDate}
+                    endDate={endDate}
+                  />
+                ) : null
+              }
             </div>
           </div>
           <div style={{ flex: 9 }}>
@@ -90,7 +94,7 @@ import '../PI.scss';
           </div>
         </div>
         <div
-          className="c7n-backlog-sprintGoal"
+          className="c7n-feature-sprintGoal"
           style={{
             display: 'flex',
           }}

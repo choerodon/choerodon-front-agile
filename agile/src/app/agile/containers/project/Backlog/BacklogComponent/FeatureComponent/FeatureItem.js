@@ -7,68 +7,68 @@ import {
 } from 'choerodon-ui';
 import _ from 'lodash';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
-import DraggableEpic from './DraggableEpic';
+import DraggableFeature from './DraggableFeature';
 
 const { AppState } = stores;
 // @inject('AppState')
 @observer
 class FeatureItem extends Component {
   /**
-   *点击epicItem的事件
+   *点击featureItem的事件
    *
    * @param {*} type
-   * @memberof Epic
+   * @memberof 
    */
-  handleClickEpic = (type) => {
-    const { clickEpic } = this.props;
-    clickEpic(type);
+  handleClickFeature = (type) => {
+    const { clickFeature } = this.props;
+    clickFeature(type);
   };
 
   render() {
     const { issueRefresh, refresh } = this.props;
     return (
-      BacklogStore.getEpicData.map((item, index) => (
+      BacklogStore.getFeatureData.map((item, index) => (
         <div
           role="none"
-          onMouseEnter={(e) => {
-            if (BacklogStore.isDragging) {
-              BacklogStore.toggleIssueDrag(true);
-              e.currentTarget.style.border = '2px dashed green';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (BacklogStore.isDragging) {
-              BacklogStore.toggleIssueDrag(false);
-              e.currentTarget.style.border = 'none';
-            }
-          }}
-          onMouseUp={(e) => {
-            if (BacklogStore.getIsDragging) {
-              BacklogStore.toggleIssueDrag(false);
-              e.currentTarget.style.border = 'none';
-              BacklogStore.axiosUpdateIssuesToEpic(
-                item.issueId, BacklogStore.getIssueWithEpicOrVersion,
-              ).then((res) => {
-                issueRefresh();
-                refresh();
-              }).catch((error) => {
-                issueRefresh();
-                refresh();
-              });
-            }
-          }}
+          // onMouseEnter={(e) => {
+          //   if (BacklogStore.isDragging) {
+          //     BacklogStore.toggleIssueDrag(true);
+          //     e.currentTarget.style.border = '2px dashed green';
+          //   }
+          // }}
+          // onMouseLeave={(e) => {
+          //   if (BacklogStore.isDragging) {
+          //     BacklogStore.toggleIssueDrag(false);
+          //     e.currentTarget.style.border = 'none';
+          //   }
+          // }}
+          // onMouseUp={(e) => {
+          //   if (BacklogStore.getIsDragging) {
+          //     BacklogStore.toggleIssueDrag(false);
+          //     e.currentTarget.style.border = 'none';
+          //     BacklogStore.axiosUpdateIssuesToFeature(
+          //       item.issueId, BacklogStore.getIssueWithFeatureOrVersion,
+          //     ).then((res) => {
+          //       issueRefresh();
+          //       refresh();
+          //     }).catch((error) => {
+          //       issueRefresh();
+          //       refresh();
+          //     });
+          //   }
+          // }}
           onClick={(e) => {
-            this.handleClickEpic(item.issueId);
+            this.handleClickFeature(item.issueId);
           }}
         >
-          <Draggable draggableId={`epicItem-${index}`} key={item.issueId} index={index}>
+          <Draggable isDragDisabled draggableId={`epicItem-${index}`} key={item.issueId} index={index}>
             {(draggableProvided, draggableSnapshot) => (
-              <DraggableEpic
+              <DraggableFeature
                 item={item}
                 refresh={refresh}
                 draggableProvided={draggableProvided}
                 draggableSnapshot={draggableSnapshot}
-                handleClickEpic={this.handleClickEpic}
+                handleClickFeature={this.handleClickFeature}
               />
             )}
           </Draggable>

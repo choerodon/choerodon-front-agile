@@ -1,4 +1,4 @@
-.c7n-backlog-sprintTop {
+.c7n-feature-sprintTop {
   .ant-select-arrow {
     bottom: unset;
   }
@@ -10,19 +10,19 @@
   background: #fff;
   padding: 8px 0;
 
-  .c7n-backlog-sprintName {
+  .c7n-feature-sprintName {
     flex-wrap: wrap;
     font-size: 13px;
     line-height: 20px;
     display: flex;
   }
 
-  .c7n-backlog-springTitle {
+  .c7n-feature-springTitle {
     display: flex;
     margin-right: 20px;
     flex-wrap: wrap;
 
-    .c7n-backlog-sprintTitleSide {
+    .c7n-feature-sprintTitleSide {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -30,7 +30,7 @@
       p {
         margin-bottom: 0;
       }
-      .c7n-backlog-sprintName {
+      .c7n-feature-sprintName {
         font-size: 13px;
         line-height: 20px;
         display: flex;
@@ -38,7 +38,7 @@
         flex-wrap: nowrap;
       }
 
-      .c7n-backlog-sprintQuestion {
+      .c7n-feature-sprintQuestion {
         font-size: 13px;
         color: rgba(0, 0, 0, 0.65);
         line-height: 20px;
@@ -50,7 +50,7 @@
         display: none;
       }
 
-      .c7n-backlog-sprintStatus {
+      .c7n-feature-sprintStatus {
         font-size: 13px;
         color: #00bfa5;
         margin-left: 22px;
@@ -61,7 +61,7 @@
         line-height: 21px;
       }
 
-      .c7n-backlog-sprintStatus2 {
+      .c7n-feature-sprintStatus2 {
         font-size: 13px;
         color: white;
         margin-left: 22px;
@@ -72,18 +72,18 @@
         line-height: 21px;
       }
 
-      .c7n-backlog-closeSprint {
+      .c7n-feature-closeSprint {
         font-size: 13px;
         color: #3f51b5;
         line-height: 20px;
         cursor: pointer;
         white-space: nowrap;
       }
-      .c7n-backlog-canCloseSprint {
+      .c7n-feature-canCloseSprint {
         color: rgba(0, 0, 0, 0.26);
         cursor: not-allowed;
       }
-      .c7n-backlog-openSprint {
+      .c7n-feature-openSprint {
         font-size: 13px;
         line-height: 20px;
         white-space: nowrap;
@@ -91,13 +91,13 @@
     }
   }
 
-  .c7n-backlog-sprintDes {
+  .c7n-feature-sprintDes {
     margin: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: end;
 
-    .c7n-backlog-sprintIcon {
+    .c7n-feature-sprintIcon {
       width: 20px;
       height: 20px;
       background: rgba(140, 158, 255, 0.2);
@@ -107,23 +107,23 @@
       align-items: center;
     }
 
-    .c7n-backlog-sprintIcon:not(:first-child) {
+    .c7n-feature-sprintIcon:not(:first-child) {
       margin-left: 8px;
     }
 
-    .c7n-backlog-sprintData {
+    .c7n-feature-sprintData {
       font-size: 13px;
       color: rgba(0, 0, 0, 0.65);
       line-height: 20px;
       margin-left: 24px;
 
-      .c7n-backlog-sprintDataItem {
+      .c7n-feature-sprintDataItem {
         cursor: pointer;
       }
     }
   }
 
-  .c7n-backlog-sprintGoal {
+  .c7n-feature-sprintGoal {
     font-size: 13px;
     color: rgba(0, 0, 0, 0.65);
     line-height: 20px;
@@ -134,7 +134,7 @@
     margin: 5px 20px 0 20px;
   }
 
-  .c7n-backlog-sprintGoalSide {
+  .c7n-feature-sprintGoalSide {
     div {
       min-width: 30px;
       height: 20px;
@@ -152,8 +152,8 @@
   }
 }
 
-.c7n-backlog-sprintIssue {
-  .c7n-backlog-sprintIssueItem {
+.c7n-feature-sprintIssue {
+  .c7n-feature-sprintIssueItem {
     user-select: none;
     background: #fff;
     padding: 10px 20px;
@@ -167,7 +167,7 @@
   .issue-selected {
     background: #eff2f9;
   }
-  .c7n-backlog-sprintCount {
+  .c7n-feature-sprintCount {
     width: 20px;
     height: 20px;
     line-height: 20px;
@@ -182,7 +182,7 @@
     top: 0;
   }
 
-  .c7n-backlog-sprintIssueSide {
+  .c7n-feature-sprintIssueSide {
     // flex: 1;
     display: flex;
     align-items: center;
@@ -192,7 +192,7 @@
       //flex: 1;
       margin-bottom: 0 !important;
     }
-    .c7n-backlog-sprintSideRightItems {
+    .c7n-feature-sprintSideRightItems {
       display: flex;
       align-items: center;
       // margin-top: 6px;
@@ -203,7 +203,7 @@
       display: none;
     }
 
-    .c7n-backlog-sprintIssueRight {
+    .c7n-feature-sprintIssueRight {
       color: white;
       text-align: center;
       // width: 16.6%;
@@ -214,24 +214,24 @@
       height: 20px;
       border-radius: 2px;
 
-      .c7n-backlog-sprintIssuePriority {
+      .c7n-feature-sprintIssuePriority {
         border-radius: 2px;
         padding: 1px 4px;
       }
 
-      .c7n-backlog-sprintIssueVersion {
+      .c7n-feature-sprintIssueVersion {
         // border: 1px solid rgba(0, 0, 0, 0.36);
         // border-radius: 2px;
         color: rgba(0, 0, 0, 0.36);
         white-space: nowrap;
       }
 
-      .c7n-backlog-sprintIssueEpic {
+      .c7n-feature-sprintIssueEpic {
         border-radius: 2px;
         white-space: nowrap;
       }
 
-      .c7n-backlog-sprintIssueStoryPoint {
+      .c7n-feature-sprintIssueStoryPoint {
         padding: 0 2px;
         min-width: 20px;
         height: 20px;
@@ -243,7 +243,7 @@
         color: rgba(0, 0, 0, 0.65);
       }
 
-      .c7n-backlog-sprintPeople {
+      .c7n-feature-sprintPeople {
         display: inline-block;
         width: 20px;
         height: 20px;
@@ -252,14 +252,14 @@
         flex-shrink: 0;
       }
 
-      .c7n-backlog-sprintIssueStatus {
+      .c7n-feature-sprintIssueStatus {
         border-radius: 2px;
         color: white;
         padding: 1px 6px;
       }
     }
 
-    .c7n-backlog-createIssue {
+    .c7n-feature-createIssue {
       font-size: 13px;
       color: #3f51b5;
       line-height: 20px;
@@ -267,18 +267,13 @@
   }
 }
 
-.c7n-backlog-sprintIssueHover:hover {
+.c7n-feature-sprintIssueHover:hover {
   background: #e9e9e9;
 }
 
 .ant-select .ant-select-underline {
   //display: none;
 }
-
-.ant-input-length-info {
-  display: none;
-}
-
 .c7n-sign {
   display: inline-block;
   width: 20px;
@@ -291,7 +286,7 @@
   line-height: 16px;
 }
 
-.c7n-backlog-sprintType {
+.c7n-feature-sprintType {
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -304,7 +299,7 @@
   }
 }
 
-.c7n-backlog-issueSideBorder {
+.c7n-feature-issueSideBorder {
   width: 2px;
   height: 100%;
   position: absolute;

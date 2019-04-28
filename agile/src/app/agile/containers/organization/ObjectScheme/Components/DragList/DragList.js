@@ -14,6 +14,7 @@ class DragList extends Component {
       addItemVisible: false,
       tempKey: false,
       value: '',
+      code: '',
       saveDisabled: true,
     };
   }
@@ -85,6 +86,7 @@ class DragList extends Component {
   addItem = () => {
     this.setState({
       addItemVisible: true,
+      tempKey: false,
     }, () => {
       const input = document.getElementById('dragList-input');
       if (input) {
@@ -94,8 +96,13 @@ class DragList extends Component {
   };
 
   editItem = (tempKey) => {
+    const { data } = this.props;
+    const editItem = data.filter(item => item.tempKey === tempKey || item.id === tempKey);
     this.setState({
       tempKey,
+      addItemVisible: false,
+      code: (editItem && editItem[0].code) || '',
+      value: (editItem && editItem[0].value) || '',
     }, () => {
       const input = document.getElementById('dragList-input');
       if (input) {
@@ -106,17 +113,24 @@ class DragList extends Component {
 
   edit = (tempKey) => {
     const { data, onEdit, onChange } = this.props;
-    const { value } = this.state;
-    if (_.find(data, { value })) {
+    const { code, value } = this.state;
+    if (data.filter(item => item.tempKey !== tempKey && item.id !== tempKey && item.value === value).length) {
       Choerodon.prompt('字段值不能重复！');
+    } else if (data.filter(item => item.tempKey !== tempKey && item.id !== tempKey && item.code === code).length) {
+      Choerodon.prompt('字段编码不能重复！');
     } else {
       if (onEdit) {
-        onEdit(tempKey, value);
+        onEdit(tempKey, code, value);
       }
       if (onChange) {
         const updatedData = data.map((d) => {
           if (d.tempKey === tempKey || d.id === tempKey) {
-            return { ...d, value, status: d.id ? 'update' : 'add' };
+            return {
+              ...d,
+              code,
+              value,
+              status: d.id ? 'update' : 'add',
+            };
           } else {
             return d;
           }
@@ -165,12 +179,14 @@ class DragList extends Component {
 
   create = () => {
     const { onCreate, data } = this.props;
-    const { value } = this.state;
+    const { code, value } = this.state;
     if (_.find(data, { value })) {
       Choerodon.prompt('字段值不能重复！');
+    } else if (_.find(data, { code })) {
+      Choerodon.prompt('字段编码不能重复！');
     } else {
       if (onCreate) {
-        onCreate(value);
+        onCreate(code, value);
       }
       this.cancel();
     }
@@ -194,13 +210,15 @@ class DragList extends Component {
       saveDisabled: true,
       tempKey: false,
       value: '',
+      code: '',
     });
   };
 
-  onInputChange = (e) => {
+  onValueChange = (e) => {
+    const { code } = this.state;
     if (e.target.value) {
       this.setState({
-        saveDisabled: false,
+        saveDisabled: !code,
         value: e.target.value,
       });
     } else {
@@ -211,26 +229,46 @@ class DragList extends Component {
     }
   };
 
+  onCodeChange = (e) => {
+    const { value } = this.state;
+    if (e.target.value) {
+      this.setState({
+        saveDisabled: !value,
+        code: e.target.value,
+      });
+    } else {
+      this.setState({
+        saveDisabled: true,
+        code: '',
+      });
+    }
+  };
+
   render() {
     const {
-      data, title, tips, intl,
+      data, tips, intl,
     } = this.props;
     const { addItemVisible, tempKey, saveDisabled } = this.state;
 
     return (
-      <div>
+      <div className="issue-dragList">
         <div className="issue-dragList-des">
           {tips}
         </div>
         <DragDropContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}>
           <div className="issue-dragList-content">
             <Card
-              title="值"
+              title={(
+                <span>
+                  <span style={{ display: 'inline-block', width: '34%' }}>值</span>
+                  <span>显示值</span>
+                </span>
+              )}
               bordered={false}
               className="issue-dragList-card"
             >
               <Droppable droppableId="droppable">
-                {(provided, snapshot) => (
+                {provided => (
                   <div
                     ref={provided.innerRef}
                     className="issue-issueTypeDrag-drop"
@@ -257,11 +295,22 @@ class DragList extends Component {
                                 <Fragment>
                                   <span className="issue-dragList-input">
                                     <Input
-                                      id="dragList-input"
+                                      id="dragList-code"
+                                      defaultValue={item.code}
+                                      onChange={this.onCodeChange}
+                                      underline={false}
+                                      placeholder={intl.formatMessage({ id: 'dragList.placeholder.code' })}
+                                      maxLength={10}
+                                    />
+                                  </span>
+                                  <span className="issue-dragList-input">
+                                    <Input
+                                      id="dragList-value"
                                       defaultValue={item.value}
-                                      onChange={this.onInputChange}
+                                      onChange={this.onValueChange}
                                       underline={false}
                                       placeholder={intl.formatMessage({ id: 'dragList.placeholder' })}
+                                      maxLength={10}
                                     />
                                   </span>
                                   <Button
@@ -285,6 +334,7 @@ class DragList extends Component {
                               )
                               : (
                                 <Fragment>
+                                  <span className="issue-dragList-text">{item.code}</span>
                                   <span className="issue-dragList-text">{item.value}</span>
                                   <div className="issue-dragList-operate">
                                     <Tooltip
@@ -328,7 +378,7 @@ class DragList extends Component {
                                     >
                                       <Popconfirm
                                         placement="top"
-                                        title={`确认要删除 ${item.value} 吗？`}
+                                        title={`确认要删除 ${item.value} 吗？问题上该字段值也会被清空。`}
                                         onConfirm={() => this.remove(item.tempKey || item.id)}
                                         okText="删除"
                                         cancelText="取消"
@@ -351,10 +401,20 @@ class DragList extends Component {
                         <div className="issue-dragList-addItem">
                           <span className="issue-dragList-input">
                             <Input
-                              id="dragList-input"
-                              onChange={this.onInputChange}
+                              id="dragList-code"
+                              onChange={this.onCodeChange}
+                              underline={false}
+                              placeholder={intl.formatMessage({ id: 'dragList.placeholder.code' })}
+                              maxLength={10}
+                            />
+                          </span>
+                          <span className="issue-dragList-input">
+                            <Input
+                              id="dragList-value"
+                              onChange={this.onValueChange}
                               underline={false}
                               placeholder={intl.formatMessage({ id: 'dragList.placeholder' })}
+                              maxLength={10}
                             />
                           </span>
                           <Button

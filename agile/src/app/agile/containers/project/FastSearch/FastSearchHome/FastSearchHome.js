@@ -24,11 +24,6 @@ class Search extends Component {
       currentFilterId: undefined,
       filter: {},
       loading: false,
-      pagination: {
-        page: 0,
-        size: 10,
-        total: undefined,
-      },
       barFilters: [],
       filterName: '',
     };
@@ -75,7 +70,7 @@ class Search extends Component {
           filterName: '',
         }).then((res) => {
           this.setState({
-            filters: res.content,
+            filters: res,
           });
         });
       })
@@ -86,16 +81,18 @@ class Search extends Component {
           filterName: '',
         }).then((ress) => {
           this.setState({
-            filters: ress.content,
+            filters: ress,
           });
         });
       });
   };
 
-  showFilter(record) {
+  handleTableChange = (pagination, filters, sorter, barFilters) => {
     this.setState({
-      editFilterShow: true,
-      currentFilterId: record.filterId,
+      filterName: filters.name && filters.name[0],
+      barFilters,
+    }, () => {
+      this.loadFilters();
     });
   }
 
@@ -115,33 +112,31 @@ class Search extends Component {
     this.setState({
       loading: true,
     });
-    axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/query_all?page=${page}&size=${size}`, {
+    axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/query_all`, {
       contents: barFilters,
       filterName,
     })
       .then((res) => {
         this.setState({
-          filters: res.content,
+          filters: res,
           loading: false,
         });
       })
       .catch((error) => {});
   }
 
-  handleTableChange = (pagination, filters, sorter, barFilters) => {
+
+  showFilter(record) {
     this.setState({
-      pagination,
-      filterName: filters.name && filters.name[0],
-      barFilters,
-    }, () => {
-      this.loadFilters();
+      editFilterShow: true,
+      currentFilterId: record.filterId,
     });
   }
 
   render() {
     const {
       loading, filters, createFileterShow, editFilterShow,
-      deleteFilterShow, filter, currentFilterId, pagination,
+      deleteFilterShow, filter, currentFilterId, 
     } = this.state;
     const column = [
       {
@@ -278,8 +273,7 @@ class Search extends Component {
           <div>
             <Spin spinning={loading}>
               <SortTable
-                onChange={this.handleTableChange}
-                pagination={pagination}
+                onChange={this.handleTableChange}             
                 handleDrag={this.handleDrag}
                 rowKey={record => record.filterId}
                 columns={column}

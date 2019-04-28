@@ -61,7 +61,7 @@ class ObjectSchemeStore {
 
   @action updateSchemeDetail(field) {
     this.schemeDetail.content = this.schemeDetail.content.map((item) => {
-      if (field.fieldId === item.fieldId) {
+      if (field.id === item.id) {
         return {
           ...item,
           objectVersionNumber: field.objectVersionNumber,
@@ -114,9 +114,9 @@ class ObjectSchemeStore {
 
   deleteField = fieldId => axios.delete(`${this.apiGetway}/object_scheme_field/${fieldId}?organizationId=${this.orgId}`);
 
-  checkName = name => axios.get(`${this.apiGetway}/object_scheme_field/check_name?name=${name}&organizationId=${this.orgId}`);
+  checkName = (name, schemeCode) => axios.get(`${this.apiGetway}/object_scheme_field/check_name?name=${name}&organizationId=${this.orgId}&schemeCode=${schemeCode}`);
 
-  checkCode = code => axios.get(`${this.apiGetway}/object_scheme_field/check_code?code=${code}&organizationId=${this.orgId}`);
+  checkCode = (code, schemeCode) => axios.get(`${this.apiGetway}/object_scheme_field/check_code?code=${code}&organizationId=${this.orgId}&schemeCode=${schemeCode}`);
 
   updateField = (fieldId, field) => axios.put(
     `${this.apiGetway}/object_scheme_field/${fieldId}?organizationId=${this.orgId}`, field,
@@ -124,7 +124,7 @@ class ObjectSchemeStore {
     if (data && !data.failed) {
       this.updateSchemeDetail(data);
     } else {
-      Choerodon.prompt(data.message);
+      Choerodon.prompt('请刷新后重试！');
     }
   });
 }

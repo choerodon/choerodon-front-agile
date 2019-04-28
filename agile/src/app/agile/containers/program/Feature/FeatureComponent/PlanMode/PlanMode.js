@@ -21,6 +21,7 @@ class PlanMode extends Component {
   componentWillUnmount() {
     FeatureStore.setEpicVisible(false);
     FeatureStore.setClickIssueDetail({});
+    FeatureStore.clearMultiSelected();
   }
 
   refresh = () => {
@@ -44,9 +45,14 @@ class PlanMode extends Component {
   };
 
   handleMove = (statusType, statusList, ...otherArgs) => {
+    const { issueRefresh } = this.props;
     let statusId = statusList[0] && statusList[0].id;
     if (statusList.length === 1) {
-      FeatureStore.moveSingleIssue(...otherArgs, statusId, statusType);
+      FeatureStore.moveSingleIssue(...otherArgs, statusId, statusType).then(() => {
+        if (issueRefresh) {
+          issueRefresh();
+        }
+      });
     } else {
       const options = statusList.map(status => <Option value={status.id}>{status.name}</Option>);
       const content = (
@@ -64,14 +70,19 @@ class PlanMode extends Component {
         title: '将特性状态置为',
         content,
         onOk: () => {
-          FeatureStore.moveSingleIssue(...otherArgs, statusId, statusType);
+          FeatureStore.moveSingleIssue(...otherArgs, statusId, statusType).then(() => {
+            if (issueRefresh) {
+              issueRefresh();
+            }
+          });
         },
       });
     }
-  }
+  };
 
 
   handleDragEnd = (result) => {
+    const { issueRefresh } = this.props;
     FeatureStore.setIsDragging(null);
     const { destination, source, draggableId } = result;
     if (destination) {
@@ -94,7 +105,11 @@ class PlanMode extends Component {
         const type = FeatureStore.getMultiSelected.size > 1 && !FeatureStore.getMultiSelected.has(destinationItem) ? 'multi' : 'single';
         // 相同pi不做状态转换判断
         if (sourceId === destinationId) {
-          FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type);
+          FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type).then(() => {
+            if (issueRefresh) {
+              issueRefresh();
+            }
+          });
         } else {
           // 判断目标pi和当前pi的状态
           const sourcePI = FeatureStore.getPIById(sourceId);
@@ -116,7 +131,11 @@ class PlanMode extends Component {
               const todoStatusList = FeatureStore.getTodoStatusList;
               this.handleMove('todo', todoStatusList, destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type);
             } else {
-              FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type);
+              FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type).then(() => {
+                if (issueRefresh) {
+                  issueRefresh();
+                }
+              });
             }
           } else if (!isSourceDoing && !isDestinationDoing) {
             // 从pi拖到准备
@@ -126,10 +145,18 @@ class PlanMode extends Component {
                 const prepareStatusList = FeatureStore.getPrepareStatusList;
                 this.handleMove('prepare', prepareStatusList, destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type);
               } else {
-                FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type);
+                FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type).then(() => {
+                  if (issueRefresh) {
+                    issueRefresh();
+                  }
+                });
               }
             } else {
-              FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type);
+              FeatureStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, type).then(() => {
+                if (issueRefresh) {
+                  issueRefresh();
+                }
+              });
             }
           }          
         }
@@ -138,10 +165,10 @@ class PlanMode extends Component {
   }
 
   render() {
-    const { issueRefresh } = this.props;
+    const { issueRefresh, display } = this.props;
     return (
       <Fragment>
-        <div className="c7n-backlog-side">
+        <div className="c7n-feature-side">
           <p
             style={{
               marginTop: 12,
@@ -163,7 +190,7 @@ class PlanMode extends Component {
           onEpicClick={this.onEpicClick}
         />
         <Spin spinning={FeatureStore.getSpinIf}>
-          <div className="c7n-backlog-content">
+          <div className="c7n-feature-content">
             <DragDropContext
               onDragEnd={this.handleDragEnd}
               onDragStart={(result) => {
@@ -175,6 +202,7 @@ class PlanMode extends Component {
               }}
             >
               <SprintItem
+                display={display}
                 epicVisible={FeatureStore.getEpicVisible}
                 onRef={(ref) => {
                   this.sprintItemRef = ref;

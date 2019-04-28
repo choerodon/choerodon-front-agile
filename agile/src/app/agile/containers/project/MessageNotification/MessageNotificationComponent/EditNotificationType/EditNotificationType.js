@@ -6,7 +6,7 @@ import {
 } from 'choerodon-front-boot';
 import _ from 'lodash';
 import {
-  Button, Table, Checkbox, Select,
+  Button, Table, Checkbox, Select, Tooltip,
 } from 'choerodon-ui';
 import './EditNotificationType.scss';
 
@@ -142,7 +142,16 @@ class EditNotificationType extends Component {
             autoFocus
           >
             {
-              userOptions && _.map(userOptions, item => <Option key={item.id ? item.id : item.userId} value={item.id ? item.id : item.userId}>{item.loginName ? `${item.loginName}${item.realName}` : item.name}</Option>)
+              userOptions && _.map(userOptions, item => (
+                <Option
+                  key={item.id ? item.id : item.userId}
+                  value={item.id ? item.id : item.userId}
+                >
+                  <Tooltip title={item.realName ? `${item.loginName || ''}${item.realName || ''}` : item.name} mouseEnterDelay={0.5}>
+                    {item.realName ? `${item.realName}` : item.name}
+                  </Tooltip>
+                </Option>
+              ))
             }
           </Select>
         ) : ''),
@@ -157,7 +166,7 @@ class EditNotificationType extends Component {
       checkeds: _.map(checkeds, (item, i) => (i === index ? e.target.checked : item)),
       updateData: _.map(updateData, (item, i) => (i === index ? { ...item, enable: e.target.checked } : item)),
     });
-  }
+  };
 
 
   handleSelectChange = (value, index) => {

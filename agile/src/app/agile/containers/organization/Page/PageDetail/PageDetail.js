@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
-  Spin, Checkbox,
+  Spin, Checkbox, Button, Icon,
 } from 'choerodon-ui';
 import {
   Page, Header, Content, stores,
@@ -54,7 +54,7 @@ class PageDetail extends Component {
       width: '25%',
     },
     {
-      title: '显示层级',
+      title: '显示范围',
       dataIndex: 'contextName',
       width: '25%',
     },
@@ -70,7 +70,7 @@ class PageDetail extends Component {
       render: (display, record) => (
         <div>
           <Checkbox
-            defaultChecked={record.display}
+            checked={record.display}
             disabled={record.system}
             onChange={() => this.onDisplayChange(record)}
           />
@@ -112,9 +112,7 @@ class PageDetail extends Component {
       display: !item.display,
       objectVersionNumber: item.objectVersionNumber,
     };
-    PageStore.updateField(item.fieldId, match.params.code, field).then(() => {
-
-    });
+    PageStore.updateField(item.fieldId, match.params.code, field);
   };
 
   render() {
@@ -137,7 +135,12 @@ class PageDetail extends Component {
         <Header
           title="编辑页面"
           backPath={`/agile/page?type=${type}&id=${id}&name=${encodeURIComponent(orgName)}&organizationId=${organizationId}`}
-        />
+        >
+          <Button funcType="flat" onClick={this.loadPageDetail}>
+            <Icon type="refresh icon" />
+            <span>刷新</span>
+          </Button>
+        </Header>
         <Content
           title={name}
           description="你可以通过上下拖动进行字段排序。"

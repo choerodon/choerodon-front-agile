@@ -37,7 +37,7 @@
       font-size: 13px;
       line-height: 20px;
 
-      .c7n-backlog-dragToEpic:hover {
+      .c7n-backlog-dragToFeature:hover {
         border: 2px dashed green;
       }
 
@@ -55,7 +55,7 @@
         }
       }
 
-      .c7n-backlog-epicItems.onClickEpic {
+      .c7n-backlog-epicItems.onClickFeature {
         background: rgba(140, 158, 255, 0.08) !important;
       }
 

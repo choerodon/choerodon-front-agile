@@ -6,6 +6,7 @@ import {
   Field, FieldAssignee, FieldVersion, FieldStatus, FieldSprint, FieldText,
   FieldReporter, FieldPriority, FieldLabel, FieldFixVersion, FieldPI,
   FieldEpic, FieldDateTime, FieldComponent, FieldTimeTrace, FieldStoryPoint,
+  FieldSummary, FieldInput,
 } from './Field';
 
 @inject('AppState')
@@ -53,10 +54,11 @@ import {
       case 'acceptanceCritera':
         return (<FieldText {...this.props} field={field} feature />);
       case 'summary':
+        return (<FieldSummary {...this.props} field={field} />);
       case 'epicName':
-        return (<FieldText {...this.props} field={field} />);
-      case 'estimateTime':
-      case 'storyPoint':
+        return (<FieldInput {...this.props} field={field} />);
+      case 'remainingTime':
+      case 'storyPoints':
         return (<FieldStoryPoint {...this.props} field={field} />);
       default:
         return (<Field {...this.props} field={field} />);
@@ -64,14 +66,26 @@ import {
   };
 
   render() {
-    const { store } = this.props;
+    const { store, isWide = false } = this.props;
     const issue = store.getIssue;
     const fields = store.getFields;
     const { issueId } = issue;
 
+    const left = [];
+    const right = [];
+    if (issueId && isWide) {
+      fields.forEach((item, index) => {
+        if (index < fields.length / 2) {
+          left.push(item);
+        } else {
+          right.push(item);
+        }
+      });
+    }
+
     return (
       <div className="c7n-content-wrapper">
-        {issueId ? fields.map(field => (
+        {!isWide && issueId ? fields.map(field => (
           <span
             className="c7n-content-item"
             key={field.fieldCode}
@@ -79,6 +93,34 @@ import {
             {this.getFieldComponent(field)}
           </span>
         )) : ''}
+        {isWide && issueId ? (
+          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+            <span style={{ flex: 1 }}>
+              {
+                left.map(field => (
+                  <span
+                    className="c7n-content-item"
+                    key={field.fieldCode}
+                  >
+                    {this.getFieldComponent(field)}
+                  </span>
+                ))
+              }
+            </span>
+            <span style={{ flex: 1 }}>
+              {
+                right.map(field => (
+                  <span
+                    className="c7n-content-item"
+                    key={field.fieldCode}
+                  >
+                    {this.getFieldComponent(field)}
+                  </span>
+                ))
+              }
+            </span>
+          </div>
+        ) : ''}
       </div>
     );
   }

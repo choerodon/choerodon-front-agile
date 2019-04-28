@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import EditIssue from './EditFeature';
+import './FeatureDetail.scss';
 
 @inject('AppState')
 @observer
@@ -35,6 +36,7 @@ class FeatureDetail extends Component {
             issueId={store.getClickIssueId}
             onCancel={() => {
               store.setClickIssueDetail({});
+              store.clearMultiSelected();
             }}
             onDeleteIssue={() => {
               store.setClickIssueDetail({});

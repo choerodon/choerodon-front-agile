@@ -93,20 +93,20 @@ export function StatusName({ record }) {
  * @param props => 任务经办人对象，任务经办人信息
  * @returns React 函数式组件
  */
-export function Assignee({ text, id, img }) {
+export function Assignee({
+  loginName, realName, id, img,
+}) {
   return (
-    <Tooltip mouseEnterDelay={0.5} title={`经办人： ${text}`}>
-      <div style={{ marginRight: 12 }}>
-        <UserHead
-          user={{
-            id,
-            loginName: '',
-            realName: text,
-            avatar: img,
-          }}
-        />
-      </div>
-    </Tooltip>
+    <div style={{ marginRight: 12 }}>
+      <UserHead
+        user={{
+          id,
+          loginName,
+          realName,
+          avatar: img,
+        }}
+      />
+    </div>
   );
 }
 
@@ -177,6 +177,9 @@ export function Epic({ color, name }) {
     lineHeight: '20px',
     padding: '0 8px',
     display: 'inline-block',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   };
   return name ? <span style={style}>{name}</span> : null;
 }

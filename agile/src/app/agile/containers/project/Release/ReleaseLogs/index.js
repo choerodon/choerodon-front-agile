@@ -177,7 +177,7 @@ class ReleaseLogs extends Component {
           description="您可以在此查看版本的版本日志，按照问题类型来分类显示问题列表，并且可以点击到具体问题进行修改。"
         >
           {
-            issueTypeData.map(e => (
+            issueTypeData.filter(type => type.typeCode !== 'feature').map(e => (
               <div>
                 {
                   this.renderSubsetIssues(e)

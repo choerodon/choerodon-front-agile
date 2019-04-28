@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import {
-  Modal, Form, Select, Input, message,
+  Modal, Form, Select, Input,
 } from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import {
@@ -14,7 +14,6 @@ import * as images from '../../../../../assets/image';
 const { AppState } = stores;
 const { Sidebar } = Modal;
 const FormItem = Form.Item;
-const { TextArea } = Input;
 const { Option } = Select;
 const formItemLayout = {
   labelCol: {
@@ -74,18 +73,30 @@ class CreateField extends Component {
     } = this.props;
     form.validateFieldsAndScroll((err, data) => {
       if (!err) {
-        const postData = data;
-        postData.schemeCode = schemeCode;
+        const { type } = AppState.currentMenuType;
+        const prefix = type === 'project' ? 'pro_' : 'org_';
+        const postData = {
+          ...data,
+          schemeCode,
+          code: `${prefix}${data.code}`,
+        };
         this.setState({
           submitting: true,
         });
         store.createField(postData)
-          .then((field) => {
-            Choerodon.prompt(intl.formatMessage({ id: 'createSuccess' }));
-            this.setState({
-              submitting: false,
-            });
-            this.handleOk();
+          .then((res) => {
+            if (!res.failed) {
+              Choerodon.prompt(intl.formatMessage({ id: 'createSuccess' }));
+              this.setState({
+                submitting: false,
+              });
+              this.handleOk();
+            } else {
+              Choerodon.prompt(intl.formatMessage({ id: 'createFailed' }));
+              this.setState({
+                submitting: false,
+              });
+            }
           }).catch(() => {
             Choerodon.prompt(intl.formatMessage({ id: 'createFailed' }));
             this.setState({
@@ -97,38 +108,40 @@ class CreateField extends Component {
   };
 
   checkName = (rule, value, callback) => {
-    const { store, intl } = this.props;
+    const { store, intl, schemeCode } = this.props;
     if (!value) {
       callback();
     } else {
-      store.checkName(value)
+      store.checkName(value, schemeCode)
         .then((data) => {
           if (data) {
             callback(intl.formatMessage({ id: 'field.name.exist' }));
           } else {
             callback();
           }
-        }).catch((error) => {
+        }).catch(() => {
           callback();
         });
     }
   };
 
   checkCode = (rule, value, callback) => {
-    const { store, intl } = this.props;
+    const { store, intl, schemeCode } = this.props;
     if (!value) {
       callback();
     } else if (!regex.test(value)) {
       callback(intl.formatMessage({ id: 'field.code.rule' }));
     } else {
-      store.checkCode(value)
+      const { type } = AppState.currentMenuType;
+      const prefix = type === 'project' ? 'pro_' : 'org_';
+      store.checkCode(`${prefix}${value}`, schemeCode)
         .then((data) => {
           if (data) {
             callback(intl.formatMessage({ id: 'field.code.exist' }));
           } else {
             callback();
           }
-        }).catch((error) => {
+        }).catch(() => {
           callback(intl.formatMessage({ id: 'network.error' }));
         });
     }
@@ -165,7 +178,7 @@ class CreateField extends Component {
                 rules: [{
                   required: true,
                   whitespace: true,
-                  message: '显示层级为必填项！',
+                  message: '字段编码为必填项！',
                 }, {
                   validator: this.checkCode,
                 }],
@@ -184,7 +197,7 @@ class CreateField extends Component {
                 rules: [{
                   required: true,
                   whitespace: true,
-                  message: '显示层级为必填项！',
+                  message: '字段名称为必填项！',
                 }, {
                   validator: this.checkName,
                 }],
@@ -202,7 +215,7 @@ class CreateField extends Component {
               {getFieldDecorator('fieldType', {
                 rules: [{
                   required: true,
-                  message: '显示层级为必填项！',
+                  message: '显示范围为必填项！',
                 }],
               })(
                 <Select
@@ -234,7 +247,7 @@ class CreateField extends Component {
               {getFieldDecorator('context', {
                 rules: [{
                   required: true,
-                  message: '显示层级为必填项！',
+                  message: '显示范围为必填项！',
                 }],
               })(
                 <Select
@@ -242,6 +255,7 @@ class CreateField extends Component {
                   label={<FormattedMessage id="field.context" />}
                   dropdownMatchSelectWidth
                   size="default"
+                  mode="multiple"
                 >
                   {fieldContext.map(ctx => (
                     <Option

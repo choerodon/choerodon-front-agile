@@ -22,7 +22,7 @@ const renderPIName = (props) => {
     for (let i = 0; i < piCount; i++) {
       piCodeNumArr.push(piCodeNumber + i);
     }
-  
+
     const newPi = piCodeNumArr.map(codeNum => (
       <span key={codeNum} style={{ marginRight: 5, fontWeight: 600 }}>{`${piCodePrefix}-${codeNum}`}</span>
     ));
@@ -40,7 +40,73 @@ const renderStartArtModalContent = (props) => {
   const doingArt = artList.find(item => item.statusCode === 'doing');
   const nonEmpty = Object.keys(_.pick(data, ['startDate', 'piCount', 'piCodePrefix', 'piCodeNumber', 'interationCount', 'interationWeeks', 'ipWeeks'])).every(key => data[key]);
   canStart = nonEmpty && !doingArt;
-  if (doingArt) {
+  const showInfos = (
+    <div>
+      {
+        Object.keys(startArtShowInfo).map((key) => {
+          if (key !== 'piName' && key !== 'startDate') {
+            return (
+              <p key={key} style={{ marginBottom: 5 }}>
+                <span>{`${startArtShowInfo[key].name}：`}</span>
+                <span style={{ fontWeight: 600, color: startArtShowInfo[key].empty ? 'red' : '#3f51b5' }}>{data[key] || 0}</span>
+              </p>
+            );
+          } else if (key === 'startDate') {
+            return (
+              <p key={key} style={{ marginBottom: 5 }}>
+                <span>{`${startArtShowInfo[key].name}：`}</span>
+                <span style={{ fontWeight: 600, color: startArtShowInfo[key].empty ? 'red' : '#3f51b5' }}>{moment(data[key]).format('YYYY-MM-DD') || '-'}</span>
+              </p>
+            );
+          } else {
+            return (
+              <p key={key} style={{ marginBottom: 5 }}>
+                <span>{`${startArtShowInfo[key].name}：`}</span>
+                <span style={{ fontWeight: 600, color: data.piCount && data.piCodePrefix && data.piCodeNumber ? '#3f51b5' : 'red' }}>
+                  {
+                    renderPIName(props)
+                  }
+                </span>
+
+              </p>
+            );
+          }
+        })
+      }
+    </div>
+  );
+  const nonEmptyShow = (
+    <div>
+      <p style={{ marginBottom: 15 }}>
+        <span>
+          {'你正在启动 '}
+          <span style={{ fontWeight: 600 }}>{data.name}</span>
+          {'，当前没有正在进行的火车。'}
+        </span>
+      </p>
+
+    </div>
+  );
+  const EmptyShow = (
+    <div>
+      <p style={{ marginBottom: 15 }}>
+        <span>
+          {'你无法启动 '}
+          <span style={{ fontWeight: 600 }}>{data.name}</span>
+          {'，请你填写完相应字段再启动火车。'}
+        </span>
+      </p>
+
+    </div>
+  );
+  if (!nonEmpty) {
+    return (
+      <div>
+        {EmptyShow}
+        {showInfos}
+      </div>
+    );
+  } else if (doingArt) {
     return (
       <div>
         {'你无法启动  '}
@@ -55,56 +121,8 @@ const renderStartArtModalContent = (props) => {
   } else {
     return (
       <div>
-        <p style={{ marginBottom: 15 }}>
-          {
-            nonEmpty ? (
-              <span>
-                { '你正在启动 '}
-                <span style={{ fontWeight: 600 }}>{data.name}</span> 
-                {'，当前没有正在进行的火车。'}
-              </span>
-            ) : (
-              <span>
-                { '你无法启动 '}
-                <span style={{ fontWeight: 600 }}>{data.name}</span> 
-                {'，请你填写完相应字段再启动火车。'}
-              </span>
-            )
-          }
-        </p>
-        <div>
-          {
-            Object.keys(startArtShowInfo).map((key) => {
-              if (key !== 'piName' && key !== 'startDate') {
-                return (
-                  <p key={key} style={{ marginBottom: 5 }}>
-                    <span>{`${startArtShowInfo[key].name}：`}</span>
-                    <span style={{ fontWeight: 600, color: startArtShowInfo[key].empty ? 'red' : '#3f51b5' }}>{data[key] || 0}</span>
-                  </p>
-                );
-              } else if (key === 'startDate') {
-                return (
-                  <p key={key} style={{ marginBottom: 5 }}>
-                    <span>{`${startArtShowInfo[key].name}：`}</span>
-                    <span style={{ fontWeight: 600, color: startArtShowInfo[key].empty ? 'red' : '#3f51b5' }}>{moment(data[key]).format('YYYY-MM-DD') || '-'}</span>
-                  </p>
-                );
-              } else {
-                return (
-                  <p key={key} style={{ marginBottom: 5 }}>
-                    <span>{`${startArtShowInfo[key].name}：`}</span>
-                    <span style={{ fontWeight: 600, color: data.piCount && data.piCodePrefix && data.piCodeNumber ? '#3f51b5' : 'red' }}>
-                      {
-                      renderPIName(props)
-                    }
-                    </span>
-                   
-                  </p>
-                );
-              }
-            })
-            }
-        </div>
+        {nonEmptyShow}
+        {showInfos}
       </div>
     );
   }

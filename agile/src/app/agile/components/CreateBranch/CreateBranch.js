@@ -180,13 +180,17 @@ class CreateBranch extends Component {
                       param: '',
                     })
                       .then((res) => {
-                        this.setState({
-                          branchs: res.content,
-                          branchsSize: res.numberOfElements,
-                          // branchsShowMore: res.totalPages !== 1,
-                          branchsObj: res,
-                          branchLoading: false,
-                        });
+                        if (res && !res.failed) {
+                          this.setState({
+                            branchs: res.content,
+                            branchsSize: res.numberOfElements,
+                            // branchsShowMore: res.totalPages !== 1,
+                            branchsObj: res,
+                            branchLoading: false,
+                          });
+                        } else {
+                          Choerodon.prompt(res.message);
+                        }
                       });
                     axios.post(`/devops/v1/projects/${AppState.currentMenuType.id}/apps/${form.getFieldValue('app')}/git/tags_list_options?page=0&size=5`, {
                       searchParam: {
@@ -195,12 +199,16 @@ class CreateBranch extends Component {
                       param: '',
                     })
                       .then((res) => {
-                        this.setState({
-                          tags: res.content,
-                          tagsSize: res.numberOfElements,
-                          // tagsShowMore: res.totalPages !== 1,
-                          tagsObj: res,
-                        });
+                        if (res && !res.failed) {
+                          this.setState({
+                            tags: res.content || [],
+                            tagsSize: res.numberOfElements,
+                            // tagsShowMore: res.totalPages !== 1,
+                            tagsObj: res,
+                          });
+                        } else {
+                          Choerodon.prompt(res.message);
+                        }
                       });
                   }}
                 >
@@ -230,12 +238,16 @@ class CreateBranch extends Component {
                                 param: null,
                               })
                                 .then((res) => {
-                                  this.setState({
-                                    branchs: res.content,
-                                    branchsSize: res.numberOfElements,
-                                    // branchsShowMore: res.totalPages !== 1,
-                                    branchsObj: res,
-                                  });
+                                  if (res && !res.failed) {
+                                    this.setState({
+                                      branchs: res.content || [],
+                                      branchsSize: res.numberOfElements,
+                                      // branchsShowMore: res.totalPages !== 1,
+                                      branchsObj: res,
+                                    });
+                                  } else {
+                                    Choerodon.prompt(res.message);
+                                  }
                                 });
                             }}
                           >
@@ -243,7 +255,7 @@ class CreateBranch extends Component {
                           </div>
                         </Option>
                         ) : null
-                    }
+                      }
                   </OptGroup>
                   <OptGroup label="tag" key="tagGroup">
                     {tags.map(s => (
@@ -271,12 +283,16 @@ class CreateBranch extends Component {
                                 param: null,
                               })
                                 .then((res) => {
-                                  this.setState({
-                                    tags: res.content,
-                                    tagsSize: res.numberOfElements,
-                                    // tagsShowMore: res.totalPages !== 1,
-                                    tagsObj: res,
-                                  });
+                                  if (res && !res.failed) {
+                                    this.setState({
+                                      tags: res.content || [],
+                                      tagsSize: res.numberOfElements,
+                                      // tagsShowMore: res.totalPages !== 1,
+                                      tagsObj: res,
+                                    });
+                                  } else {
+                                    Choerodon.prompt(res.message);
+                                  }
                                 });
                             }}
                           >

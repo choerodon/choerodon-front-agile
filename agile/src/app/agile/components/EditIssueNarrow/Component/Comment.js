@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import { Icon, Popconfirm } from 'choerodon-ui';
-import { AppState } from 'choerodon-front-boot';
-import _ from 'lodash';
 import UserHead from '../../UserHead';
 import WYSIWYGEditor from '../../WYSIWYGEditor';
 import { IssueDescription, DatetimeAgo } from '../../CommonComponent';
 import {
-  delta2Html, text2Delta, beforeTextUpload, formatDate, 
+  delta2Html, text2Delta, beforeTextUpload,
 } from '../../../common/utils';
 import { deleteCommit, updateCommit } from '../../../api/NewIssueApi';
 import './Comment.scss';
@@ -25,59 +23,58 @@ class Comment extends Component {
   componentDidMount() {
   }
 
-  confirm(commentId, e) {
-    this.handleDeleteCommit(commentId);
-  }
-
-  cancel(e) {
-  }
-
-  handleDeleteCommit(commentId) {
+  handleDeleteCommit = (commentId) => {
+    const { onDeleteComment } = this.props;
     deleteCommit(commentId)
-      .then((res) => {
-        this.props.onDeleteComment();
+      .then(() => {
+        if (onDeleteComment) {
+          onDeleteComment();
+        }
       });
-  }
+  };
 
-  handleUpdateComment(comment) {
+  handleUpdateComment = (comment) => {
+    const { editComment } = this.state;
     const { commentId, objectVersionNumber } = comment;
     const extra = {
       commentId,
       objectVersionNumber,
     };
-    const updateCommentDes = this.state.editComment;
+    const updateCommentDes = editComment;
     if (updateCommentDes) {
       beforeTextUpload(updateCommentDes, extra, this.updateComment, 'commentText');
     } else {
       extra.commentText = '';
       this.updateComment(extra);
     }
-  }
+  };
 
   updateComment = (comment) => {
-    updateCommit(comment).then((res) => {
+    const { onUpdateComment } = this.props;
+    updateCommit(comment).then(() => {
       this.setState({
         editCommentId: undefined,
         editComment: undefined,
       });
-      this.props.onUpdateComment();
+      if (onUpdateComment) {
+        onUpdateComment();
+      }
     });
-  }
+  };
 
   render() {
-    // const { commit, isWide } = this.props;
-    // const { commit } = this.props;
-    const commit = this.props.comment;
-    const { isWide } = this.props;
+    const { comment } = this.props;
+    const { editComment, editCommentId, expand } = this.state;
 
-    const deltaEdit = text2Delta(this.state.editComment);
+
+    const deltaEdit = text2Delta(editComment);
     return (
       <div
-        className={`c7n-comment ${commit.commentId === this.state.editCommentId ? 'c7n-comment-focus' : ''}`}
+        className={`c7n-comment ${comment.commentId === editCommentId ? 'c7n-comment-focus' : ''}`}
       >
         <div className="line-justify">
           {
-            this.state.expand ? (
+            expand ? (
               <Icon
                 role="none"
                 style={{ 
@@ -95,7 +92,7 @@ class Comment extends Component {
             ) : null
           }
           {
-            !this.state.expand ? (
+            !expand ? (
               <Icon
                 role="none"
                 style={{ 
@@ -115,16 +112,16 @@ class Comment extends Component {
           <div className="c7n-title-commit" style={{ flex: 1 }}>
             <UserHead
               user={{
-                id: commit.userId,
+                id: comment.userId,
                 loginName: '',
-                realName: commit.userName,
-                avatar: commit.userImageUrl,
+                realName: comment.userName,
+                avatar: comment.userImageUrl,
               }}
               color="#3f51b5"
             />
-            <div className="line-start" style={{ color: 'rgba(0, 0, 0, 0.65)', marginLeft: 15 }}>
+            <div style={{ color: 'rgba(0, 0, 0, 0.65)', marginLeft: 15 }}>
               <DatetimeAgo
-                date={commit.lastUpdateDate}
+                date={comment.lastUpdateDate}
               />
             </div>
           </div>
@@ -134,8 +131,8 @@ class Comment extends Component {
               type="mode_edit mlr-3 pointer"
               onClick={() => {
                 this.setState({
-                  editCommentId: commit.commentId,
-                  editComment: commit.commentText,
+                  editCommentId: comment.commentId,
+                  editComment: comment.commentText,
                   expand: true,
                 });
               }}
@@ -143,30 +140,24 @@ class Comment extends Component {
             <Popconfirm
               title="确认要删除该评论吗?"
               placement="left"
-              onConfirm={this.confirm.bind(this, commit.commentId)}
+              onConfirm={() => this.handleDeleteCommit(comment.commentId)}
               onCancel={this.cancel}
               okText="删除"
               cancelText="取消"
               okType="danger"
             >
               <Icon
-                // role="none"
+                role="none"
                 type="delete_forever mlr-3 pointer"
-                // onClick={() => this.handleDeleteCommit(commit.commentId)}
               />
             </Popconfirm>
-            {/* <Icon
-              role="none"
-              type="delete_forever mlr-3 pointer"
-              onClick={() => this.handleDeleteCommit(commit.commentId)}
-            /> */}
           </div>
         </div>
         {
-          this.state.expand && (
+          expand && (
             <div className="c7n-conent-commit" style={{ marginTop: 10 }}>
               {
-                commit.commentId === this.state.editCommentId ? (
+                comment.commentId === editCommentId ? (
                   <WYSIWYGEditor
                     bottomBar
                     value={deltaEdit}
@@ -180,12 +171,12 @@ class Comment extends Component {
                         editComment: undefined,
                       });
                     }}
-                    handleSave={this.handleUpdateComment.bind(this, commit)}
-                    toolbarHeight={isWide ? null : 66}
+                    handleSave={this.handleUpdateComment.bind(this, comment)}
+                    // toolbarHeight={isWide ? null : 66}
                     // toolbarHeight={66}
                   />
                 ) : (
-                  <IssueDescription data={delta2Html(commit.commentText)} />
+                  <IssueDescription data={delta2Html(comment.commentText)} />
                 )
               }
             </div>

@@ -93,36 +93,39 @@ let hasPermission;
   };
 
   handleCopyIssue = () => {
-    const { onUpdate, reloadIssue } = this.props;
+    const { onUpdate, onCopyAndTransformToSubIssue } = this.props;
     VisibleStore.setCopyIssueShow(false);
     if (onUpdate) {
       onUpdate();
     }
-    if (reloadIssue) {
-      reloadIssue();
+    if (onCopyAndTransformToSubIssue) {
+      onCopyAndTransformToSubIssue();
     }
+    this.loadIssueDetail();
   };
 
   handleTransformSubIssue() {
-    const { onUpdate, reloadIssue } = this.props;
+    const { onUpdate, onCopyAndTransformToSubIssue } = this.props;
     VisibleStore.setTransformSubIssueShow(false);
     if (onUpdate) {
       onUpdate();
     }
-    if (reloadIssue) {
-      reloadIssue();
+    if (onCopyAndTransformToSubIssue) {
+      onCopyAndTransformToSubIssue();
     }
+    this.loadIssueDetail();
   }
 
   handleTransformFromSubIssue() {
-    const { onUpdate, reloadIssue } = this.props;
+    const { onUpdate, onCopyAndTransformToSubIssue } = this.props;
     VisibleStore.setTransformFromSubIssueShow(false);
     if (onUpdate) {
       onUpdate();
     }
-    if (reloadIssue) {
-      reloadIssue();
+    if (onCopyAndTransformToSubIssue) {
+      onCopyAndTransformToSubIssue();
     }
+    this.loadIssueDetail();
   }
 
   render() {
@@ -132,7 +135,7 @@ let hasPermission;
       onCancel,
       style,
       onUpdate,
-      reloadIssue,
+      onDeleteIssue,
     } = this.props;
     const {
       issueLoading,
@@ -175,6 +178,7 @@ let hasPermission;
           ) : null
         }
         <IssueSidebar
+          type="wide"
           store={store}
           reloadIssue={this.loadIssueDetail}
           onUpdate={onUpdate}
@@ -183,13 +187,16 @@ let hasPermission;
           <IssueHeader
             store={store}
             reloadIssue={this.loadIssueDetail}
+            onDeleteIssue={onDeleteIssue}
             backUrl={backUrl}
             onCancel={onCancel}
             loginUserId={loginUserId}
             hasPermission={hasPermission}
             onUpdate={onUpdate}
+            type="wide"
           />
           <IssueBody
+            isWide
             store={store}
             reloadIssue={this.loadIssueDetail}
             onUpdate={onUpdate}
@@ -248,9 +255,7 @@ let hasPermission;
               objectVersionNumber={objectVersionNumber}
               onOk={() => {
                 VisibleStore.setAssigneeShow(false);
-                if (reloadIssue) {
-                  reloadIssue();
-                }
+                this.loadIssueDetail(issueId);
               }}
               onCancel={() => {
                 VisibleStore.setAssigneeShow(false);
@@ -267,9 +272,7 @@ let hasPermission;
               objectVersionNumber={objectVersionNumber}
               onOk={() => {
                 VisibleStore.setChangeParentShow(false);
-                if (reloadIssue) {
-                  reloadIssue();
-                }
+                this.loadIssueDetail(issueId);
               }}
               onCancel={() => {
                 VisibleStore.setChangeParentShow(false);

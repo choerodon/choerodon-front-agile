@@ -21,7 +21,7 @@ import '../../PI.scss';
 
   render() {
     return (
-      <p className="c7n-backlog-sprintQuestion">
+      <p className="c7n-feature-sprintQuestion">
         {
           `剩余${this.getLastDays()}天`
         }

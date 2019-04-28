@@ -23,8 +23,7 @@ import DataLogs from '../../../../../../../components/EditIssueNarrow/Component/
     const datalogs = _.filter(stateDatalogs, v => v.field !== 'Version');
     const issue = store.getIssue;
     const {
-      typeCode, createdById, creationDate,
-      createdBy,
+      typeCode, createdBy, creationDate,
       createrImageUrl, createrEmail,
       createrName, issueTypeDTO = {},
     } = issue;
@@ -44,7 +43,7 @@ import DataLogs from '../../../../../../../components/EditIssueNarrow/Component/
       <DataLogs
         datalogs={[...datalogs, createLog]}
         typeCode={typeCode}
-        createdById={createdById}
+        createdById={createdBy}
         creationDate={creationDate}
       />
     );

@@ -18,7 +18,6 @@ import WYSIWYGEditor from '../WYSIWYGEditor';
 import FullEditor from '../FullEditor';
 import UserHead from '../UserHead';
 import TypeTag from '../TypeTag';
-import FieldBlank from './FieldBlank';
 import './CreateIssue.scss';
 
 const { AppState } = stores;
@@ -210,7 +209,7 @@ class CreateIssue extends Component {
       .then((res) => {
         if (res && res.length) {
           const story = res.filter(item => item.typeCode === 'story');
-          const defaultType = (story && story.length) ? res[0] : story[0];
+          const defaultType = (story && story.length) ? story[0] : res[0];
           const param = {
             schemeCode: 'agile_issue',
             context: defaultType.typeCode,
@@ -222,6 +221,7 @@ class CreateIssue extends Component {
               originIssueTypes: res,
               defaultTypeId: defaultType.id,
               loading: false,
+              newIssueTypeCode: defaultType.typeCode,
             });
           });
         }
@@ -304,7 +304,7 @@ class CreateIssue extends Component {
       estimatedTime,
       originLinks,
     } = this.state;
-    form.validateFields((err, values) => {
+    form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         const { typeCode } = originIssueTypes.find(t => t.id === values.typeId);
         const exitComponents = originComponents;
@@ -427,7 +427,7 @@ class CreateIssue extends Component {
             className="fieldWith"
           >
             {fieldOptions && fieldOptions.length > 0
-            && fieldOptions.map(item => (
+            && fieldOptions.filter(option => option.enabled).map(item => (
               <Radio
                 className="radioStyle"
                 value={item.id}
@@ -440,7 +440,12 @@ class CreateIssue extends Component {
         );
       } else {
         return (
-          <FieldBlank />
+          <Radio.Group
+            label={fieldName}
+            className="fieldWith"
+          >
+            <span style={{ color: '#D50000' }}>暂无选项，请联系管理员</span>
+          </Radio.Group>
         );
       }
     } else if (field.fieldType === 'checkbox') {
@@ -452,7 +457,7 @@ class CreateIssue extends Component {
           >
             <Row>
               {fieldOptions && fieldOptions.length > 0
-              && fieldOptions.map(item => (
+              && fieldOptions.filter(option => option.enabled).map(item => (
                 <Col
                   span={24}
                   key={item.id}
@@ -471,7 +476,12 @@ class CreateIssue extends Component {
         );
       } else {
         return (
-          <FieldBlank />
+          <Checkbox.Group
+            label={fieldName}
+            className="fieldWith"
+          >
+            <span style={{ color: '#D50000' }}>暂无选项，请联系管理员</span>
+          </Checkbox.Group>
         );
       }
     } else if (field.fieldType === 'time') {
@@ -501,7 +511,7 @@ class CreateIssue extends Component {
           allowClear={!required}
         >
           {field.fieldOptions && field.fieldOptions.length > 0
-          && field.fieldOptions.map(item => (
+          && field.fieldOptions.filter(option => option.enabled).map(item => (
             <Option
               value={item.id}
               key={item.id}
@@ -520,7 +530,7 @@ class CreateIssue extends Component {
           className="fieldWith"
         >
           {field.fieldOptions && field.fieldOptions.length > 0
-          && field.fieldOptions.map(item => (
+          && field.fieldOptions.filter(option => option.enabled).map(item => (
             <Option
               value={item.id}
               key={item.id}
@@ -541,6 +551,7 @@ class CreateIssue extends Component {
     } else if (field.fieldType === 'text') {
       return (
         <TextArea
+          autosize
           label={fieldName}
           className="fieldWith"
         />
@@ -558,7 +569,9 @@ class CreateIssue extends Component {
   getFieldComponent = (field) => {
     const { form } = this.props;
     const { getFieldDecorator } = form;
-    const { defaultValue, fieldName, fieldCode } = field;
+    const {
+      defaultValue, fieldName, fieldCode, fieldType, required,
+    } = field;
     const {
       originIssueTypes, originPriorities, defaultPriority, storyPoints,
       edit, delta, originUsers, selectLoading, estimatedTime,
@@ -877,7 +890,7 @@ class CreateIssue extends Component {
             </FormItem>
           )
         );
-      case 'estimateTime':
+      case 'remainingTime':
         return (
           newIssueTypeCode !== 'issue_epic' && (
             <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
@@ -904,7 +917,7 @@ class CreateIssue extends Component {
             </div>
           )
         );
-      case 'storyPoint':
+      case 'storyPoints':
         return (
           newIssueTypeCode === 'story' && (
             <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
@@ -962,13 +975,27 @@ class CreateIssue extends Component {
         return (
           <FormItem label={fieldName} style={{ width: 520 }}>
             {getFieldDecorator(fieldCode, {
-              rules: [{ required: true, message: `${fieldName}为必填项` }],
-              initialValue: defaultValue || undefined,
+              rules: [{ required, message: `${fieldName}为必填项` }],
+              initialValue: this.transformValue(fieldType, defaultValue),
             })(
               this.renderField(field),
             )}
           </FormItem>
         );
+    }
+  };
+
+  transformValue = (fieldType, value) => {
+    if (value) {
+      if (fieldType === 'time' || fieldType === 'datetime') {
+        return value ? moment(value) : undefined;
+      } else if (value instanceof Array) {
+        return value.slice();
+      } else {
+        return value;
+      }
+    } else {
+      return undefined;
     }
   };
 

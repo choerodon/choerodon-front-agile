@@ -14,8 +14,8 @@ import {
   loadPriorities, loadProgramEpics, loadIssueTypes, createIssue,
   createFieldValue, getFields,
 } from '../../../../../api/NewIssueApi';
+import { getPISelect } from '../../../../../api/PIApi';
 import { beforeTextUpload, handleFileUpload } from '../../../../../common/utils';
-import FieldBlank from './FieldBlank';
 import './CreateFeature.scss';
 
 const { AppState } = stores;
@@ -39,6 +39,7 @@ class CreateFeature extends Component {
       fileList: [],
       selectLoading: false,
       loading: true,
+      PIList: [],
     };
   }
 
@@ -55,6 +56,11 @@ class CreateFeature extends Component {
       });
     });
     this.loadFields();
+    getPISelect().then((res) => {
+      this.setState({
+        PIList: res,
+      });
+    });
   }
 
   loadFields = () => {
@@ -76,7 +82,7 @@ class CreateFeature extends Component {
     const {
       selectedIssueType, defaultPriority, storyPoints, delta,
     } = this.state;
-    form.validateFields((err, values) => {
+    form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         const issueObj = {
           projectId: AppState.currentMenuType.id,
@@ -87,6 +93,7 @@ class CreateFeature extends Component {
           priorityId: defaultPriority.id,
           priorityCode: `priority-${defaultPriority.id}`,
           epicId: values.epicId || 0,
+          piId: values.pi || 0,
           parentIssueId: 0,
           storyPoints,
           featureDTO: {
@@ -232,7 +239,7 @@ class CreateFeature extends Component {
             className="fieldWith"
           >
             {fieldOptions && fieldOptions.length > 0
-            && fieldOptions.map(item => (
+            && fieldOptions.filter(option => option.enabled).map(item => (
               <Radio
                 className="radioStyle"
                 value={item.id}
@@ -245,7 +252,12 @@ class CreateFeature extends Component {
         );
       } else {
         return (
-          <FieldBlank />
+          <Radio.Group
+            label={fieldName}
+            className="fieldWith"
+          >
+            <span style={{ color: '#D50000' }}>暂无选项，请联系管理员</span>
+          </Radio.Group>
         );
       }
     } else if (field.fieldType === 'checkbox') {
@@ -257,7 +269,7 @@ class CreateFeature extends Component {
           >
             <Row>
               {fieldOptions && fieldOptions.length > 0
-              && fieldOptions.map(item => (
+              && fieldOptions.filter(option => option.enabled).map(item => (
                 <Col
                   span={24}
                   key={item.id}
@@ -276,7 +288,12 @@ class CreateFeature extends Component {
         );
       } else {
         return (
-          <FieldBlank />
+          <Checkbox.Group
+            label={fieldName}
+            className="fieldWith"
+          >
+            <span style={{ color: '#D50000' }}>暂无选项，请联系管理员</span>
+          </Checkbox.Group>
         );
       }
     } else if (field.fieldType === 'time') {
@@ -306,7 +323,7 @@ class CreateFeature extends Component {
           allowClear={!required}
         >
           {field.fieldOptions && field.fieldOptions.length > 0
-          && field.fieldOptions.map(item => (
+          && field.fieldOptions.filter(option => option.enabled).map(item => (
             <Option
               value={item.id}
               key={item.id}
@@ -325,7 +342,7 @@ class CreateFeature extends Component {
           className="fieldWith"
         >
           {field.fieldOptions && field.fieldOptions.length > 0
-          && field.fieldOptions.map(item => (
+          && field.fieldOptions.filter(option => option.enabled).map(item => (
             <Option
               value={item.id}
               key={item.id}
@@ -346,6 +363,7 @@ class CreateFeature extends Component {
     } else if (field.fieldType === 'text') {
       return (
         <TextArea
+          autosize
           label={fieldName}
           className="fieldWith"
         />
@@ -363,9 +381,11 @@ class CreateFeature extends Component {
   getFieldComponent = (field) => {
     const { form } = this.props;
     const { getFieldDecorator } = form;
-    const { defaultValue, fieldName, fieldCode } = field;
     const {
-      originEpics, delta, selectLoading,
+      defaultValue, fieldName, fieldCode, fieldType, required,
+    } = field;
+    const {
+      originEpics, delta, selectLoading, PIList,
       selectedIssueType, storyPoints, fullEdit,
     } = this.state;
 
@@ -470,9 +490,9 @@ class CreateFeature extends Component {
         );
       case 'epicName':
         return '';
-      case 'estimateTime':
+      case 'remainingTime':
         return '';
-      case 'storyPoint':
+      case 'storyPoints':
         return (
           <div style={{ width: 520, paddingBottom: 8, marginBottom: 12 }}>
             <Select
@@ -540,17 +560,49 @@ class CreateFeature extends Component {
             )}
           </FormItem>
         );
+      case 'pi':
+        return (
+          <FormItem label="PI" style={{ width: 520, marginBottom: 20 }}>
+            {getFieldDecorator('pi')(
+              <Select
+                label="PI"
+                getPopupContainer={triggerNode => triggerNode.parentNode}
+              >
+                {PIList.map(pi => (
+                  <Option key={pi.id} value={pi.id}>
+                    {`${pi.code}-${pi.name}`}
+                  </Option>
+                ))
+                }
+              </Select>,
+            )}
+          </FormItem>
+        );
       default:
         return (
           <FormItem label={fieldName} style={{ width: 520 }}>
             {getFieldDecorator(fieldCode, {
-              rules: [{ required: true, message: `${fieldName}为必填项` }],
-              initialValue: defaultValue || undefined,
+              rules: [{ required, message: `${fieldName}为必填项` }],
+              initialValue: this.transformValue(fieldType, defaultValue),
             })(
               this.renderField(field),
             )}
           </FormItem>
         );
+    }
+  };
+
+  transformValue = (fieldType, value) => {
+    if (value) {
+      if (fieldType === 'time' || fieldType === 'datetime') {
+        return value ? moment(value) : undefined;
+      } else if (value instanceof Array) {
+        return value.slice();
+      } else {
+        return value;
+      }
+    } else {
+      return undefined;
     }
   };
 

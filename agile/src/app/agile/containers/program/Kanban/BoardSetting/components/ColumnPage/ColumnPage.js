@@ -40,6 +40,18 @@ class ColumnPage extends Component {
     }
   }
 
+  // judgeCanDrag=(result) => {
+  //   const groupedColumns = groupBy(KanbanStore.getBoardData, 'categoryCode');
+  //   const { destination: { droppableId }, draggableId } = result;
+  //   const statusCode = draggableId.split(',')[2];
+  //   const sameStatusColumn = groupedColumns[statusCode];
+  //   const isOnlyOne = groupedColumns[statusCode].length === 1;
+  //   if (isOnlyOne) {
+  //     return '只剩一个状态';
+  //   }
+  //   return null;
+  // }
+
   handleDragEnd(result) {
     KanbanStore.setCurrentDrag(null);
     if (!result.destination) {
@@ -69,9 +81,16 @@ class ColumnPage extends Component {
         KanbanStore.setBoardData(originState2);
       });
     } else {
+      // const message = this.judgeCanDrag(result);
+      // if (message) {
+      //   Choerodon.prompt(message);
+      //   return;
+      // }
       // 移动状态
       const originState = JSON.parse(JSON.stringify(KanbanStore.getBoardData));
       const newState = JSON.parse(JSON.stringify(KanbanStore.getBoardData));
+
+
       let draggableData = {};
       let columnIndex;
       for (let index = 0, len = newState.length; index < len; index += 1) {
@@ -340,7 +359,7 @@ class ColumnPage extends Component {
     return (
 
       <Content
-        description="分栏可以添加、删除、重新排序和重命名。列是基于全局状态和可移动的列与列之间。最小和最大限制可设置为每个已映射的列中。"
+        description="分栏可以添加、删除、重新排序和重命名。列是基于全局状态和可移动的列与列之间。注意：项目群中状态只能拖放到对应类别的列中。"
         style={{
           padding: 0,
           overflow: 'unset',

@@ -1,3 +1,5 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import {
@@ -36,52 +38,18 @@ class ComponentHome extends Component {
           contents: '',
         },
       },
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
     };
   }
 
   componentDidMount() {
-    this.loadComponents(this.state.filters);
+    this.loadComponents();
   }
 
-  showComponent(record) {
-    this.setState({
-      editComponentShow: true,
-      currentComponentId: record.componentId,
-    });
-  }
-
-  clickDeleteComponent(record) {
-    this.setState({
-      component: record,
-      confirmShow: true,
-      filters: {
-        advancedSearchArgs: {},
-        searchArgs: {},
-        contents: [],
-      },
-    });
-  }
-
-  deleteComponent() {
-    this.setState({
-      confirmShow: false,
-    });
-    this.loadComponents(this.state.filters);
-  }
-
-  loadComponents(filters) {
-    this.setState({
-      loading: true,
-    });
-    loadComponents(filters)
-      .then((res) => {
-        this.setState({
-          components: res.content,
-          loading: false,
-        });
-      })
-      .catch((error) => {});
-  }
 
   handleFilterChange = (pagination, filters, sorter, barFilters) => {
     // console.log(`filters: ${JSON.stringify(filters)}`);
@@ -107,13 +75,63 @@ class ComponentHome extends Component {
     this.setState({
       filters: filtersPost,
     });
-    this.loadComponents(filtersPost);
+    this.loadComponents({ pagination, filters: filtersPost });
+  }
+
+  clickDeleteComponent(record) {
+    this.setState({
+      component: record,
+      confirmShow: true,
+      filters: {
+        advancedSearchArgs: {},
+        searchArgs: {},
+        contents: [],
+      },
+    });
+  }
+
+  deleteComponent() {
+    this.setState({
+      confirmShow: false,
+    });
+    this.loadComponents();
+  }
+
+  loadComponents({ pagination = this.state.pagination, filters = this.state.filters } = {}) {
+    this.setState({
+      loading: true,
+    });
+    loadComponents(pagination, filters)
+      .then((res) => {
+        const {
+          content, number, totalElements, size,
+        } = res;
+        this.setState({
+          components: content,
+          pagination: {
+            current: number + 1,
+            total: totalElements,
+            pageSize: size,
+          },
+          loading: false,
+        });
+      })
+      .catch((error) => {});
+  }
+
+
+  showComponent(record) {
+    this.setState({
+      editComponentShow: true,
+      currentComponentId: record.componentId,
+    });
   }
 
   render() {
     const menu = AppState.currentMenuType;
     const urlParams = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
+    const { pagination, components } = this.state;
     const column = [
       {
         title: '模块',
@@ -185,18 +203,14 @@ class ComponentHome extends Component {
         width: '15%',
         render: (managerId, record) => (
           <div style={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
-            <Tooltip placement="topLeft" mouseEnterDelay={0.5} title={record.managerName}>
-              <div>
-                <UserHead
-                  user={{
-                    id: record.managerId,
-                    loginName: '',
-                    realName: record.managerName,
-                    avatar: record.imageUrl,
-                  }}
-                />
-              </div>
-            </Tooltip>
+            <UserHead
+              user={{
+                id: record.managerId,
+                loginName: record.managerLoginName,
+                realName: record.managerRealName,
+                avatar: record.imageUrl,
+              }}
+            />
           </div>
         ),
         filters: [],
@@ -313,7 +327,7 @@ class ComponentHome extends Component {
               <span>创建模块</span>
             </Button>
           </Permission>
-          <Button funcType="flat" onClick={() => this.loadComponents(this.state.filters)}>
+          <Button funcType="flat" onClick={() => this.loadComponents()}>
             <Icon type="refresh icon" />
             <span>刷新</span>
           </Button>
@@ -344,9 +358,9 @@ class ComponentHome extends Component {
             )}
           </Spin> */}
           <Table
-            pagination={this.state.components.length > 10}
+            pagination={pagination}
             columns={column}
-            dataSource={this.state.components}
+            dataSource={components}
             scroll={{ x: true }}
             filterBarPlaceholder="过滤表"
             onChange={this.handleFilterChange}
@@ -357,7 +371,7 @@ class ComponentHome extends Component {
               visible={this.state.createComponentShow}
               onCancel={() => this.setState({ createComponentShow: false })}
               onOk={() => {
-                this.loadComponents(this.state.filters);
+                this.loadComponents();
                 this.setState({
                   createComponentShow: false,
                 });
@@ -370,7 +384,7 @@ class ComponentHome extends Component {
               visible={this.state.editComponentShow}
               onCancel={() => this.setState({ editComponentShow: false })}
               onOk={() => {
-                this.loadComponents(this.state.filters);
+                this.loadComponents();
                 this.setState({
                   editComponentShow: false,
                 });

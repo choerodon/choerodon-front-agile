@@ -149,6 +149,10 @@ class Issue extends Component {
     );
   };
 
+  onHideIssue = () => {
+    this.issueTable.onHideIssue();
+  };
+
   // ExpandCssControler => 用于向 IssueTable 注入 CSS 样式
   render() {
     // 清除整页滚动条
@@ -195,19 +199,21 @@ class Issue extends Component {
         </Header>
         <Content className="c7n-Issue">
           <ExportIssue />
-          <div className="c7n-Issue-search">
-            <QuickSearch
-              style={{ paddingLeft: 24 }}
-              onQuickSearchChange={this.onQuickSearchChange}
-              quickSearchAllowClear
-            />
-            <div className="c7n-advancedSearch">
-              <AdvancedSearch />
-              <SaveFilterModal />
-              <FilterManage />
+          <div style={{ height: 48 }}>
+            <div className="c7n-Issue-search">
+              <QuickSearch
+                style={{ paddingLeft: 24 }}
+                onQuickSearchChange={this.onQuickSearchChange}
+                quickSearchAllowClear
+              />
+              <div className="c7n-advancedSearch">
+                <AdvancedSearch />
+                <SaveFilterModal />
+                <FilterManage />
+              </div>
             </div>
           </div>
-          <div style={{ display: 'flex', flex: 1 }}>
+          <div style={{ display: 'flex', flex: 1, overflowY: 'scroll' }}>
             
             <ExpandCssControler />
             
@@ -218,13 +224,14 @@ class Issue extends Component {
                 position: 'relative',
                 padding: '0px 18px',
                 height: '100%',
-                overflowY: 'auto',
+                // overflowY: 'auto',
               }}
             >
               
-              <IssueTable filterControler={this.filterControler} />
+              <IssueTable filterControler={this.filterControler} ref={this.saveRef('issueTable')} />
             </div>
             <ExpandWideCard
+              onHideIssue={this.onHideIssue}
               issueRefresh={this.Refresh}
             />
           </div>

@@ -38,7 +38,7 @@ import './IssueComponent.scss';
       updateIssue(issueUpdateDTO)
         .then(() => {
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
           if (onUpdate) {
             onUpdate();
@@ -55,7 +55,7 @@ import './IssueComponent.scss';
       updateIssueType(issueUpdateTypeDTO)
         .then(() => {
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
           if (onUpdate) {
             onUpdate();
@@ -92,6 +92,8 @@ import './IssueComponent.scss';
         },
       ];
       currentIssueType = featureType === 'business' ? issueTypeData[0] : issueTypeData[1];
+    } else {
+      issueTypeData = issueTypeData.filter(item => item.typeCode !== 'feature');
     }
 
     const typeList = (
@@ -122,7 +124,7 @@ import './IssueComponent.scss';
       <div className="c7n-nav">
         {/* 转换类型 */}
         <div>
-          <Dropdown overlay={typeList} trigger={['click']} disabled={issueTypeDTO.typeCode === 'sub_task'}>
+          <Dropdown overlay={typeList} trigger={['click']} disabled={issueTypeDTO.typeCode === 'issue_epic'}>
             <div
               style={{
                 height: 50,

@@ -25,6 +25,10 @@ const { Text, Edit } = TextEditToggle;
     this.loadIssueStatus();
   }
 
+  componentWillReceiveProps() {
+    this.loadIssueStatus();
+  }
+
   loadIssueStatus = () => {
     const { store } = this.props;
     const issue = store.getIssue;
@@ -54,7 +58,7 @@ const { Text, Edit } = TextEditToggle;
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
           this.setState({
             transformId: undefined,

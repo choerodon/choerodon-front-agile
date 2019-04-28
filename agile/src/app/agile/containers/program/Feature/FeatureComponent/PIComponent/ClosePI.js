@@ -79,7 +79,7 @@ class ClosePI extends Component {
               paddingBottom: 20,
             }}
             title={`完成PI“${data.name}”`}
-            description="请在下面选择未完成特性的去向，以完成一个PI计划。"
+            description="请在下面选择未完成特性的去向，以完成一个PI计划。注意：完成当前PI后会自动为您开启下一个PI。"
             link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/pi/close-pi/"
           >
             <p className="c7n-closeSprint-message">

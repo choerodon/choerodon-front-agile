@@ -2,14 +2,13 @@ import React, { Component } from 'react';
 import {
   Input, Icon, Menu, Dropdown, Spin,
 } from 'choerodon-ui';
-import _ from 'lodash';
 import './CreateIssue.scss';
 import TypeTag from '../../../../../components/TypeTag';
 import clickOutSide from '../../../../../components/CommonComponent/ClickOutSide';
-import { createIssue } from '../../../../../api/NewIssueApi';
+import { createIssue, createIssueField } from '../../../../../api/NewIssueApi';
 
 const { TextArea } = Input;
-const filterIssueTypeCode = ['issue_epic', 'sub_task'];
+const filterIssueTypeCode = ['issue_epic', 'sub_task', 'feature'];
 
 class CreateIssue extends Component {
   constructor(props) {
@@ -29,10 +28,10 @@ class CreateIssue extends Component {
   handlePresEnter = (e) => {
     e.preventDefault();
     this.handleCreateIssue();
-  }
+  };
 
   handleCreateIssue = () => {
-    const { summary, selectIssueType, loading } = this.state;
+    const { summary, selectIssueType } = this.state;
     const {
       onCancel, onOk, data, store,
     } = this.props;
@@ -60,9 +59,15 @@ class CreateIssue extends Component {
       this.setState({ loading: true });
       createIssue(issue)
         .then((res) => {
+          const dto = {
+            schemeCode: 'agile_issue',
+            context: res.typeCode,
+            pageCode: 'agile_issue_create',
+          };
+          createIssueField(res.issueId, dto);
           onOk(res);
         })
-        .catch((error) => {
+        .catch(() => {
           this.setState({ loading: false });
           this.couldCreate = true;
         });

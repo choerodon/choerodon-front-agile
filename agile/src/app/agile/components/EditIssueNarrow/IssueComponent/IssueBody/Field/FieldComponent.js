@@ -76,7 +76,7 @@ const { Text, Edit } = TextEditToggle;
             onUpdate();
           }
           if (reloadIssue) {
-            reloadIssue();
+            reloadIssue(issueId);
           }
           this.setState({
             newComponents: [],
@@ -87,7 +87,7 @@ const { Text, Edit } = TextEditToggle;
 
   render() {
     const { selectLoading, originComponents } = this.state;
-    const { store, hasPermission } = this.props;
+    const { store } = this.props;
     const issue = store.getIssue;
     const { componentIssueRelDTOList = [] } = issue;
     return (
@@ -121,7 +121,7 @@ const { Text, Edit } = TextEditToggle;
             <Edit>
               <Select
                 loading={selectLoading}
-                mode={hasPermission ? 'tags' : 'multiple'}
+                mode="multiple"
                 getPopupContainer={triggerNode => triggerNode.parentNode}
                 tokenSeparators={[',']}
                 style={{ width: '200px', marginTop: 0, paddingTop: 0 }}

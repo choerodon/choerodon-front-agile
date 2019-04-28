@@ -4,7 +4,7 @@ import { observer, inject } from 'mobx-react';
 import { Page, Header, stores } from 'choerodon-front-boot';
 import { DragDropContext } from 'react-beautiful-dnd';
 import {
-  Button, Spin, message, Icon,
+  Button, Spin, Checkbox, Icon,
 } from 'choerodon-ui';
 import Version from '../BacklogComponent/VersionComponent/Version';
 import Epic from '../BacklogComponent/EpicComponent/Epic';
@@ -13,9 +13,11 @@ import IssueDetail from '../BacklogComponent/IssueDetailComponent/IssueDetail';
 import CreateIssue from '../../../../components/CreateIssueNew';
 import './BacklogHome.scss';
 import SprintItem from '../BacklogComponent/SprintComponent/SprintItem';
-import QuickSearch from '../../../../components/QuickSearch';
+import QuickSearch, { QuickSearchEvent } from '../../../../components/QuickSearch';
 import Injecter from '../../../../components/Injecter';
 import ClearFilter from '../BacklogComponent/SprintComponent/SprintItemComponent/SprintHeaderComponent/ClearAllFilter';
+import { getFeaturesInProject } from '../../../../api/FeatureApi';
+import { getProjectsInProgram } from '../../../../api/CommonApi';
 
 const { AppState } = stores;
 
@@ -28,16 +30,24 @@ class BacklogHome extends Component {
       spinIf: false,
       versionVisible: false,
       epicVisible: false,
+      isInProgram: false,
+      display: false,
     };
   }
 
   componentDidMount() {
     this.refresh();
+    getProjectsInProgram().then((res) => {
+      this.setState({
+        isInProgram: Boolean(res),
+      });
+    });
   }
 
   componentWillUnmount() {
     const { BacklogStore } = this.props;
     BacklogStore.resetData();
+    BacklogStore.clearMultiSelected();
   }
 
   /**
@@ -50,7 +60,7 @@ class BacklogHome extends Component {
     BacklogStore.axiosGetIssueTypes();
     BacklogStore.axiosGetDefaultPriority();
     Promise.all([BacklogStore.axiosGetQuickSearchList(), BacklogStore.axiosGetIssueTypes(), BacklogStore.axiosGetDefaultPriority(), BacklogStore.axiosGetSprint()]).then(([quickSearch, issueTypes, priorityArr, backlogData]) => {
-      BacklogStore.initBacklogData(quickSearch.content, issueTypes, priorityArr, backlogData);
+      BacklogStore.initBacklogData(quickSearch, issueTypes, priorityArr, backlogData);
     });
   };
 
@@ -84,6 +94,18 @@ class BacklogHome extends Component {
     });
   };
 
+  /**
+   * 加载特性
+   */
+  loadFeature = () => {
+    const { BacklogStore } = this.props;
+
+    getFeaturesInProject().then((data) => {
+      BacklogStore.setFeatureData(data);
+    }).catch((error3) => {
+    });
+  };
+
   paramConverter = (url) => {
     const reg = /[^?&]([^=&#]+)=([^&#]*)/g;
     const retObj = {};
@@ -105,8 +127,10 @@ class BacklogHome extends Component {
     this.getSprint(isCreate, issue);
     if (BacklogStore.getCurrentVisible === 'version') {
       this.loadVersion();
-    } else {
+    } else if (BacklogStore.getCurrentVisible === 'epic') {
       this.loadEpic();
+    } else if (BacklogStore.getCurrentVisible === 'feature') {
+      this.loadFeature();
     }
   };
 
@@ -201,12 +225,23 @@ class BacklogHome extends Component {
     if (BacklogStore.getCurrentVisible === type) {
       BacklogStore.toggleVisible(null);
     } else {
+      if (type === 'feature') {
+        QuickSearchEvent.emit('setSelectQuickSearch', [{ key: -2, label: '仅故事' }]);
+      }
       BacklogStore.toggleVisible(type);
     }
   };
 
+  onCheckChange = (e) => {
+    this.setState({
+      display: e.target.checked,
+    });
+  };
+
   render() {
     const { BacklogStore, HeaderStore } = this.props;
+    const arr = BacklogStore.getSprintData;
+    const { isInProgram, display } = this.state;
     return (
       <Page
         service={[
@@ -224,10 +259,12 @@ class BacklogHome extends Component {
             <Icon type="playlist_add icon" />
             <span>创建问题</span>
           </Button>
-          <Button className="leftBtn" functyp="flat" onClick={this.handleCreateSprint}>
-            <Icon type="queue" />
-            {'创建冲刺'}
-          </Button>
+          {!isInProgram && (
+            <Button className="leftBtn" functyp="flat" onClick={this.handleCreateSprint}>
+              <Icon type="queue" />
+              {'创建冲刺'}
+            </Button>
+          )}
           <Button
             className="leftBtn2"
             functyp="flat"
@@ -239,6 +276,17 @@ class BacklogHome extends Component {
             <Icon type="refresh" />
             {'刷新'}
           </Button>
+          {isInProgram
+            ? (
+              <Checkbox
+                disabled={!arr.length}
+                style={{ marginLeft: 20, color: '#3f51b5' }}
+                onChange={this.onCheckChange}
+              >
+                显示未开始冲刺
+              </Checkbox>
+            ) : ''
+          }
         </Header>
         <div style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
           <div
@@ -280,17 +328,19 @@ class BacklogHome extends Component {
               >
                 {'史诗'}
               </p>
-              <p
-                style={{
-                  marginTop: 12,
-                }}
-                role="none"
-                onClick={() => {
-                  this.toggleCurrentVisible('feature');
-                }}
-              >
-                {'特性'}
-              </p>
+              {isInProgram && (
+                <p
+                  style={{
+                    marginTop: 12,
+                  }}
+                  role="none"
+                  onClick={() => {
+                    this.toggleCurrentVisible('feature');
+                  }}
+                >
+                  {'特性'}
+                </p>
+              )}
             </div>
             <Version
               store={BacklogStore}
@@ -307,13 +357,15 @@ class BacklogHome extends Component {
                 this.IssueDetail.refreshIssueDetail();
               }}
             />
-            <Feature
-              refresh={this.refresh}
-              visible={BacklogStore.getCurrentVisible}
-              issueRefresh={() => {
-                this.IssueDetail.refreshIssueDetail();
-              }}
-            />
+            {isInProgram && (
+              <Feature
+                refresh={this.refresh}
+                visible={BacklogStore.getCurrentVisible}
+                issueRefresh={() => {
+                  this.IssueDetail.refreshIssueDetail();
+                }}
+              />
+            )}
             <Spin spinning={BacklogStore.getSpinIf}>
               <div className="c7n-backlog-content">
                 <DragDropContext
@@ -338,9 +390,17 @@ class BacklogHome extends Component {
                           destinationItem = destinationArr[destinationIndex];
                         }
                         if (BacklogStore.getMultiSelected.size > 1 && !BacklogStore.getMultiSelected.has(destinationItem)) {
-                          BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'multi');
+                          BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'multi').then(() => {
+                            if (this.IssueDetail) {
+                              this.IssueDetail.refreshIssueDetail();
+                            }
+                          });
                         } else {
-                          BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'single');
+                          BacklogStore.moveSingleIssue(destinationId, destinationIndex, sourceId, sourceIndex, draggableId, item, 'single').then(() => {
+                            if (this.IssueDetail) {
+                              this.IssueDetail.refreshIssueDetail();
+                            }
+                          });
                         }
                       }
                     }
@@ -354,6 +414,8 @@ class BacklogHome extends Component {
                   }}
                 >
                   <SprintItem
+                    display={display}
+                    isInProgram={isInProgram}
                     epicVisible={BacklogStore.getEpicVisible}
                     versionVisible={BacklogStore.getVersionVisible}
                     onRef={(ref) => {

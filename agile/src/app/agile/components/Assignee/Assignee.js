@@ -158,7 +158,7 @@ class Assignee extends Component {
                         />
                       </div>
                     </Option>
-))}
+                  ))}
                 </Select>,
               )}
             </FormItem>

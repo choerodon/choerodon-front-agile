@@ -8,7 +8,7 @@
   }
 
   input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0px 1000px #fff inset;
+    -webkit-box-shadow: 0 0 0 1000px #fff inset;
   }
 
   .clear-p-mw {
@@ -33,5 +33,29 @@
   .ant-upload-list-item-info {
     padding-right: 20px;
     max-width: 100%;
+  }
+
+  .fieldWith {
+    width: 520px;
+  }
+}
+
+.is-required {
+  .ant-radio-group-label:after {
+    display: inline-block;
+    margin-left: 4px;
+    content: "*";
+    line-height: 1;
+    font-size: 13px;
+    color: #d50000;
+  }
+
+  .ant-checkbox-group-label:after {
+    display: inline-block;
+    margin-left: 4px;
+    content: "*";
+    line-height: 1;
+    font-size: 13px;
+    color: #d50000;
   }
 }

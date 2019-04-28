@@ -1,4 +1,5 @@
 import { stores, axios } from 'choerodon-front-boot';
+import { getProjectId, getOrganizationId } from '../common/utils';
 
 const { AppState } = stores;
 
@@ -9,6 +10,13 @@ export function createIssue(issueObj, applyType = 'agile', projectId = AppState.
   };
   return axios.post(`/agile/v1/projects/${projectId}/issues?applyType=${applyType}`, issue);
 }
+
+export function createIssueField(issueId, dto) {
+  const projectId = AppState.currentMenuType.id;
+  const orgId = AppState.currentMenuType.organizationId;
+  return axios.post(`/foundation/v1/projects/${projectId}/field_value/quick_create/${issueId}?organizationId=${orgId}`, dto);
+}
+
 export function loadIssueTypes(applyType) {
   const projectId = AppState.currentMenuType.id;
   return axios.get(`/issue/v1/projects/${projectId}/schemes/query_issue_types_with_sm_id?apply_type=${applyType || 'agile'}`);
@@ -47,18 +55,11 @@ export function deleteCommit(commitId, projectId = AppState.currentMenuType.id) 
 export function loadComponents() {
   const projectId = AppState.currentMenuType.id;
   return axios.post(
-    `/agile/v1/projects/${projectId}/component/query_all`, {
+    `/agile/v1/projects/${projectId}/component/query_all?size=${999}&page=${0}`, {
       advancedSearchArgs: {},
       searchArgs: {},
       content: '',
     },
-  );
-}
-
-export function loadFeatures(epicId) {
-  const projectId = AppState.currentMenuType.id;
-  return axios.get(
-    `/agile/v1/projects/${projectId}/issues/feature/select_data?epicId=${epicId}`,
   );
 }
 

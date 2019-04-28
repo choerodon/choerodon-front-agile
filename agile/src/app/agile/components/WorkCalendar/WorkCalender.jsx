@@ -344,7 +344,7 @@ class WorkCalendar extends Component {
     return (
       <div className="c7n-workCalendar">
         <Calendar
-          defaultValue={moment(new Date())}
+          defaultValue={moment(startDate)}
           showDateInput={false}
           showToday={false}
           locale={zhCN}

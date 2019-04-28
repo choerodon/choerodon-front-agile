@@ -21,6 +21,7 @@ import CreateVOS from '../component/CreateVOS';
 import CreateIssue from '../component/CreateIssue/CreateIssue.js';
 // import epicPic from '../../../../assets/image/用户故事地图－空.svg';
 import epicPic from '../../../../assets/image/emptyStory.svg';
+import { getProjectsInProgram } from '../../../../api/CommonApi';
 
 const FileSaver = require('file-saver');
 
@@ -71,6 +72,7 @@ class Home extends Component {
       popOverVisible: false,
       showDoneEpicCheckbox: false,
       filterEpicCheckbox: false,
+      isInProgram: false,
     };
   }
 
@@ -95,6 +97,11 @@ class Home extends Component {
     document.addEventListener('mozfullscreenchange', this.handleChangeFullScreen);
     document.addEventListener('MSFullscreenChange', this.handleChangeFullScreen);
     UserMapStore.setCurrentFilter(false, false, []);
+    getProjectsInProgram().then((res) => {
+      this.setState({
+        isInProgram: Boolean(res),
+      });
+    });
   }
 
   componentWillUnmount() {
@@ -1350,7 +1357,6 @@ class Home extends Component {
   }
 
   handleCalcStoryPoints = (issues, vos, id, type, mode) => {
-
     // _.reduce(_.filter(issues, issue => issue.epicId !== 0
     //   && ((mode !== 'none' && issue[id] == null) || mode === 'none')), (sum, issue) => {
     //   if (issue.statusMapDTO && issue.statusMapDTO.type === 'todo') {
@@ -1362,10 +1368,8 @@ class Home extends Component {
 
     const storyPoints = _.reduce(_.filter(
       issues,
-      (issue) => {
-        return !mode && vos ? (issue[id] === vos[id] && issue.epicId !== 0) : (issue.epicId !== 0
-        && ((mode !== 'none' && issue[id] == null) || mode === 'none'))
-      },
+      issue => (!mode && vos ? (issue[id] === vos[id] && issue.epicId !== 0) : (issue.epicId !== 0
+        && ((mode !== 'none' && issue[id] == null) || mode === 'none'))),
     ),
     (sum, issue) => {
       if (issue.statusMapDTO && issue.statusMapDTO.type === type) {
@@ -1374,7 +1378,7 @@ class Home extends Component {
         return sum;
       }
     }, 0);
-    return Math.floor(storyPoints) === storyPoints ? storyPoints : storyPoints.toFixed(1)
+    return Math.floor(storyPoints) === storyPoints ? storyPoints : storyPoints.toFixed(1);
   }
 
   renderHeader = () => {
@@ -1487,12 +1491,13 @@ class Home extends Component {
             </Button>
           ) : null
         }
-      </Header>);
+      </Header>
+    );
   }
 
   renderBody = () => {
     const { UserMapStore } = this.props;
-    const { expandColumns, showChild } = this.state;
+    const { expandColumns, showChild, isInProgram } = this.state;
     const dom = [];
     const epicData = UserMapStore.getEpics;
     const {
@@ -1522,14 +1527,12 @@ class Home extends Component {
                     {todoStoryPoints}
                   </p>
                 </Tooltip>
-                <Tooltip title={`处理中故事点：${doingStoryPoints}`}
-                >
+                <Tooltip title={`处理中故事点：${doingStoryPoints}`}>
                   <p className="point-span" style={{ background: '#FFB100' }}>
                     {doingStoryPoints}
                   </p>
                 </Tooltip>
-                <Tooltip title={`已完成故事点: ${doneStoryPoints}`}
-                >
+                <Tooltip title={`已完成故事点: ${doneStoryPoints}`}>
                   <p className="point-span" style={{ background: '#00BFA5' }}>
                     {doneStoryPoints}
                   </p>
@@ -1637,30 +1640,31 @@ class Home extends Component {
                         <Permission service={['agile-service.product-version.createVersion']}>
                           <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
                             <Icon type="playlist_add" />
-                            {`创建${mode === 'sprint' ? '冲刺' : '版本'}`}
+                            {'创建版本'}
                           </Button>
                         </Permission>
-                      )
-                      : (
+                      ) : ''
+                    }
+                    {mode === 'sprint' && !isInProgram
+                      ? (
                         <Button className="createSpringBtn" functyp="flat" onClick={this.handleCreateVOS.bind(this, mode)}>
                           <Icon type="playlist_add" />
-                          {`创建${mode === 'sprint' ? '冲刺' : '版本'}`}
+                          {'冲刺'}
                         </Button>
-                      )}
+                      ) : ''
+                    }
                   </React.Fragment>
                 ) }
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Tooltip title={`待处理故事点：${unPlanTodoStoryPoints}`}
-              >
+              <Tooltip title={`待处理故事点：${unPlanTodoStoryPoints}`}>
                 <p className="point-span" style={{ background: '#4D90FE' }}>
                   {
                     unPlanTodoStoryPoints
                   }
                 </p>
               </Tooltip>
-              <Tooltip title={`处理中故事点：${unPlanDoingStoryPoints}`}
-              >
+              <Tooltip title={`处理中故事点：${unPlanDoingStoryPoints}`}>
                 <p className="point-span" style={{ background: '#FFB100' }}>
                   {unPlanDoingStoryPoints}
                 </p>
@@ -1898,7 +1902,8 @@ class Home extends Component {
                         </p>
                       </div>
                     </div>
-                  </div>)}
+                  </div>
+                )}
         </Content>
       </Page>
     );

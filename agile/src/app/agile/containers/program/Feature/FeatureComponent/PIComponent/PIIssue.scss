@@ -3,13 +3,13 @@
 }
 
 //@media (min-width: 500px) {
-//  .c7n-backlog-IssueCard {
+//  .c7n-feature-IssueCard {
 //    display: flex;
 //    flex-wrap: wrap;
 //  }
 //}
 
-.c7n-backlog-IssueCard {
+.c7n-feature-IssueCard {
   display: flex;
   //justify-content: space-between;
   flex-wrap: wrap;
@@ -47,7 +47,7 @@
   &-right {
     display: flex;
     justify-content: flex-end;
-    min-width: 170px;
+    min-width: 230px;
     flex: 1;
     margin-bottom: 2px;
     .container {
@@ -56,7 +56,7 @@
       height: 20px;
       display: block;
       padding: 0 3px;
-      max-width: 50px;
+      max-width: 100px;
       margin: 0 6px;
       text-align: center;
       overflow: hidden;

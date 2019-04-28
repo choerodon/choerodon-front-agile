@@ -27,9 +27,8 @@ import { handleFileUpload } from '../../../../common/utils';
     this.setState({ fileList: data });
   };
 
-  refresh = (newFile) => {
-    const { fileList } = this.state;
-    this.setFileList([...fileList, ...newFile]);
+  refresh = () => {
+    this.setFileList(false);
     const { reloadIssue } = this.props;
     if (reloadIssue) {
       reloadIssue();
@@ -74,7 +73,7 @@ import { handleFileUpload } from '../../../../common/utils';
           }}
           />
         </div>
-        <div className="c7n-content-wrapper" style={{ marginTop: '-47px' }}>
+        <div className="c7n-content-wrapper" style={{ marginTop: '-47px', justifyContent: 'flex-end' }}>
           <UploadButtonNow
             onRemove={this.setFileList}
             onBeforeUpload={this.setFileList}

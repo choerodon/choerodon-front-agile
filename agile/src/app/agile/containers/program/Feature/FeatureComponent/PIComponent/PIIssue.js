@@ -21,10 +21,10 @@ class PIItem extends Component {
   render() {
     const { item } = this.props;
     return (
-      <div className={classnames('c7n-backlog-IssueCard')}>
+      <div className={classnames('c7n-feature-IssueCard')}>
         <div
           label="PIItem"
-          className={classnames('c7n-backlog-IssueCard-left')}
+          className={classnames('c7n-feature-IssueCard-left')}
         >
           <TypeTag
             data={{
@@ -32,31 +32,24 @@ class PIItem extends Component {
               colour: item.featureType === 'business' ? '#29B6F6' : '#FFCA28',
             }}
           />
-          <div className="c7n-backlog-IssueCard-left-summaryContainer">
-            <div className="c7n-backlog-IssueCard-left-issueNum" style={{ textDecoration: item.statusMapDTO && item.statusMapDTO.code === 'complete' ? 'line-through' : 'none' }}>
+          <div className="c7n-feature-IssueCard-left-summaryContainer">
+            <div className="c7n-feature-IssueCard-left-issueNum" style={{ textDecoration: item.statusMapDTO && item.statusMapDTO.code === 'complete' ? 'line-through' : 'none' }}>
               {`${item.issueNum}`}
             </div>
             <Tooltip title={item.summary} placement="topLeft">
-              <div className="c7n-backlog-IssueCard-left-issueSummary">{item.summary}</div>
+              <div className="c7n-feature-IssueCard-left-issueSummary">{item.summary}</div>
             </Tooltip>
           </div>
         </div>
         <div
-          className={classnames('c7n-backlog-IssueCard-right')}
+          className={classnames('c7n-feature-IssueCard-right')}
         >
           <div className={classnames('line-two-left')}>
-            {item.versionNames && item.versionNames.length > 0 ? (
-              <Tooltip title={`版本: ${item.versionNames.join(', ')}`}>
-                <span className="c7n-backlog-IssueCard-right-version container">
-                  {item.versionNames.join(', ')}
-                </span>
-              </Tooltip>
-            ) : ''}
             {!_.isNull(item.epicName) && item.epicName ? (
               <Tooltip title={`史诗: ${item.epicName}`}>
                 <span
                   label="PIItem"
-                  className="c7n-backlog-IssueCard-right-epic container"
+                  className="c7n-feature-IssueCard-right-epic container"
                   style={{
                     color: item.color || item.epicColor,
                     border: `1px solid ${item.color || item.epicColor}`,
@@ -79,24 +72,17 @@ class PIItem extends Component {
           </div>
           <div className={classnames('line-two-right')}>
             <Tooltip title={`状态: ${item.statusMapDTO ? item.statusMapDTO.name : ''}`}>
-              <div className="c7n-backlog-IssueCard-right-status">
+              <div className="c7n-feature-IssueCard-right-status">
                 <StatusTag
                   data={item.statusMapDTO}
                 />
               </div>
             </Tooltip>
-            {item.priorityDTO
-              ? (
-                <Tooltip title={`优先级: ${item.priorityDTO ? item.priorityDTO.name : ''}`}>
-                  <PriorityTag priority={item.priorityDTO} />
-                </Tooltip>
-              ) : ''
-            }
             <Tooltip title={`故事点: ${item.storyPoints}`}>
               <div
                 label="PIItem"
-                className={classnames('c7n-backlog-IssueCard-right-storyPoint', {
-                  visible: item.storyPoints && item.issueTypeDTO && item.issueTypeDTO.typeCode === 'story',
+                className={classnames('c7n-feature-IssueCard-right-storyPoint', {
+                  visible: item.storyPoints,
                 })}
               >
                 {item.storyPoints}

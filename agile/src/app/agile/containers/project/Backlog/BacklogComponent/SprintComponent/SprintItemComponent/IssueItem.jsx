@@ -21,9 +21,7 @@ class IssueItem extends Component {
   };
 
   render() {
-    const {
-      epicVisible, versionVisible, item, onClick,
-    } = this.props;
+    const { item } = this.props;
     return (
       <div
         className={classnames('c7n-backlog-sprintIssueItem', {
