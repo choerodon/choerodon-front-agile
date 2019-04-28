@@ -46,7 +46,7 @@ const { Text, Edit } = TextEditToggle;
     this.setState({
       selectLoading: true,
     });
-    getUsers(input).then((res) => {
+    getUsers(input).then((res) => {  
       this.setState({
         originUsers: res.content,
         selectLoading: false,
@@ -138,6 +138,7 @@ const { Text, Edit } = TextEditToggle;
                 loading={selectLoading}
                 allowClear
                 filter
+                filterOption={false}
                 onFilterChange={this.onFilterChange.bind(this)}
                 getPopupContainer={triggerNode => triggerNode.parentNode}
                 onChange={(value) => {
