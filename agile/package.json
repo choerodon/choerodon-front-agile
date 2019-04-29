@@ -18,6 +18,7 @@
   "keywords": [],
   "devDependencies": {},
   "dependencies": {
+    "@toast-ui/react-calendar": "^1.0.1",
     "bizcharts": "^3.1.10",
     "canvas2image": "^1.0.5",
     "choerodon-front-boot": "0.10.10",
