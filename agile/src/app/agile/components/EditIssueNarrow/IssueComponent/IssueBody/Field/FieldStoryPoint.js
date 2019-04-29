@@ -104,7 +104,7 @@ const defaultList = ['0.5', '1', '2', '3', '4', '5', '8', '13'];
             {`${fieldName}：`}
           </span>
         </div>
-        <div className="c7n-value-wrapper" style={{ width: 'auto' }}>
+        <div className="c7n-value-wrapper" style={{ width: '80px' }}>
           <TextEditToggle
             onSubmit={this.updateIssueField}
           >

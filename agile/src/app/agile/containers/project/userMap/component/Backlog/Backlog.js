@@ -6,7 +6,7 @@ import {
   Input, Icon, Popover, Checkbox,
 } from 'choerodon-ui';
 import { toJS } from 'mobx';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { Droppable, Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 import './Backlog.scss';
 import '../../../../Agile.scss';
@@ -43,6 +43,13 @@ class Backlog extends Component {
     this.setState({ keyword: e.target.value });
   };
 
+  onIssueClick = (id) => {
+    const { handleClickIssue } = this.props;
+    if (handleClickIssue) {
+      handleClickIssue(id);
+    }
+  };
+
   loadIssues() {
     US.loadBacklogIssues();
   }
@@ -77,7 +84,7 @@ class Backlog extends Component {
    */
   renderIssues() {
     const {
-      mode, backlogExpand, selectIssueIds, currentDraggableId, 
+      mode, backlogExpand,
     } = US;
     const { keyword } = this.state;
     let group = [];
@@ -294,10 +301,6 @@ class Backlog extends Component {
     );
   }
 
-  onIssueClick = (id) => {
-    this.props.handleClickIssue(id);
-  };
-
   render() { 
     return (
       <div className="c7n-userMap-backlog agile">
@@ -341,7 +344,7 @@ class Backlog extends Component {
                   ))
                 }
                 {
-                  US.getFilters.content.map(filter => (
+                  US.getFilters.map(filter => (
                     <Checkbox
                       onChange={this.handleClickFilter.bind(this, filter.filterId)}
                       checked={US.currentBacklogFilters.includes(filter.filterId)}
