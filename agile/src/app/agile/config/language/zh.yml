@@ -13,6 +13,12 @@
 'agile.iterationBoard': 迭代控制台
 'agile.messageNotification': 通知设置
 
+'agile.feature': 特性列表
+'agile.artCalendar': ART日历
+'agile.pi': PI目标
+'agile.art': ART设置
+'agile.programSetting': 项目设置
+
 "program": 大规模敏捷
 'program.feature': 特性列表
 'program.artCalendar': ART日历

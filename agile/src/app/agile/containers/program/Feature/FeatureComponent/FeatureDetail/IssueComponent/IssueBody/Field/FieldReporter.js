@@ -139,6 +139,7 @@ const { Text, Edit } = TextEditToggle;
                 loading={selectLoading}
                 allowClear
                 filter
+                filterOption={false}
                 onFilterChange={this.onFilterChange.bind(this)}
                 getPopupContainer={triggerNode => triggerNode.parentNode}
                 onChange={(value) => {
