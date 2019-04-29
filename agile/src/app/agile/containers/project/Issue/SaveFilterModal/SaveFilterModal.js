@@ -47,9 +47,9 @@ class SaveFilterModal extends Component {
             createEndDate,
             createStartDate,
           }), _.pick(userFilter.otherArgs, ['assigneeId', 'component', 'sprint', 'epic', 'label', 'version']), userFilter.contents);
-          IssueStore.setCreateFilterData(createFilterData, { name: value.filterName, personalFilterSearchDTO });
-          IssueStore.setLoading(true);
-          axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter`, JSON.stringify(IssueStore.getCreateFilterData))
+          IssueStore.setCreateFilterData(createFilterData, { name: value.filterName, personalFilterSearchDTO, filterJson: JSON.stringify(personalFilterSearchDTO) });
+          IssueStore.setLoading(true);   
+          axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/personal_filter`, IssueStore.getCreateFilterData)
             .then((res) => {
               IssueStore.axiosGetMyFilterList();
               IssueStore.setSaveFilterVisible(false);
