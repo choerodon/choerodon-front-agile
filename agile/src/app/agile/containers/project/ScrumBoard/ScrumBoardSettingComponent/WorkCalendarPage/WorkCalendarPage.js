@@ -36,7 +36,7 @@ class WorkCalendarPage extends Component {
       workHolidayCalendarDTOS: holidayRefs,
     } = ScrumBoardStore.getWorkSetting;
     const {
-      sprintWorkCalendarRefDTOS: workDates,
+      workCalendarRefDTOS: workDates,
       startDate,
       endDate,
     } = ScrumBoardStore.getWorkDate;

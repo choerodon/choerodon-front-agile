@@ -20,7 +20,7 @@ const FormItem = Form.Item;
 const Fields = {
   1: ['code', 'piCount', 'rteId', 'startDate'],
   2: ['ipWeeks', 'interationCount', 'interationWeeks'],
-  3: ['piCodePrefix', 'piCodeNumber'],
+  3: ['piCodePrefix', 'piCodeNumber', 'sprintCompleteSetting'],
 };
 const propTypes = {
   initValue: PropTypes.shape({}).isRequired,
@@ -207,6 +207,18 @@ class ArtForm extends Component {
                 normalize: value => (value ? value.toString().replace(/[^\d]|^0/g, '') : value),
               })(
                 <Input style={{ width: 500 }} label="PI起始编号" maxLength={3} placeholder="请输入PI起始编号" />,
+              )}
+            </FormItem>
+            <FormItem>
+              {getFieldDecorator('sprintCompleteSetting', {
+                rules: [{
+                  required: true, message: '请选择要移动的位置',
+                }],
+              })(
+                <Select style={{ width: 500 }} label="冲刺中未完成问题移动位置">
+                  <Option key="backlog" value="backlog">待办事项</Option>
+                  <Option key="next_sprint" value="next_sprint">下个冲刺</Option>
+                </Select>,
               )}
             </FormItem>
           </TabPane>

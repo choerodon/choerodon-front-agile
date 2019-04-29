@@ -65,15 +65,15 @@ class WorkCalendarStore {
 
   axiosUpdateSetting(orgId, timeZoneId, data) {
     return axios.put(`/agile/v1/organizations/${orgId}/time_zone_work_calendars/${timeZoneId}`, data);
-  };
+  }
 
   axiosDeleteCalendarData(orgId, calendarId) {
     return axios.delete(`/agile/v1/organizations/${orgId}/time_zone_work_calendars/ref/${calendarId}`);
-  };
+  }
 
   axiosCreateCalendarData(orgId, timeZoneId, data) {
     return axios.post(`/agile/v1/organizations/${orgId}/time_zone_work_calendars/ref/${timeZoneId}`, data);
-  };
+  }
 }
 
 const workCalendarStore = new WorkCalendarStore();
