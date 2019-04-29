@@ -802,12 +802,12 @@ class ScrumBoardStore {
 
   axiosDeleteCalendarData(calendarId) {
     const proId = AppState.currentMenuType.id;
-    return axios.delete(`/agile/v1/projects/${proId}/sprint/work_calendar/${calendarId}`);
+    return axios.delete(`/agile/v1/projects/${proId}/work_calendar_ref/${calendarId}`);
   }
 
   axiosCreateCalendarData(sprintId, data) {
     const proId = AppState.currentMenuType.id;
-    return axios.post(`/agile/v1/projects/${proId}/sprint/work_calendar_create/${sprintId}`, data);
+    return axios.post(`/agile/v1/projects/${proId}/work_calendar_ref/sprint/${sprintId}`, data);
   }
 
   @action setWorkDate(data) {
@@ -824,7 +824,7 @@ class ScrumBoardStore {
   // 获取项目层工作日历
   axiosGetCalendarData = (year) => {
     const proId = AppState.currentMenuType.id;
-    return axios.get(`/agile/v1/projects/${proId}/sprint/work_calendar?year=${year}`).then((data) => {
+    return axios.get(`/agile/v1/projects/${proId}/work_calendar_ref/sprint?year=${year}`).then((data) => {
       if (data) {
         this.setWorkDate(data);
       } else {

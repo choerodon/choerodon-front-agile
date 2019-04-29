@@ -102,7 +102,7 @@ class BacklogHome extends Component {
 
     getFeaturesInProject().then((data) => {
       BacklogStore.setFeatureData(data);
-    }).catch((error3) => {
+    }).catch(() => {
     });
   };
 
