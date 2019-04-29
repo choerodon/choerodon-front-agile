@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import React from 'react';
 import { Select } from 'choerodon-ui';
 import { find } from 'lodash';
@@ -10,7 +11,33 @@ import TypeTag from '../TypeTag';
 import StatusTag from '../StatusTag';
 
 const { Option } = Select;
-
+const issue_type_program = {
+  props: {
+    filterOption:
+      (input, option) => option.props.children
+        && option.props.children.toLowerCase().indexOf(
+          input.toLowerCase(),
+        ) >= 0,
+  },
+  request: () => new Promise(resolve => loadIssueTypes('program').then((issueTypes) => {
+    const defaultType = find(issueTypes, { typeCode: 'feature' }).id;
+    resolve(issueTypes, defaultType);
+  })),
+  render: issueType => (
+    <Option
+      key={issueType.id}
+      value={issueType.id}
+      name={issueType.name}
+    >
+      <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
+        <TypeTag
+          data={issueType}
+          showName
+        />
+      </div>
+    </Option>
+  ),
+};
 export default {
   user: {
     request: (...args) => new Promise(resolve => getUsers(...args).then((UserData) => { resolve(UserData.content); })),
@@ -95,30 +122,16 @@ export default {
       </Option>
     ),
   },
-  issue_type_program: {
-    props: {
-      filterOption:
-        (input, option) => option.props.children
-          && option.props.children.toLowerCase().indexOf(
-            input.toLowerCase(),
-          ) >= 0,
-    },
-    request: () => new Promise(resolve => loadIssueTypes('program').then((issueTypes) => {
-      const defaultType = find(issueTypes, { typeCode: 'feature' }).id;
-      resolve(issueTypes, defaultType);
-    })),
+  issue_type_program,
+  issue_type_program_simple: {
+    ...issue_type_program,
     render: issueType => (
       <Option
         key={issueType.id}
         value={issueType.id}
         name={issueType.name}
       >
-        <div style={{ display: 'inline-flex', alignItems: 'center', padding: '2px' }}>
-          <TypeTag
-            data={issueType}
-            showName
-          />
-        </div>
+        {issueType.name}
       </Option>
     ),
   },

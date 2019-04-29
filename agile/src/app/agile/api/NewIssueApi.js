@@ -328,3 +328,25 @@ export function createFieldValue(id, code, dto) {
   const orgId = AppState.currentMenuType.organizationId;
   return axios.post(`/foundation/v1/projects/${projectId}/field_value/${id}?organizationId=${orgId}&schemeCode=${code}`, dto);
 }
+export function getMyFilters() {
+  const { userInfo: { id } } = AppState;
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(`/agile/v1/projects/${projectId}/personal_filter/query_all/${id}`);
+}
+
+export function createMyFilter(data) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.post(`/agile/v1/projects/${projectId}/personal_filter`, data);
+}
+export function checkMyFilterName(filterName) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.get(`/agile/v1/projects/${projectId}/personal_filter/check_name?userId=${AppState.userInfo.id}&name=${filterName}`);
+}
+export function updateMyFilter(filterId, updateData) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.put(`/agile/v1/projects/${projectId}/personal_filter/${filterId}`, updateData);
+}
+export function deleteMyFilter(filterId) {
+  const projectId = AppState.currentMenuType.id;
+  return axios.delete(`/agile/v1/projects/${projectId}/personal_filter/${filterId}`);
+}

@@ -91,12 +91,12 @@
         sort: 14
         delete: true
         permission:
-          - 'agile-service.pi.queryAll'
+          - 'agile-service.pi.queryAll'    
     - "pi":
         icon: center_focus_strong
         category: PROGRAM
         Routes: /agile/pi
-        sort: 15
+        sort: 16
         delete: true
         permission:
           - 'agile-service.pi.queryAll'
@@ -104,7 +104,7 @@
         icon: train
         category: PROGRAM
         Routes: /agile/art
-        sort: 16
+        sort: 17
         delete: true
         permission:
           - 'agile-service.art.queryArtList'
@@ -112,7 +112,7 @@
         icon: folder_shared
         category: PROGRAM
         Routes: /agile/programSetting
-        sort: 17
+        sort: 18
         delete: true
         permission:
           - 'agile-service.art.queryArtList'
@@ -142,25 +142,32 @@
         sort: 3
         permission:
           - 'agile-service.art.queryArtCalendar'
+    - "roadMap":
+        icon: view_week
+        category: PROGRAM
+        Routes: /agile/roadMap
+        sort: 4     
+        permission:
+          - 'agile-service.road_map.queryRoadMapOfProgram'
     - "pi":
         icon: center_focus_strong
         category: PROGRAM
         Routes: /agile/pi
-        sort: 4
+        sort: 5
         permission:
           - 'agile-service.pi-objective.queryPiObjectiveList'
     - "art":
         icon: train
         category: PROGRAM
         Routes: /agile/art
-        sort: 5
+        sort: 6
         permission:
           - 'agile-service.art.queryArtList'
     - "programSetting":
         icon: folder_shared
         category: PROGRAM
         Routes: /agile/programSetting
-        sort: 6
+        sort: 7
         permission:
           - 'agile-service.project-info.updateProjectInfo'
 

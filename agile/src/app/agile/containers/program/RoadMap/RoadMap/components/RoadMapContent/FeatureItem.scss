@@ -1,0 +1,12 @@
+.c7nagile-RoadMap-FeatureItem {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  cursor: pointer;
+  &-summary {
+    flex: 1;
+    overflow: hidden;
+    margin-left: 10px;
+    word-break: break-word;
+  }
+}
