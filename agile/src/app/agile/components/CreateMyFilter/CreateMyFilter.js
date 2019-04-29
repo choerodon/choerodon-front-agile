@@ -33,7 +33,7 @@ class CreateMyFilter extends Component {
           name: filterName,
           // filterId: 0,
           // objectVersionNumber: 0,
-          personalFilterSearchDTO: searchDTO,
+          personalFilterSearchDTO: JSON.stringify(searchDTO),
           projectId: AppState.currentMenuType.id,
           userId: AppState.userInfo.id,
         };
