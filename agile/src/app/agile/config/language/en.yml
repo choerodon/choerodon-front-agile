@@ -22,6 +22,7 @@
 'program': Program
 'program.feature': Feature
 'program.artCalendar': ART Calendar
+'program.roadMap': Road Map
 'program.pi': PI Objective
 'program.art': ART Setting
 'program.programKanban': Program Kanban
