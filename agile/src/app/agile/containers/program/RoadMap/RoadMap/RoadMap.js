@@ -54,27 +54,27 @@ class RoadMap extends Component {
         />
         <Content style={{ paddingTop: 0 }}>         
           <RoadMapHeader startDate={startDate} endDate={endDate} />
-          <RoadMapContent piList={piList} onFeatureClick={this.handleFeatureClick} />
-          <div style={{
-            position: 'absolute',
-            bottom: 0,
-            right: 0,
-            height: 'calc(100% - 106px)',
-            background: 'white',
-            zIndex: 8,
-          }}
-          >
-            {
+          <RoadMapContent piList={piList} onFeatureClick={this.handleFeatureClick} />          
+          {
             editFeatureVisible && (
-            <EditFeature 
-              store={FeatureStore}
-              issueId={currentFeature}
-              onCancel={this.handleCancel}
-              onDeleteIssue={this.handleDelete}
-              // onUpdate={refresh}
-            />
-            )}
-          </div>
+              <div style={{
+                position: 'fixed',
+                bottom: 0,
+                right: 0,
+                width: 440,
+                height: 'calc(100% - 106px)',
+                background: 'white',
+                zIndex: 8,
+              }}
+              >
+                <EditFeature 
+                  store={FeatureStore}
+                  issueId={currentFeature}
+                  onCancel={this.handleCancel}
+                  onDeleteIssue={this.handleDelete}
+                />
+              </div>
+            )}         
         </Content>
       </Page>
     );
