@@ -72,7 +72,7 @@ import { updateIssue } from '../../../../../../../api/NewIssueApi';
     if (!description || editDesShow) {
       return (
         <div
-          className="line-start mt-10 two-to-one"          
+          className="line-start mt-10 two-to-one"
         >
           <div style={{
             width: '100%',
