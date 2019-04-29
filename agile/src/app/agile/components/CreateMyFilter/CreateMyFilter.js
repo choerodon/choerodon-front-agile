@@ -36,7 +36,7 @@ class CreateMyFilter extends Component {
           filterJson: JSON.stringify(searchDTO),
           projectId: AppState.currentMenuType.id,
           userId: AppState.userInfo.id,
-        };
+        };  
         this.setState({
           loading: true,
         });
