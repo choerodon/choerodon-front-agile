@@ -36,21 +36,45 @@ class ExportIssue extends PureComponent {
     const orgId = AppState.currentMenuType.organizationId;
     const { searchDTO, tableShowColumns, onCancel } = this.props;
     const { mode } = this.state;
-    const exportFieldCodes = mode === 'all' ? [] : tableShowColumns;
+    const exportFieldCodes = mode === 'all' ? [] : this.getExportFieldCodes(tableShowColumns);
     const search = {
       ...searchDTO,
       exportFieldCodes,
     };
-    // console.log(search);
-    // exportFeatures(search)
-    //   .then((data) => {
-    //     const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    //     const fileName = `${AppState.currentMenuType.name}.xlsx`;
-    //     FileSaver.saveAs(blob, fileName);
-    //     Choerodon.prompt('导出成功');        
-    //     onCancel();
-    //   });
+    exportFeatures(search)
+      .then((data) => {
+        const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const fileName = `${AppState.currentMenuType.name}.xlsx`;
+        FileSaver.saveAs(blob, fileName);
+        Choerodon.prompt('导出成功');        
+        onCancel();
+      });
   };
+
+  getExportFieldCodes=(tableShowColumns) => {
+    const transform = {
+      issueNum: 'issueNum',
+      summary: 'summary',
+      featureType: 'typeName',
+      assignee: 'assigneeName',
+      reporter: 'reporterName',
+      statusList: 'statusName',
+      sprint: 'sprintName',
+      creationDate: 'creationDate',
+      lastUpdateDate: 'lastUpdateDate',
+      priorityId: 'priorityName',
+      version: 'versionName',  
+      label: 'labelName',
+      storyPoints: 'storyPoints',
+      component: 'componentName',
+      epicList: 'epicName',
+      piList: 'piName',
+      benfitHypothesis: 'benfitHypothesis',
+      acceptanceCritera: 'acceptanceCritera',
+    };
+
+    return tableShowColumns.map(key => transform[key]);
+  }
 
   render() {
     const { mode } = this.state;
