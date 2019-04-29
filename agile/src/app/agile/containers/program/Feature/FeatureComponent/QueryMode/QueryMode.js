@@ -157,7 +157,7 @@ class QueryMode extends Component {
     if (targetFilter) {
       const { filterJson } = targetFilter;
       this.setState({
-        searchDTO: JSON.parse(filterJson),
+        searchDTO: JSON.parse(filterJson) || {},
         selectedFilter: filterId,
       },
       this.loadFeatures);

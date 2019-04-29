@@ -120,7 +120,7 @@ class AdvancedSearch extends PureComponent {
             }
           </Select>
 
-          <SelectFocusLoad
+          {/* <SelectFocusLoad
             type="issue_type_program_simple"
             className="SelectTheme"
             mode="multiple"
@@ -136,7 +136,7 @@ class AdvancedSearch extends PureComponent {
             onChange={this.handleSelectChange.bind(this, 'issueTypeList')}
             value={SelectValue.issueTypeList}
             getPopupContainer={triggerNode => triggerNode.parentNode}
-          />
+          /> */}
 
           <SelectFocusLoad
             className="SelectTheme"
@@ -158,7 +158,7 @@ class AdvancedSearch extends PureComponent {
             getPopupContainer={triggerNode => triggerNode.parentNode}
           />
           
-          <SelectFocusLoad
+          {/* <SelectFocusLoad
             className="SelectTheme"
             type="user"
             loadWhenMount
@@ -174,7 +174,7 @@ class AdvancedSearch extends PureComponent {
             value={SelectValue.assigneeIds}
             getPopupContainer={triggerNode => triggerNode.parentNode}
             render={user => <Option value={user.id}>{user.realName}</Option>}
-          />
+          /> */}
 
           {/* {
               (moment(createStartDate).format('YYYY-MM-DD') === moment(projectInfo.creationDate).format('YYYY-MM-DD') || createStartDate === '') && (moment(createEndDate).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD') || createEndDate === '') ? (
