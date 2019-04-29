@@ -68,14 +68,14 @@ class SprintIssue extends Component {
           </div>
           <div className={classnames('line-two-right')}>
             {item.assigneeId && (
-              <UserHead
-                user={{
-                  id: item.assigneeId,
-                  loginName: item.assigneeLoginName,
-                  realName: item.assigneeRealName,
-                  avatar: item.imageUrl,
-                }}
-              />
+            <UserHead
+              user={{
+                id: item.assigneeId,
+                loginName: '',
+                realName: item.assigneeName,
+                avatar: item.imageUrl,
+              }}
+            />
             )}
             <Tooltip title={`状态: ${item.statusMapDTO ? item.statusMapDTO.name : ''}`}>
               <div className="c7n-backlog-IssueCard-right-status">

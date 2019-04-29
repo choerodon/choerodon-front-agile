@@ -29,6 +29,7 @@ import VisibleStore from '../../../../stores/common/visible/VisibleStore';
               worklog={worklog}
               onDeleteLog={reloadIssue}
               onUpdateLog={reloadIssue}
+              hasPermission={hasPermission}
             />
           ))
         }

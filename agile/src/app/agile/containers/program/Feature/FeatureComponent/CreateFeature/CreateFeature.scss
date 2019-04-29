@@ -17,6 +17,13 @@
     display: inline-block;
   }
 
+  .ant-upload-list-item {
+    .icon-close {
+      transform: none;
+      font-size: 14px;
+    }
+  }
+
   .fieldWith {
     width: 520px;
   }
