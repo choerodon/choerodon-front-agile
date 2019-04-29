@@ -28,8 +28,8 @@ const getColumns = (filters, getFilteredValue) => ([
     className: 'issueId',
     sorterId: 'issueId',
     width: 100,  
-    filters: [],
-    filteredValue: getFilteredValue('issueNum'),
+    // filters: [],
+    // filteredValue: getFilteredValue('issueNum'),
     render: text => <IssueNum text={text} />,
   },
   {
@@ -68,8 +68,8 @@ const getColumns = (filters, getFilteredValue) => ([
     className: 'summary',
     key: 'summary',
     width: 240, 
-    filters: [],
-    filteredValue: getFilteredValue('summary'),
+    // filters: [],
+    // filteredValue: getFilteredValue('summary'),
     render: text => <Summary text={text} />,
   },
   {
