@@ -203,7 +203,7 @@ class CreateField extends Component {
                 }],
               })(
                 <Input
-                  maxLength={15}
+                  maxLength={6}
                   label={<FormattedMessage id="name" />}
                 />,
               )}
