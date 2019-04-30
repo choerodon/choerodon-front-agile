@@ -551,7 +551,7 @@ class CreateFeature extends Component {
           <FormItem style={{ width: 520, marginBottom: 15 }}>
             {getFieldDecorator('benfitHypothesis', {
             })(
-              <Input label="特性价值" placeholder="请输入特性价值" maxLength={255} />,
+              <Input label="特性价值" placeholder="请输入特性价值" maxLength={100} />,
             )}
           </FormItem>
         );
@@ -560,7 +560,7 @@ class CreateFeature extends Component {
           <FormItem style={{ width: 520 }}>
             {getFieldDecorator('acceptanceCritera', {
             })(
-              <Input label="验收标准" placeholder="请输入验收标准" maxLength={255} />,
+              <Input label="验收标准" placeholder="请输入验收标准" maxLength={100} />,
             )}
           </FormItem>
         );
