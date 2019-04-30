@@ -126,7 +126,7 @@ let hasPermission;
       onCancel,
       style,
       onUpdate,
-      reloadIssue,
+      onDeleteIssue,
     } = this.props;
     const {
       issueLoading,
@@ -181,7 +181,7 @@ let hasPermission;
             onCancel={onCancel}
             loginUserId={loginUserId}
             hasPermission={hasPermission}
-            onUpdate={onUpdate}
+            onDeleteIssue={onDeleteIssue}
           />
           <IssueBody
             store={store}
@@ -242,6 +242,9 @@ let hasPermission;
               objectVersionNumber={objectVersionNumber}
               onOk={() => {
                 VisibleStore.setAssigneeShow(false);
+                if (onUpdate) {
+                  onUpdate();
+                }
                 this.loadIssueDetail(issueId);
               }}
               onCancel={() => {

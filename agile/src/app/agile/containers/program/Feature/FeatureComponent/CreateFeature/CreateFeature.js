@@ -308,6 +308,7 @@ class CreateFeature extends Component {
     } else if (field.fieldType === 'datetime') {
       return (
         <DatePicker
+          showTime
           label={fieldName}
           format="YYYY-MM-DD HH:mm:ss"
           className="fieldWith"
@@ -358,6 +359,7 @@ class CreateFeature extends Component {
           label={fieldName}
           className="fieldWith"
           step={field.extraConfig === '1' ? 0.1 : 1}
+          maxLength={8}
         />
       );
     } else if (field.fieldType === 'text') {
@@ -366,6 +368,7 @@ class CreateFeature extends Component {
           autosize
           label={fieldName}
           className="fieldWith"
+          maxLength={255}
         />
       );
     } else {
@@ -373,6 +376,7 @@ class CreateFeature extends Component {
         <Input
           label={fieldName}
           className="fieldWith"
+          maxLength={100}
         />
       );
     }
@@ -547,7 +551,7 @@ class CreateFeature extends Component {
           <FormItem style={{ width: 520, marginBottom: 15 }}>
             {getFieldDecorator('benfitHypothesis', {
             })(
-              <Input label="特性价值" placeholder="请输入特性价值" maxLength={255} />,
+              <Input label="特性价值" placeholder="请输入特性价值" maxLength={100} />,
             )}
           </FormItem>
         );
@@ -556,7 +560,7 @@ class CreateFeature extends Component {
           <FormItem style={{ width: 520 }}>
             {getFieldDecorator('acceptanceCritera', {
             })(
-              <Input label="验收标准" placeholder="请输入验收标准" maxLength={255} />,
+              <Input label="验收标准" placeholder="请输入验收标准" maxLength={100} />,
             )}
           </FormItem>
         );

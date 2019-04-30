@@ -8,6 +8,7 @@ import {
 import { injectIntl } from 'react-intl';
 import TextEditToggle from '../../../../TextEditToggle';
 import { updateFieldValue } from '../../../../../api/NewIssueApi';
+import './Field.scss';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -162,6 +163,7 @@ const { Text, Edit } = TextEditToggle;
     } else if (field.fieldType === 'datetime') {
       return (
         <DatePicker
+          showTime
           format="YYYY-MM-DD HH:mm:ss"
           className="fieldWith"
           allowClear={!required}
@@ -212,6 +214,7 @@ const { Text, Edit } = TextEditToggle;
           onChange={e => this.handleChange(e)}
           className="fieldWith"
           step={field.extraConfig === '1' ? 0.1 : 1}
+          maxLength={8}
         />
       );
     } else if (field.fieldType === 'text') {
@@ -220,11 +223,13 @@ const { Text, Edit } = TextEditToggle;
           autosize
           className="fieldWith"
           onChange={e => this.handleChange(e)}
+          maxLength={255}
         />
       );
     } else {
       return (
         <Input
+          maxLength={100}
           className="fieldWith"
           onChange={e => this.handleChange(e)}
         />
@@ -265,7 +270,7 @@ const { Text, Edit } = TextEditToggle;
             // ]}
           >
             <Text key="text">
-              <div>
+              <div style={{ maxWidth: 200, wordBreak: 'break-all' }}>
                 {valueStr || '无'}
               </div>
             </Text>

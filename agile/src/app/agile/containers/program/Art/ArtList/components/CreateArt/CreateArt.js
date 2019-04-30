@@ -111,6 +111,7 @@ class CreateArt extends Component {
           {/* ) */}
           {/* } */}
           {/* </FormItem> */}
+
         </Form>
       </Sidebar>
     );

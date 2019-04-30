@@ -101,7 +101,7 @@ const { Text, Edit } = TextEditToggle;
           <TextEditToggle
             formKey="component"
             onSubmit={this.updateIssueComponents}
-            originData={componentIssueRelDTOList.map(component => component.id)}
+            originData={componentIssueRelDTOList.map(component => component.name)}
           >
             <Text>
               {componentIssueRelDTOList && componentIssueRelDTOList.length

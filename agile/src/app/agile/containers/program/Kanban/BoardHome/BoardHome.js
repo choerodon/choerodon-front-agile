@@ -245,8 +245,8 @@ class BoardHome extends Component {
           </div>
           <Spin spinning={KanbanStore.getSpinIf}>
             <div style={{ display: 'flex', width: '100%' }}>
-              <div className="c7n-board">
-                <div className="c7n-board-header" style={HeaderStore.announcementClosed ? {} : { height: 'calc(100vh - 208px)' }}>
+              <div className="c7n-board" style={HeaderStore.announcementClosed ? {} : { height: 'calc(100vh - 208px)' }}>
+                <div className="c7n-board-header">
                   <StatusColumn />
                 </div>
                 {!KanbanStore.didCurrentSprintExist || KanbanStore.allDataMap.size === 0 ? (
@@ -254,6 +254,7 @@ class BoardHome extends Component {
                 ) : (
                   <div
                     className="c7n-board-content"
+                    style={HeaderStore.announcementClosed ? {} : { height: 'calc(100vh - 256px)' }}
                   >
                     <div className="c7n-board-container">
                       <SwimLane

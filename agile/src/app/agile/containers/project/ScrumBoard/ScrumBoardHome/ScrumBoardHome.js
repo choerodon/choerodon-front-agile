@@ -408,6 +408,7 @@ class ScrumBoardHome extends Component {
                 ) : (
                   <div
                     className="c7n-scrumboard-content"
+                    style={HeaderStore.announcementClosed ? {} : { height: 'calc(100vh - 256px)' }}
                   >
                     <div className="c7n-scrumboard-container">
                       <SwimLane

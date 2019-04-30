@@ -49,7 +49,8 @@ export default class IssueFilterControler {
     });
 
     const { 
-      paramChoose, paramCurrentVersion, paramCurrentSprint, paramId, paramType, paramIssueId, paramName,
+      paramChoose, paramCurrentVersion, paramCurrentSprint, paramId,
+      paramType, paramIssueId, paramName, paramOpenIssueId,
     } = paramObj;
     
     if (paramChoose) {
@@ -97,7 +98,7 @@ export default class IssueFilterControler {
       // filter.searchArgs.issueNum = paramName;
       // 地址栏有id和名称时，会同时发送id和名称, 以达到精确搜索
       filter.searchArgs.issueNum = `${IssueStore.getProjectInfo.projectCode}-${paramName.split('-')[paramName.split('-').length - 1]}`;
-      filter.otherArgs.issueIds = [paramIssueId];
+      filter.otherArgs.issueIds = [paramOpenIssueId || paramIssueId];
       paramIssueSelected = true;
     }
 

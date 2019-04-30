@@ -349,6 +349,7 @@ class CreateSubIssue extends Component {
     } else if (field.fieldType === 'datetime') {
       return (
         <DatePicker
+          showTime
           label={fieldName}
           format="YYYY-MM-DD HH:mm:ss"
           className="fieldWith"
@@ -399,6 +400,7 @@ class CreateSubIssue extends Component {
           label={fieldName}
           className="fieldWith"
           step={field.extraConfig === '1' ? 0.1 : 1}
+          maxLength={8}
         />
       );
     } else if (field.fieldType === 'text') {
@@ -407,6 +409,7 @@ class CreateSubIssue extends Component {
           autosize
           label={fieldName}
           className="fieldWith"
+          maxLength={255}
         />
       );
     } else {
@@ -414,6 +417,7 @@ class CreateSubIssue extends Component {
         <Input
           label={fieldName}
           className="fieldWith"
+          maxLength={100}
         />
       );
     }

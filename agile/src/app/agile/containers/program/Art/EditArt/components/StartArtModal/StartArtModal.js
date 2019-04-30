@@ -91,9 +91,13 @@ const renderStartArtModalContent = (props) => {
     <div>
       <p style={{ marginBottom: 15 }}>
         <span>
-          {'你无法启动 '}
+          {'你无法启动火车 '}
           <span style={{ fontWeight: 600 }}>{data.name}</span>
-          {'，请你填写完相应字段再启动火车。'}
+          {'，请输入带'}
+          <span style={{ color: 'red' }}>
+            {' * '}
+          </span>
+          {'符号的必填信息再启动火车。'}
         </span>
       </p>
 
@@ -109,9 +113,9 @@ const renderStartArtModalContent = (props) => {
   } else if (doingArt) {
     return (
       <div>
-        {'你无法启动  '}
+        {'你无法开启新的火车  '}
         <span style={{ fontWeight: 600 }}>{data.name}</span>
-        {'  ，'}
+        {'  ，火车 '}
         <span style={{ color: 'red', fontWeight: 600 }}>
           {doingArt.name}
         </span>

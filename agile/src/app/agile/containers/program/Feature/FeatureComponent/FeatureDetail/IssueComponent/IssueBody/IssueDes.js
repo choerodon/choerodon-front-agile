@@ -75,6 +75,7 @@ import { updateIssue } from '../../../../../../../api/NewIssueApi';
           className="line-start mt-10"
           style={{
             height: 190,
+            width: '100%',
           }}
         >
           <WYSIWYGEditor
