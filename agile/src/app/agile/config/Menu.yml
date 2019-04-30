@@ -148,7 +148,7 @@
         Routes: /agile/roadMap
         sort: 4     
         permission:
-          - 'agile-service.road_map.queryRoadMapOfProgram'
+          - 'agile-service.road-map.queryRoadMapOfProgram'
     - "pi":
         icon: center_focus_strong
         category: PROGRAM
