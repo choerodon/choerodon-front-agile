@@ -13,14 +13,13 @@ class SelectFocusLoad extends Component {
     extraList: [],
   }
 
-  componentDidMount() {
-    this.avoidShowError();   
+  componentDidMount() {      
     this.loadData(); 
   }
   
   componentDidUpdate(prevProps, prevState) {
     // eslint-disable-next-line react/destructuring-assignment
-    if ((prevProps.loading && !this.props.loading) || prevProps.value !== this.props.value) {
+    if (prevProps.value !== this.props.value) {
       this.avoidShowError();
     }
   }
@@ -32,10 +31,10 @@ class SelectFocusLoad extends Component {
   }
 
   // 防止取值不在option列表中，比如user
-  avoidShowError=() => {
+  // eslint-disable-next-line react/destructuring-assignment
+  avoidShowError=(List = this.state.List) => {
     const Type = this.getType();
-    if (Type.avoidShowError) {
-      const { List } = this.state;
+    if (Type.avoidShowError) {     
       Type.avoidShowError(this.props, List).then((extraList) => {        
         if (extraList) {
           this.setState({
@@ -59,6 +58,7 @@ class SelectFocusLoad extends Component {
         loading: true,
       });
       request().then((Data) => {
+        this.avoidShowError(Data);
         this.setState({
           List: Data,
           loading: false,
@@ -91,6 +91,7 @@ class SelectFocusLoad extends Component {
             loading: true,
           });
           request(value).then((Data) => {
+            this.avoidShowError(Data);
             this.setState({
               List: Data,
               loading: false,
