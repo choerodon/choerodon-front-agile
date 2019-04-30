@@ -7,21 +7,24 @@ import './PiCard.scss';
 
 class PiCard extends Component {
   renderFeatures = () => {
-    const { pi, onFeatureClick } = this.props;
+    const { pi, onFeatureClick, currentFeature } = this.props;
     const { subFeatureDTOList } = pi;
+    if (subFeatureDTOList.length === 0) {
+      return '暂无数据';
+    }
     const groupedFeatures = groupBy(subFeatureDTOList, 'featureType');
     const enablerFeatures = groupedFeatures.enabler || [];
     const businessFeatures = groupedFeatures.business || [];
     return (
       <Fragment>
         <div className="c7nagile-PiCard-business-list">
-          {businessFeatures.map(feature => <FeatureItem feature={feature} onFeatureClick={onFeatureClick} />)}
+          {businessFeatures.map(feature => <FeatureItem selected={currentFeature === feature.issueId} feature={feature} onFeatureClick={onFeatureClick} />)}
         </div>
         {
           enablerFeatures.length > 0
           && (
             <div className="c7nagile-PiCard-enabler-list">
-              {enablerFeatures.map(feature => <FeatureItem feature={feature} onFeatureClick={onFeatureClick} />)}
+              {enablerFeatures.map(feature => <FeatureItem selected={currentFeature === feature.issueId} feature={feature} onFeatureClick={onFeatureClick} />)}
             </div>
           )
         }

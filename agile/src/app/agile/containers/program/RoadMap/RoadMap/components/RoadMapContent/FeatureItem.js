@@ -12,10 +12,10 @@ class FeatureItem extends Component {
   }
 
   render() {
-    const { feature } = this.props;
+    const { feature, selected } = this.props;
     const { featureType, summary, issueTypeDTO } = feature;
     return (
-      <div className="c7nagile-RoadMap-FeatureItem" onClick={this.handleClick} role="none">
+      <div className="c7nagile-RoadMap-FeatureItem" onClick={this.handleClick} role="none" style={{ background: selected && 'rgba(63,81,181,0.08)' }}>
         <TypeTag
           data={{
             ...issueTypeDTO,
