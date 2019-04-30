@@ -4,12 +4,15 @@ import {
   Page, Header, Content, stores,
 } from 'choerodon-front-boot';
 import moment from 'moment';
-import EditFeature from '../../../../components/EditIssueNarrow';
+import { observer, inject } from 'mobx-react';
+import EditFeature from '../../Feature/FeatureComponent/FeatureDetail/EditFeature';
 import RoadMapContent from './components/RoadMapContent';
 import RoadMapHeader from './components/RoadMapHeader';
 import { getRoadMap } from '../../../../api/RoadMapApi';
 import FeatureStore from '../../../../stores/program/Feature/FeatureStore';
 
+@inject('HeaderStore')
+@observer
 class RoadMap extends Component {
   state = {    
     piList: [],
@@ -61,6 +64,7 @@ class RoadMap extends Component {
     const {
       piList, editFeatureVisible, currentFeature, loading, 
     } = this.state;
+    const { HeaderStore } = this.props;
     const { startDate, endDate } = this.getRange(piList);
     return (
       <Page className="c7ntest-Issue c7ntest-region">
@@ -77,7 +81,7 @@ class RoadMap extends Component {
                 bottom: 0,
                 right: 0,
                 width: 440,
-                height: 'calc(100% - 106px)',
+                height: HeaderStore.announcementClosed ? 'calc(100% - 106px)' : 'calc(100% - 208px)',
                 background: 'white',
                 zIndex: 8,
               }}
