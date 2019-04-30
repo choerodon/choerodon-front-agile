@@ -54,8 +54,8 @@ const navIcon = {
 };
 
 const noDisplay = {
-  sub_task: ['sub_task', 'link_task'],
   feature: ['sub_task', 'wiki', 'branch', 'log', 'link_task'],
+  issue_epic: ['sub_task', 'branch', 'log', 'link_task'],
 };
 let sign = true;
 

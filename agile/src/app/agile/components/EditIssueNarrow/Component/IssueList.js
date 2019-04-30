@@ -18,14 +18,14 @@ class IssueList extends Component {
     };
   }
 
-  componentDidMount() {
-    const { location: { search }, onOpen } = this.props;
-    const theRequest = this.GetRequest(search);
-    const { paramIssueId, paramOpenIssueId } = theRequest;
-    if (paramOpenIssueId && paramIssueId && paramOpenIssueId !== paramIssueId) {
-      onOpen(paramOpenIssueId);
-    }
-  }
+  // componentDidMount() {
+  //   const { location: { search }, onOpen } = this.props;
+  //   const theRequest = this.GetRequest(search);
+  //   const { paramIssueId, paramOpenIssueId } = theRequest;
+  //   if (paramOpenIssueId && paramIssueId && paramOpenIssueId !== paramIssueId) {
+  //     onOpen(paramOpenIssueId);
+  //   }
+  // }
 
   confirm = (issueId) => {
     this.handleDeleteIssue(issueId);
