@@ -100,7 +100,7 @@ class ArtForm extends Component {
           <TabPane tab="ART设置" key="1">
             <FormItem>
               {getFieldDecorator('rteId', {
-                normalize: value => (value === 0 ? undefined : value),
+                normalize: value => (value === 0 || value === null ? undefined : value),
               })(
                 <SelectFocusLoad allowClear type="user" label="发布火车工程师" style={{ width: 500 }} />,
               )}
@@ -131,11 +131,7 @@ class ArtForm extends Component {
                   }],
                   initialValue: 3,
                 })(
-                  <Select style={{ width: 500, marginBottom: 15 }} label="PI生成个数" disabled>
-                    {
-                      [3, 4, 5, 6, 7, 8].map(value => <Option key={value} value={value}>{value}</Option>)
-                    }
-                  </Select>,
+                  <Input style={{ width: 500, marginBottom: 15 }} label="PI生成个数" disabled />,
                 )
               }
             </FormItem>
@@ -178,12 +174,7 @@ class ArtForm extends Component {
                 }],
                 initialValue: 1,
               })(
-                <Select style={{ width: 500 }} label="IP时长（周）" placeholder="请选择IP时长" disabled>
-                  {
-                    [1, 2, 3, 4].map(value => <Option value={value}>{value}</Option>)
-                  }
-                </Select>,
-
+                <Input style={{ width: 500 }} label="IP时长（周）" disabled />,
               )}
             </FormItem>
           </TabPane>

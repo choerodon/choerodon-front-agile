@@ -1,11 +1,10 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import {
-  Table,
+  Table, Tooltip,
 } from 'choerodon-ui';
 import FiltersProvider from '../../../../../components/FiltersProvider';
 import {
-  IssueNum, TypeCode, Summary, StatusName, Priority, Assignee, LastUpdateTime, Sprint, Epic,
+  IssueNum, Summary, StatusName, LastUpdateTime, Sprint, Epic,
 } from '../../../../project/Issue/IssueTable/IssueTableComponent';
 import TypeTag from '../../../../../components/TypeTag';
 import { QuickCreateFeatureWithProvider } from '../../../../../components/QuickCreateFeature';
@@ -89,7 +88,11 @@ const getColumns = filters => ([
     filters: filters.pi,
     filterMultiple: true,
     width: 134,
-    render: piNameDTOList => Sprint({ objArray: piNameDTOList, name: piNameDTOList.length > 0 && `${piNameDTOList[0].code}-${piNameDTOList[0].name}` }),
+    render: piNameDTOList => (
+      <Tooltip placement="top" title={piNameDTOList.length ? piNameDTOList.map(o => `${o.code}-${o.name};`) : ''}>
+        {Sprint({ objArray: piNameDTOList, name: piNameDTOList.length > 0 && `${piNameDTOList[0].code}-${piNameDTOList[0].name}` })}
+      </Tooltip>
+    ),
   },
   {
     title: '最后更新时间',

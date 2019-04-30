@@ -255,6 +255,9 @@ let hasPermission;
               objectVersionNumber={objectVersionNumber}
               onOk={() => {
                 VisibleStore.setAssigneeShow(false);
+                if (onUpdate) {
+                  onUpdate();
+                }
                 this.loadIssueDetail(issueId);
               }}
               onCancel={() => {
