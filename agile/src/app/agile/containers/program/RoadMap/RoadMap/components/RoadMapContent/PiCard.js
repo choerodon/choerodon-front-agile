@@ -10,7 +10,7 @@ class PiCard extends Component {
     const { pi, onFeatureClick, currentFeature } = this.props;
     const { subFeatureDTOList } = pi;
     if (subFeatureDTOList.length === 0) {
-      return '暂无数据';
+      return <div style={{ textAlign: 'center', color: 'rgba(0, 0, 0, 0.65)', paddingBottom: 10 }}>暂无数据</div>;
     }
     const groupedFeatures = groupBy(subFeatureDTOList, 'featureType');
     const enablerFeatures = groupedFeatures.enabler || [];
