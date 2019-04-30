@@ -13,11 +13,16 @@ import FeatureStore from '../../../../stores/program/Feature/FeatureStore';
 class RoadMap extends Component {
   state = {    
     piList: [],
+    loading: false,
     editFeatureVisible: false,
     currentFeature: null,
   }
 
   componentDidMount() {
+    this.loadRoadMap();
+  }
+
+  loadRoadMap=() => {
     getRoadMap().then((piList) => {
       this.setState({
         piList,
@@ -44,8 +49,18 @@ class RoadMap extends Component {
     });
   }
 
+  handleDelete=() => {
+    this.setState({
+      currentFeature: null,
+      editFeatureVisible: false,
+    });
+    this.loadRoadMap();
+  }
+
   render() {
-    const { piList, editFeatureVisible, currentFeature } = this.state;
+    const {
+      piList, editFeatureVisible, currentFeature, loading, 
+    } = this.state;
     const { startDate, endDate } = this.getRange(piList);
     return (
       <Page className="c7ntest-Issue c7ntest-region">
@@ -54,7 +69,7 @@ class RoadMap extends Component {
         />
         <Content style={{ paddingTop: 0 }}>         
           <RoadMapHeader startDate={startDate} endDate={endDate} />
-          <RoadMapContent piList={piList} onFeatureClick={this.handleFeatureClick} />          
+          <RoadMapContent piList={piList} onFeatureClick={this.handleFeatureClick} currentFeature={currentFeature} />          
           {
             editFeatureVisible && (
               <div style={{
@@ -71,6 +86,7 @@ class RoadMap extends Component {
                   store={FeatureStore}
                   issueId={currentFeature}
                   onCancel={this.handleCancel}
+                  onUpdate={this.loadRoadMap}
                   onDeleteIssue={this.handleDelete}
                 />
               </div>

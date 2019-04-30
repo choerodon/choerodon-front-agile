@@ -7,8 +7,8 @@ import './RoadMapContent.scss';
 
 class RoadMapContent extends PureComponent {
   renderPiList=() => {
-    const { piList, onFeatureClick } = this.props;
-    const contents = piList.map(pi => <PiCard pi={pi} onFeatureClick={onFeatureClick} />);
+    const { piList, onFeatureClick, currentFeature } = this.props;
+    const contents = piList.map(pi => <PiCard pi={pi} onFeatureClick={onFeatureClick} currentFeature={currentFeature} />);
 
     // piList.forEach((pi, i) => {
     //   const currentPi = pi;      
