@@ -42,9 +42,14 @@ const ArtTable = ({
       render: statusCode => (<StatusTag categoryCode={statusCode} name={STATUS[statusCode]} />),
     }, {
       title: '创建日期',
-      dataIndex: 'createDate',
-      key: 'createDate',
-      render: createDate => moment(createDate).format('YYYY-MM-DD'),
+      dataIndex: 'creationDate',
+      key: 'creationDate',
+      render: creationDate => moment(creationDate).format('YYYY-MM-DD'),
+    }, {
+      title: '最后更新日期',
+      dataIndex: 'lastUpdateDate',
+      key: 'lastUpdateDate',
+      render: lastUpdateDate => moment(lastUpdateDate).format('YYYY-MM-DD'),
     }, {
       title: '',
       key: 'action',
