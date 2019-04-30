@@ -97,6 +97,7 @@ class EditArt extends Component {
         name,
         piCount,
         statusCode,
+        sprintCompleteSetting,
       } = ress[1];
       const formData = {
         interationCount,
@@ -110,6 +111,7 @@ class EditArt extends Component {
         piCount,
         id,
         statusCode,
+        sprintCompleteSetting,
       };
       this.setState({
         loading: false,
@@ -183,6 +185,7 @@ class EditArt extends Component {
         name,
         piCount,
         statusCode,
+        sprintCompleteSetting,
       } = data;
       const formData = {
         interationCount,
@@ -196,6 +199,7 @@ class EditArt extends Component {
         piCount,
         statusCode,
         id,
+        sprintCompleteSetting,
       };
       this.setState({
         loading: false,

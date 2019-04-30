@@ -1,26 +1,27 @@
 import React, { Component } from 'react';
 import {
-  stores, axios, Page, Header, Content, Permission,
+  stores, Page, Header, Content, Permission,
 } from 'choerodon-front-boot';
+import { observer } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import {
   Form, Input, Button, Icon, Tabs, Table,
 } from 'choerodon-ui';
 import moment from 'moment';
+import WorkCalendar from './Component/WorkCalendar';
+import SettingStore from '../../../stores/program/Setting/SettingStore';
 
 const { AppState } = stores;
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
 
+@observer
 class ProgramSetting extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: false,
-      shortName: undefined,
-      origin: undefined,
       currentTab: '1',
-      proData: [],
     };
   }
 
@@ -28,57 +29,37 @@ class ProgramSetting extends Component {
     this.getProgramSetting();
   }
 
-  getProgramSetting() {
+  getProgramSetting = () => {
     const { form } = this.props;
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`)
-      .then((res) => {
-        this.setState({
-          origin: res,
-          shortName: res.projectCode,
-        });
-        form.setFieldsValue({
-          shortName: res.projectCode,
-        });
-      });
-    axios.get(`/agile/v1/projects/${AppState.currentMenuType.id}/program_info/team`)
-      .then((res) => {
-        this.setState({
-          proData: res,
-        });
-      });
-  }
+    SettingStore.getProgramInfo().then(() => {
+      const { projectCode } = SettingStore.getProgram;
+      form.setFieldsValue({ projectCode });
+    });
+    SettingStore.getProgramTeams();
+    const year = moment().year();
+    SettingStore.axiosOrgSetting(year);
+    SettingStore.axiosGetProSetting(year);
+  };
 
   handleUpdateProgramSetting = () => {
     const { form } = this.props;
-    const { origin } = this.state;
+    const program = SettingStore.getProgram;
     form.validateFields((err, values, modify) => {
       if (!err && modify) {
-        const projectInfoDTO = {
-          ...origin,
-          projectCode: values.shortName,
+        const info = {
+          ...program,
+          projectCode: values.projectCode,
         };
         this.setState({
           loading: true,
         });
-        axios.put(`/agile/v1/projects/${AppState.currentMenuType.id}/project_info`, projectInfoDTO)
-          .then((res) => {
-            if (res.failed) {
-              Choerodon.prompt(res.message);
-            } else {
-              this.setState({
-                origin: res,
-                loading: false,
-                shortName: res.projectCode,
-              });
-              Choerodon.prompt('修改成功');
-            }
-          })
-          .catch(() => {
-            this.setState({
-              loading: false,
-            });
-            Choerodon.prompt('修改失败');
+        SettingStore.updateProgramInfo(info).then(() => {
+          const { projectCode } = SettingStore.getProgram;
+          form.setFieldsValue({ projectCode });
+          this.setState({
+            loading: false,
           });
+        });
       }
     });
   };
@@ -104,13 +85,37 @@ class ProgramSetting extends Component {
     render: startDate => <span>{moment(startDate).format('YYYY-MM-DD')}</span>,
   }];
 
+  updateSelete = (data) => {
+    const year = moment().year();
+    if (data.calendarId) {
+      SettingStore.axiosDeleteCalendarData(data.calendarId).then(() => {
+        SettingStore.axiosGetProSetting(year);
+      });
+    } else {
+      SettingStore.axiosCreateCalendarData(data).then(() => {
+        SettingStore.axiosGetProSetting(year);
+      });
+    }
+  };
+
   render() {
     const { form: { getFieldDecorator } } = this.props;
     const {
-      shortName, loading, currentTab, proData,
+      loading, currentTab,
     } = this.state;
     const menu = AppState.currentMenuType;
     const { type, id: projectId, organizationId: orgId } = menu;
+    const {
+      saturdayWork,
+      sundayWork,
+      useHoliday,
+      timeZoneWorkCalendarDTOS: selectDays,
+      workHolidayCalendarDTOS: holidayRefs,
+    } = SettingStore.getOrgSetting;
+    const proSetting = SettingStore.getProSetting;
+    const { projectCode } = SettingStore.getProgram;
+    const teams = SettingStore.getTeams;
+
     return (
       <Page
         service={[
@@ -129,17 +134,21 @@ class ProgramSetting extends Component {
               根据项目需求，你可以修改项目编码。
               <div style={{ marginTop: 20 }}>
                 <Form layout="vertical">
-                  <FormItem label="项目编码" style={{ width: 512 }}>
-                    {getFieldDecorator('shortName', {
-                      rules: [{ required: true, message: '项目编码必填' }],
-                      initialValue: shortName,
-                    })(
-                      <Input
-                        label="项目编码"
-                        maxLength={5}
-                      />,
-                    )}
-                  </FormItem>
+                  {projectCode
+                    ? (
+                      <FormItem label="项目编码" style={{ width: 512 }}>
+                        {getFieldDecorator('projectCode', {
+                          rules: [{ required: true, message: '项目编码必填' }],
+                          initialValue: projectCode,
+                        })(
+                          <Input
+                            label="项目编码"
+                            maxLength={5}
+                          />,
+                        )}
+                      </FormItem>
+                    ) : ''
+                  }
                 </Form>
                 <div style={{ padding: '12px 0', borderTop: '1px solid rgba(0, 0, 0, 0.12)' }}>
                   <Permission type={type} projectId={projectId} organizationId={orgId} service={['agile-service.project-info.updateProjectInfo']}>
@@ -167,11 +176,26 @@ class ProgramSetting extends Component {
               <div style={{ width: 520, marginTop: 20 }}>
                 <Table
                   columns={this.getColumns()}
-                  dataSource={proData}
+                  dataSource={teams}
                   filterBar={false}
                   pagination={false}
                 />
               </div>
+            </TabPane>
+            <TabPane tab="工作日历" key="3">
+              <div style={{ width: 520, marginBottom: 15 }}>
+                工作日历是用于配置当前PI的实际工作时间，比如：在开启ART后，原定的法定假日需要加班，这是可针对改该进行日历修改。
+              </div>
+              <WorkCalendar
+                startDate={moment(new Date())}
+                saturdayWork={saturdayWork}
+                sundayWork={sundayWork}
+                useHoliday={useHoliday}
+                selectDays={selectDays}
+                holidayRefs={holidayRefs}
+                workDates={proSetting || []}
+                onWorkDateChange={this.updateSelete}
+              />
             </TabPane>
           </Tabs>
         </Content>
