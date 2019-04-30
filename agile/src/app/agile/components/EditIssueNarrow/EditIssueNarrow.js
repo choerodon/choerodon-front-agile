@@ -242,6 +242,7 @@ class EditIssueNarrow extends Component {
                 loginUserId={loginUserId}
                 hasPermission={hasPermission}
                 onDeleteIssue={onDeleteIssue}
+                onUpdate={onUpdate}
               />
               <IssueBody
                 store={store}
