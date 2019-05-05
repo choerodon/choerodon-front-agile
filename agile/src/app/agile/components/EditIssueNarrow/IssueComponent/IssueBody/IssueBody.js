@@ -10,6 +10,7 @@ import IssueLog from './IssueLog';
 import SubTask from './SubTask';
 import IssueLink from './IssueLink';
 import IssueBranch from './IssueBranch';
+import TestLink from './TestLink';
 
 @inject('AppState', 'HeaderStore')
 @observer class IssueBody extends Component {
@@ -47,6 +48,9 @@ import IssueBranch from './IssueBranch';
             {issueTypeDTO.typeCode && ['feature', 'sub_task'].indexOf(issueTypeDTO.typeCode) === -1
               ? <IssueLink store={store} reloadIssue={reloadIssue} /> : ''
              }
+            {issueTypeDTO.typeCode && ['feature', 'sub_task'].indexOf(issueTypeDTO.typeCode) === -1
+              ? <TestLink store={store} /> : ''
+            }
             {issueTypeDTO.typeCode && ['feature'].indexOf(issueTypeDTO.typeCode) === -1
               ? <IssueBranch store={store} reloadIssue={reloadIssue} /> : ''
              }

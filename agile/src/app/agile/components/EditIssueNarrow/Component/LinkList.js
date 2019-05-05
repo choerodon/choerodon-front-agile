@@ -1,14 +1,7 @@
 import React, { Component } from 'react';
 import { Icon, Popconfirm, Tooltip } from 'choerodon-ui';
-import { AppState } from 'choerodon-front-boot';
-import _ from 'lodash';
 import UserHead from '../../UserHead';
-import WYSIWYGEditor from '../../WYSIWYGEditor';
-import { IssueDescription } from '../../CommonComponent';
-import {
-  delta2Html, text2Delta, beforeTextUpload, formatDate, 
-} from '../../../common/utils';
-import { deleteLink, updateCommit } from '../../../api/NewIssueApi';
+import { deleteLink } from '../../../api/NewIssueApi';
 import PriorityTag from '../../PriorityTag';
 import StatusTag from '../../StatusTag';
 import TypeTag from '../../TypeTag';
@@ -25,22 +18,23 @@ class IssueList extends Component {
   componentWillMount() {
   }
 
-  confirm(issueId, e) {
+  confirm(issueId) {
     this.handleDeleteIssue(issueId);
   }
 
-  cancel(e) {
-  }
-
   handleDeleteIssue(linkId) {
+    const { onRefresh } = this.props;
     deleteLink(linkId)
-      .then((res) => {
-        this.props.onRefresh();
+      .then(() => {
+        onRefresh();
       });
   }
 
   render() {
-    const { issue, i, showAssignee } = this.props;
+    const {
+      issue, i, showAssignee,
+      canDelete = true, onOpen,
+    } = this.props;
     return (
       <div
         style={{
@@ -71,7 +65,7 @@ class IssueList extends Component {
               }}
               role="none"
               onClick={() => {
-                this.props.onOpen(issue.issueId, issue.linkedIssueId);
+                onOpen(issue.issueId, issue.linkedIssueId);
               }}
             >
               {`${issue.issueNum} ${issue.summary}`}
@@ -112,15 +106,6 @@ class IssueList extends Component {
           width: '48px', marginRight: '15px', display: 'flex', justifyContent: 'flex-end', 
         }}
         >
-          {/* <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${issue.statusName}`}>
-            <div>
-              <StatusTag
-                name={issue.statusName}
-                color={issue.statusColor}
-              />
-            </div>
-          </Tooltip> */}
-
           <Tooltip mouseEnterDelay={0.5} title={`任务状态： ${issue.statusMapDTO.name}`}>
             <div>
               <StatusTag
@@ -129,25 +114,29 @@ class IssueList extends Component {
             </div>
           </Tooltip>
         </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: '16px',
-          }}
-        >
-          <Popconfirm
-            title="确认要删除该问题链接吗?"
-            placement="left"
-            onConfirm={this.confirm.bind(this, issue.linkId)}
-            onCancel={this.cancel}
-            okText="删除"
-            cancelText="取消"
-            okType="danger"
-          >
-            <Icon type="delete_forever mlr-3 pointer" />
-          </Popconfirm>
-        </div>
+        {canDelete
+          ? (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                fontSize: '16px',
+              }}
+            >
+              <Popconfirm
+                title="确认要删除该问题链接吗?"
+                placement="left"
+                onConfirm={this.confirm.bind(this, issue.linkId)}
+                onCancel={this.cancel}
+                okText="删除"
+                cancelText="取消"
+                okType="danger"
+              >
+                <Icon type="delete_forever mlr-3 pointer" />
+              </Popconfirm>
+            </div>
+          ) : ''
+        }
       </div>
     );
   }

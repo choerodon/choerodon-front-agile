@@ -83,7 +83,7 @@ const { Text, Edit } = TextEditToggle;
 
   render() {
     const { selectLoading, originUsers } = this.state;
-    const { store } = this.props;
+    const { store, loginUserId, hasPermission } = this.props;
     const issue = store.getIssue;
     const {
       assigneeId, assigneeImageUrl,
@@ -162,29 +162,33 @@ const { Text, Edit } = TextEditToggle;
               </Select>
             </Edit>
           </TextEditToggle>
-          <span
-            role="none"
-            style={{
-              color: '#3f51b5',
-              cursor: 'pointer',
-              marginLeft: '10px',
-              display: 'inline-block',
-              verticalAlign: 'middle',
-            }}
-            onClick={() => {
-              getSelf().then((res) => {
-                if (res.id !== assigneeId) {
-                  this.setState({
-                    newAssigneeId: res.id,
-                  }, () => {
-                    this.updateIssueAssignee();
+          {assigneeId !== loginUserId && hasPermission
+            ? (
+              <span
+                role="none"
+                style={{
+                  color: '#3f51b5',
+                  cursor: 'pointer',
+                  marginLeft: '10px',
+                  display: 'inline-block',
+                  verticalAlign: 'middle',
+                }}
+                onClick={() => {
+                  getSelf().then((res) => {
+                    if (res.id !== assigneeId) {
+                      this.setState({
+                        newAssigneeId: res.id,
+                      }, () => {
+                        this.updateIssueAssignee();
+                      });
+                    }
                   });
-                }
-              });
-            }}
-          >
-            {'分配给我'}
-          </span>
+                }}
+              >
+                {'分配给我'}
+              </span>
+            ) : ''
+          }
         </div>
       </div>
     );
