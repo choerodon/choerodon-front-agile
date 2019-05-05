@@ -152,7 +152,7 @@ const getColumns = (filters, getFilteredValue) => ([
   },
 ]);
 
-class FeatureTable extends PureComponent {
+class FeatureTable extends Component {
   getFilteredValue=(key) => {
     const { searchDTO } = this.props;
     let field = '';
@@ -207,6 +207,7 @@ class FeatureTable extends PureComponent {
               scroll={{
                 x: true,
               }}
+              rowClassName={record => (record.selected ? 'c7nagile-FeatureTable-row-select' : '')}
             />
           </div>
         )}
