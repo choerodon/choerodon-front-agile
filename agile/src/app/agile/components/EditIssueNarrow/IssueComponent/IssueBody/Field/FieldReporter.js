@@ -163,7 +163,7 @@ const { Text, Edit } = TextEditToggle;
               </Select>
             </Edit>
           </TextEditToggle>
-          {reporterId === loginUserId || hasPermission
+          {reporterId !== loginUserId && hasPermission
             ? (
               <span
                 role="none"

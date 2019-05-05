@@ -55,7 +55,7 @@ import LinkList from '../../Component/LinkList';
   renderLinkIssues() {
     const { store } = this.props;
     const linkIssues = store.getLinkIssues;
-    const group = _.groupBy(linkIssues, 'ward');
+    const group = _.groupBy(linkIssues.filter(i => i.applyType === 'agile'), 'ward');
     return (
       <div className="c7n-tasks">
         {
@@ -79,7 +79,7 @@ import LinkList from '../../Component/LinkList';
     const { issueId } = issue;
 
     return (
-      <div id="link_task">
+      <div id="link_test">
         <div className="c7n-title-wrapper">
           <div className="c7n-title-left">
             <Icon type="link c7n-icon-title" />
