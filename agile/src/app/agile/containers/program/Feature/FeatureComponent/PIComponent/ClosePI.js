@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Modal, Select } from 'choerodon-ui';
+import {
+  Modal, Select, Tooltip, Icon,
+} from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import FeatureStore from '../../../../../stores/program/Feature/FeatureStore';
@@ -23,7 +25,7 @@ class ClosePI extends Component {
     this.setState({
       targetStatus: value,
     });
-  }
+  };
 
   /**
    *完成PI事件
@@ -108,15 +110,29 @@ class ClosePI extends Component {
               ) : ''}
               <Option value="0">特性列表</Option>
             </Select>
-            <br />            
-            <Select 
-              style={{ marginTop: 24, width: 512 }}
-              label="目标状态"
-              onChange={this.handleTargetStatusChange}
-              defaultValue={todoStatusList[0].id}
-            >
-              {todoStatusList.map(status => <Option value={status.id}>{status.name}</Option>)}
-            </Select>          
+            <br />
+            {selectChose !== '0'
+              ? (
+                <React.Fragment>
+                  <Select
+                    style={{ marginTop: 24, width: 512 }}
+                    label="目标状态"
+                    onChange={this.handleTargetStatusChange}
+                    defaultValue={todoStatusList[0].id}
+                  >
+                    {todoStatusList.map(status => <Option value={status.id}>{status.name}</Option>)}
+                  </Select>
+                  <Tooltip title="自动开启下一个PI时，处于准备阶段状态的问题将会转换到该状态。" placement="top">
+                    <Icon
+                      type="help"
+                      style={{
+                        fontSize: 16, color: '#bdbdbd', height: 20, lineHeight: 1.25, marginLeft: 2,
+                      }}
+                    />
+                  </Tooltip>
+                </React.Fragment>
+              ) : ''
+            }
           </Content>
         </Sidebar>
       ) : null;

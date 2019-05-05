@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Table } from 'choerodon-ui';
+import { Table } from 'choerodon-ui';
 import moment from 'moment';
 import StatusTag from '../../../../../../components/StatusTag';
 import Empty from '../../../../../../components/Empty';
@@ -30,6 +30,16 @@ const ArtTable = ({
       title: '名称',
       dataIndex: 'name',
       key: 'name',
+      render: (name, record) => (
+        <a
+          role="none"
+          onClick={() => {
+            onEditArtClick(record);
+          }}
+        >
+          {name}
+        </a>
+      ),
     }, {
       title: '开始日期',
       dataIndex: 'startDate',
@@ -50,14 +60,6 @@ const ArtTable = ({
       dataIndex: 'lastUpdateDate',
       key: 'lastUpdateDate',
       render: lastUpdateDate => moment(lastUpdateDate).format('YYYY-MM-DD'),
-    }, {
-      title: '',
-      key: 'action',
-      render: (text, record) => (
-        <div>
-          <Button shape="circle" icon="mode_edit" onClick={() => { onEditArtClick(record); }} />
-        </div>
-      ),
     }];
 
   return (

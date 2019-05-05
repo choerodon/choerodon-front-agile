@@ -182,6 +182,7 @@ let hasPermission;
             loginUserId={loginUserId}
             hasPermission={hasPermission}
             onDeleteIssue={onDeleteIssue}
+            onUpdate={onUpdate}
           />
           <IssueBody
             store={store}
