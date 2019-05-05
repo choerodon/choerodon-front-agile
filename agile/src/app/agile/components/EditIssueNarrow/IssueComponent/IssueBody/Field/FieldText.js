@@ -97,7 +97,13 @@ const { TextArea } = Input;
             originData={value}
           >
             <Text>
-              <div style={{ ...textStyle, maxWidth: feature ? 200 : '', wordBreak: 'break-all' }}>
+              <div style={{
+                ...textStyle,
+                maxWidth: feature ? 200 : '',
+                wordBreak: 'break-all',
+                whiteSpace: 'pre-line',
+              }}
+              >
                 {value || '无'}
               </div>
             </Text>
@@ -112,12 +118,12 @@ const { TextArea } = Input;
                     newValue: e.target.value,
                   });
                 }}
-                onPressEnter={() => {
-                  if (this.TextEditToggle && this.TextEditToggle.leaveEditing) {
-                    this.updateIssueField();
-                    this.TextEditToggle.leaveEditing();
-                  }
-                }}
+                // onPressEnter={() => {
+                //   if (this.TextEditToggle && this.TextEditToggle.leaveEditing) {
+                //     this.updateIssueField();
+                //     this.TextEditToggle.leaveEditing();
+                //   }
+                // }}
               />
             </Edit>
           </TextEditToggle>
