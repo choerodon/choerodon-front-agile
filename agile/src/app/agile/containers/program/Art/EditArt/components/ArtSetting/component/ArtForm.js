@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import {
   Form, Input, Tabs, DatePicker,
-  Button, Divider, Select,
+  Button, Divider, Select, Tooltip, Icon,
 } from 'choerodon-ui';
 import EventEmitter from 'wolfy87-eventemitter';
 import './ArtForm.scss';
@@ -200,18 +200,26 @@ class ArtForm extends Component {
                 <Input style={{ width: 500 }} label="PI起始编号" maxLength={3} placeholder="请输入PI起始编号" />,
               )}
             </FormItem>
-            <FormItem>
+            <FormItem style={{ display: 'inline-block' }}>
               {getFieldDecorator('sprintCompleteSetting', {
                 rules: [{
                   required: true, message: '请选择要移动的位置',
                 }],
               })(
-                <Select style={{ width: 500 }} label="冲刺中未完成问题移动位置">
+                <Select style={{ width: 500 }} label="各团队未完成问题移动到">
                   <Option key="backlog" value="backlog">待办事项</Option>
                   <Option key="next_sprint" value="next_sprint">下个冲刺</Option>
                 </Select>,
               )}
             </FormItem>
+            <Tooltip title="关闭PI时，会自动完成各团队下当前PI创建的未完成的冲刺，可以在此设置将未完成的问题移动的位置。" placement="top">
+              <Icon
+                type="help"
+                style={{
+                  fontSize: 16, color: '#bdbdbd', height: 3, lineHeight: 2, marginLeft: 2,
+                }}
+              />
+            </Tooltip>
           </TabPane>
           {data.statusCode !== 'todo' && (
             <TabPane tab="PI列表" key="4">
