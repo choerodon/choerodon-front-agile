@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Form, Input, Modal, DatePicker, Select,
+  Form, Input, Modal, DatePicker,
 } from 'choerodon-ui';
 import moment from 'moment';
 import SelectFocusLoad from '../../../../../../components/SelectFocusLoad';
@@ -10,7 +10,6 @@ import './CreateArt.scss';
 
 const FormItem = Form.Item;
 const { Sidebar } = Modal;
-const { Option } = Select;
 
 const propTypes = {
   visible: PropTypes.bool.isRequired,
@@ -71,7 +70,7 @@ class CreateArt extends Component {
                 validator: this.checkArtNameRepeat,
               }],
             })(
-              <Input style={{ width: 500 }} maxLength={30} label="名称" placeholder="请输入ART名称" />,
+              <Input style={{ width: 500 }} maxLength={15} label="名称" placeholder="请输入ART名称" />,
             )}
           </FormItem>
           <FormItem>
