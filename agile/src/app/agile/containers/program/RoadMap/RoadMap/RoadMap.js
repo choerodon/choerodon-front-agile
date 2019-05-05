@@ -81,7 +81,7 @@ class RoadMap extends Component {
                 bottom: 0,
                 right: 0,
                 width: 440,
-                height: HeaderStore.announcementClosed ? 'calc(100% - 106px)' : 'calc(100% - 208px)',
+                height: HeaderStore.announcementClosed ? 'calc(100% - 106px)' : 'calc(100% - 158px)',
                 background: 'white',
                 zIndex: 8,
               }}

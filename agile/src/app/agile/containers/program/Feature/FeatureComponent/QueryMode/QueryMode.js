@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import FileSaver from 'file-saver';
 import { stores } from 'choerodon-front-boot';
+import { findIndex } from 'lodash';
+import { observer } from 'mobx-react';
 import FeatureTable from '../FeatureTable';
 import SearchArea from '../SearchArea';
 import ExportIssue from '../ExportIssue';
@@ -60,6 +62,7 @@ const filterConvert = (filters) => {
   });
   return searchDTO;
 };
+@observer
 class QueryMode extends Component {
   state = {
     loading: false,
@@ -293,7 +296,7 @@ class QueryMode extends Component {
         />
         <FeatureTable
           loading={loading}
-          dataSource={issues}
+          dataSource={issues.map(issue => (FeatureStore.getClickIssueDetail.issueId === issue.issueId ? { ...issue, selected: true } : { ...issue, selected: false }))}
           pagination={pagination}
           searchDTO={searchDTO}
           tableShowColumns={tableShowColumns}
