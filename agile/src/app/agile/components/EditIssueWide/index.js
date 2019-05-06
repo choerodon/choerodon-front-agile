@@ -1,3 +1,3 @@
-import EditIssueNarrow from './EditIssueNarrow';
+import EditIssueWide from './EditIssueWide';
 
-export default EditIssueNarrow;
+export default EditIssueWide;

@@ -25,7 +25,7 @@ const { AppState } = stores;
 let loginUserId;
 let hasPermission;
 @observer 
-class CreateSprint extends Component {
+class EditIssueNarrow extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -163,6 +163,7 @@ class CreateSprint extends Component {
         }}
       >  
         <div className="choerodon-modal-editIssue" style={style}>
+          {/* <div className="choerodon-modal-editIssue-divider" /> */}
           {
           issueLoading ? (
             <div
@@ -290,4 +291,4 @@ class CreateSprint extends Component {
     );
   }
 }
-export default withRouter(CreateSprint);
+export default withRouter(EditIssueNarrow);

@@ -215,7 +215,7 @@ class Issue extends Component {
           </div>
           <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
             
-            <ExpandCssControler />
+            {/* <ExpandCssControler /> */}
             
             <div
               className="c7n-content-issue"

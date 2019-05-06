@@ -85,7 +85,7 @@ import {
 
     return (
       <div className="c7n-content-wrapper">
-        {!isWide && issueId ? fields.map(field => (
+        { issueId ? fields.map(field => (
           <span
             className="c7n-content-item"
             key={field.fieldCode}
@@ -93,7 +93,7 @@ import {
             {this.getFieldComponent(field)}
           </span>
         )) : ''}
-        {isWide && issueId ? (
+        {/* {isWide && issueId ? (
           <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
             <span style={{ flex: 1 }}>
               {
@@ -120,7 +120,7 @@ import {
               }
             </span>
           </div>
-        ) : ''}
+        ) : ''} */}
       </div>
     );
   }
