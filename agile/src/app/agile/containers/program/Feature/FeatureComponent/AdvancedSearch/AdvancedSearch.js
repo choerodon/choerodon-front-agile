@@ -96,8 +96,7 @@ class AdvancedSearch extends PureComponent {
     } = this.props;
     const SelectValue = this.searchConvert();
     const isFilterEmpty = this.checkFilterEmpty();
-    const filterExist = isFilterEmpty ? undefined : this.findSameFilter();    
-    // console.log(filterExist);
+    const filterExist = isFilterEmpty ? undefined : this.findSameFilter();
     return (
       <div className="c7nagile-AdvancedSearch">
         <div style={{ display: 'flex', alignItems: 'center' }}>

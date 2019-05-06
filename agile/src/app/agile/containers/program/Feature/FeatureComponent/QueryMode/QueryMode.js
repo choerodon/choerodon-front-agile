@@ -1,3 +1,5 @@
+/* eslint-disable react/no-access-state-in-setstate */
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import FileSaver from 'file-saver';
@@ -34,8 +36,8 @@ const getDefaultSearchDTO = () => ({
   //   version: '',
   },
 });
-const filterConvert = (filters) => {
-  const searchDTO = getDefaultSearchDTO();
+const filterConvert = (filters, originSearchDTO = getDefaultSearchDTO()) => {
+  const searchDTO = { ...originSearchDTO };
   const setArgs = (field, filter) => {
     Object.assign(searchDTO[field], filter);
   };
@@ -90,9 +92,7 @@ class QueryMode extends Component {
     exportIssueVisible: false,
   }
 
-  advancedFilters = {}
-
-  tableFilters = {}
+  filters = {}
 
   componentDidMount() {
     this.refresh();
@@ -215,24 +215,24 @@ class QueryMode extends Component {
 
 
   handleAdvancedSearchChange = (type, values) => {
-    this.advancedFilters[type] = values;
-    this.reSearch();
+    const searchDTO = filterConvert({ [type]: values }, this.state.searchDTO);
+    this.loadFeatures({ searchDTO });
+    this.setState({
+      searchDTO,
+      selectedFilter: undefined,
+    });
   }
 
   handleTableChange = (pagination, filters) => {
-    this.tableFilters = filters;
-   
-    this.reSearch(pagination);
-  }
-
-  reSearch = (pagination) => {
-    const searchDTO = filterConvert({ ...this.advancedFilters, ...this.tableFilters });    
-    this.loadFeatures({ pagination, searchDTO });
+    this.filters = { ...this.filters, ...filters };  
+    const searchDTO = filterConvert(filters, this.state.searchDTO); 
+    this.loadFeatures({ searchDTO, pagination });
     this.setState({
-      selectedFilter: undefined,
       searchDTO,
+      selectedFilter: undefined,
     });
   }
+
 
   handleRow = record => ({
     onClick: (event) => { this.handleTableRowClick(record); },
@@ -247,9 +247,8 @@ class QueryMode extends Component {
   }
 
 
-  handleClearFilter = () => {
-    this.advancedFilters = {};
-    this.tableFilters = {};
+  handleClearFilter = () => {   
+    this.filters = {};
     this.reSearch();
   }
 

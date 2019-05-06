@@ -20,7 +20,7 @@ const RadioButton = Radio.Button;
 class FeatureList extends Component {
   state = {
     visible: false,
-    mode: 'plan',
+    mode: 'query',
     display: false,
   };
 
