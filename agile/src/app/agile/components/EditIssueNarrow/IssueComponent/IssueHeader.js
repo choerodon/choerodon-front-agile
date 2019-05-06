@@ -75,6 +75,8 @@ const { confirm } = Modal;
       VisibleStore.setAssigneeShow(true);
     } else if (e.key === '8') {
       VisibleStore.setChangeParentShow(true);
+    } else if (e.key === '9') {
+      VisibleStore.setCreateSubBugShow(true);
     }
   };
 
@@ -107,6 +109,13 @@ const { confirm } = Modal;
           ['sub_task', 'feature'].indexOf(typeCode) === -1 && (
             <Menu.Item key="2">
               {'创建子任务'}
+            </Menu.Item>
+          )
+        }
+        {
+          ['story'].indexOf(typeCode) !== -1 && (
+            <Menu.Item key="9">
+              {'创建缺陷'}
             </Menu.Item>
           )
         }
