@@ -47,8 +47,8 @@ class AdvancedSearch extends PureComponent {
 
   filterSame = (obj, obj2) => {
     const keys1 = Object.keys(obj);
-    const keys2 = Object.keys(obj2);    
-    
+    const keys2 = Object.keys(obj2);
+
     if (keys1.length !== keys2.length || difference(keys1, keys2).length > 0) {
       return false;
     } else {
@@ -65,10 +65,10 @@ class AdvancedSearch extends PureComponent {
 
   findSameFilter = () => {
     const { myFilters, searchDTO } = this.props;
-    const hasValueFields = this.getValueFields(searchDTO);    
+    const hasValueFields = this.getValueFields(searchDTO);
     return myFilters.find((filter) => {
       const { filterJson } = filter;
-      const filterHasValueFields = this.getValueFields(JSON.parse(filterJson));  
+      const filterHasValueFields = this.getValueFields(JSON.parse(filterJson));
       // console.log(filterHasValueFields, hasValueFields);    
       return this.filterSame(filterHasValueFields, hasValueFields);
     });
@@ -90,14 +90,24 @@ class AdvancedSearch extends PureComponent {
     return advancedSearchArgs;
   }
 
+  renderPlaceHolder=(type, props, ommittedValues) => {
+    const values = [];
+    for (const value of ommittedValues) {
+      const target = find(this[type], { [props[0]]: value })[props[1]];
+      if (target) {
+        values.push(target);
+      }
+    }
+    return values.join(', ');
+  }
+
   render() {
     const {
       myFilters, onSaveClick, onManageClick, onSelectMyFilter, onClearFilter, selectedFilter,
     } = this.props;
     const SelectValue = this.searchConvert();
     const isFilterEmpty = this.checkFilterEmpty();
-    const filterExist = isFilterEmpty ? undefined : this.findSameFilter();    
-    // console.log(filterExist);
+    const filterExist = isFilterEmpty ? undefined : this.findSameFilter();
     return (
       <div className="c7nagile-AdvancedSearch">
         <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -110,7 +120,7 @@ class AdvancedSearch extends PureComponent {
             filter
             optionFilterProp="children"
             onChange={onSelectMyFilter}
-            value={filterExist ? filterExist.filterId : selectedFilter}            
+            value={filterExist ? filterExist.filterId : selectedFilter}
             getPopupContainer={triggerNode => triggerNode.parentNode}
           >
             {
@@ -120,8 +130,8 @@ class AdvancedSearch extends PureComponent {
             }
           </Select>
 
-          {/* <SelectFocusLoad
-            type="issue_type_program_simple"
+          <SelectFocusLoad
+            type="issue_type_program_feature_epic"
             className="SelectTheme"
             mode="multiple"
             allowClear
@@ -129,15 +139,14 @@ class AdvancedSearch extends PureComponent {
             loadWhenMount
             style={SelectStyle}
             dropdownMatchSelectWidth={false}
-            placeholder="问题类型"     
-            saveList={this.saveList.bind(this, 'issueTypeList', 'id')}       
+            placeholder="问题类型"
+            saveList={this.saveList.bind(this, 'issueTypeList', 'id')}
             maxTagCount={0}
-            maxTagPlaceholder={ommittedValues => `${ommittedValues.map(value => find(this.issueTypeList, { id: value }).name).join(', ')}`}
+            maxTagPlaceholder={this.renderPlaceHolder.bind(this, 'issueTypeList', ['id', 'name'])}
             onChange={this.handleSelectChange.bind(this, 'issueTypeList')}
-            value={SelectValue.issueTypeList}
+            value={SelectValue.issueTypeList.concat(SelectValue.featureTypeList)}
             getPopupContainer={triggerNode => triggerNode.parentNode}
-          /> */}
-
+          />
           <SelectFocusLoad
             className="SelectTheme"
             mode="multiple"
@@ -151,13 +160,13 @@ class AdvancedSearch extends PureComponent {
             saveList={this.saveList.bind(this, 'statusList', 'id')}
             maxTagCount={0}
             optionLabelProp="name"
-            maxTagPlaceholder={ommittedValues => `${ommittedValues.map(value => find(this.statusList, { id: value }).name).join(', ')}`}
+            maxTagPlaceholder={this.renderPlaceHolder.bind(this, 'statusList', ['id', 'name'])}
             onChange={this.handleSelectChange.bind(this, 'statusList')}
             value={SelectValue.statusList}
             render={status => <Option value={status.id}>{status.name}</Option>}
             getPopupContainer={triggerNode => triggerNode.parentNode}
           />
-          
+
           {/* <SelectFocusLoad
             className="SelectTheme"
             type="user"

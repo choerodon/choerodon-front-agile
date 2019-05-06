@@ -37,6 +37,7 @@ const zh_CN = {
   "issue.log": '工作日志',
   "issue.data_log": '活动日志',
   "issue.sub_task": '子任务',
+  "issue.bug": '缺陷',
   "issue.link_task": '问题链接',
   "issue.branch": '开发',
   "issue.branch.create": '创建分支',

@@ -11,6 +11,7 @@ const en_US = {
   "issue.log": 'Work Log',
   "issue.data_log": 'Log',
   "issue.sub_task": 'SubTask',
+  "issue.bug": 'Bug',
   "issue.link_task": 'Issue Link',
   "issue.branch": 'Branch',
   "issue.branch.create": 'Create Branch',

@@ -52,6 +52,7 @@
     "react/require-default-props": "off",
     "no-console": "error",
     "no-unused-vars":"warn",
+    "no-restricted-syntax":"off",
     "jsx-a11y/anchor-is-valid": [
       "warn",
       {

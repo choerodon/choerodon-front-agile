@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import {
   Page, Header, Content, stores,
 } from 'choerodon-front-boot';
@@ -10,11 +11,14 @@ import RoadMapContent from './components/RoadMapContent';
 import RoadMapHeader from './components/RoadMapHeader';
 import { getRoadMap } from '../../../../api/RoadMapApi';
 import FeatureStore from '../../../../stores/program/Feature/FeatureStore';
+import Empty from '../../../../components/Empty';
+import { artListLink } from '../../../../common/utils';
+import noPI from '../../../../assets/noPI.svg';
 
 @inject('HeaderStore')
 @observer
 class RoadMap extends Component {
-  state = {    
+  state = {
     piList: [],
     loading: false,
     editFeatureVisible: false,
@@ -25,7 +29,7 @@ class RoadMap extends Component {
     this.loadRoadMap();
   }
 
-  loadRoadMap=() => {
+  loadRoadMap = () => {
     getRoadMap().then((piList) => {
       this.setState({
         piList,
@@ -38,21 +42,21 @@ class RoadMap extends Component {
     endDate: piList[piList.length - 1] && piList[piList.length - 1].endDate,
   })
 
-  handleFeatureClick=(feature) => {
+  handleFeatureClick = (feature) => {
     this.setState({
       currentFeature: feature.issueId,
       editFeatureVisible: true,
     });
   }
 
-  handleCancel=() => {
+  handleCancel = () => {
     this.setState({
       currentFeature: null,
       editFeatureVisible: false,
     });
   }
 
-  handleDelete=() => {
+  handleDelete = () => {
     this.setState({
       currentFeature: null,
       editFeatureVisible: false,
@@ -62,7 +66,7 @@ class RoadMap extends Component {
 
   render() {
     const {
-      piList, editFeatureVisible, currentFeature, loading, 
+      piList, editFeatureVisible, currentFeature, loading,
     } = this.state;
     const { HeaderStore } = this.props;
     const { startDate, endDate } = this.getRange(piList);
@@ -71,9 +75,28 @@ class RoadMap extends Component {
         <Header
           title="路线图"
         />
-        <Content style={{ paddingTop: 0 }}>         
-          <RoadMapHeader startDate={startDate} endDate={endDate} />
-          <RoadMapContent piList={piList} onFeatureClick={this.handleFeatureClick} currentFeature={currentFeature} />          
+        <Content style={{ paddingTop: 0 }}>
+          {
+            piList.length > 0 ? (
+              <Fragment>
+                <RoadMapHeader startDate={startDate} endDate={endDate} />
+                <RoadMapContent piList={piList} onFeatureClick={this.handleFeatureClick} currentFeature={currentFeature} />
+              </Fragment>
+            ) : (
+              <Empty
+                style={{ marginTop: 60 }}
+                pic={noPI}
+                title="没有进行中的敏捷发布火车"
+                description={(
+                  <Fragment>
+                      这是您的ART线路图。如果您想看到具体的PI计划，可以先到
+                    <Link to={artListLink()}>ART设置</Link>
+                      创建开启火车。
+                  </Fragment>
+                  )}
+              />
+            )
+          }
           {
             editFeatureVisible && (
               <div style={{
@@ -86,7 +109,7 @@ class RoadMap extends Component {
                 zIndex: 8,
               }}
               >
-                <EditFeature 
+                <EditFeature
                   store={FeatureStore}
                   issueId={currentFeature}
                   onCancel={this.handleCancel}
@@ -94,7 +117,7 @@ class RoadMap extends Component {
                   onDeleteIssue={this.handleDelete}
                 />
               </div>
-            )}         
+            )}
         </Content>
       </Page>
     );

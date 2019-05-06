@@ -24,12 +24,23 @@ export default class SwimLaneHeader extends Component {
       ['swimlane_epic', '子任务'],
       ['swimlane_none', '子任务'],
     ]);
-    return (
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        {switchMap.get(mode)(parentIssue)}
-        <span className="c7n-parentIssue-count" style={{ whiteSpace: 'nowrap' }}>{`  (${subIssueDataLength} ${strMap.get(mode)})`}</span>
-      </div>
-    );
+    if (mode === 'parent_child') {
+      const bugLength = parentIssue.subIssueData.filter(issue => issue.typeCode === 'bug').length;
+      const subTaskLength = parentIssue.subIssueData.filter(issue => issue.typeCode === 'sub_task').length;
+      return (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {switchMap.get(mode)(parentIssue)}
+          <span className="c7n-parentIssue-count" style={{ whiteSpace: 'nowrap' }}>{`  (${subTaskLength} 子任务${bugLength ? `, ${bugLength} 缺陷` : ''})`}</span>
+        </div>
+      );
+    } else {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {switchMap.get(mode)(parentIssue)}
+          <span className="c7n-parentIssue-count" style={{ whiteSpace: 'nowrap' }}>{`  (${subIssueDataLength} ${strMap.get(mode)})`}</span>
+        </div>
+      );
+    }
   }
 
   renderStoryComponent = ({

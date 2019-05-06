@@ -8,6 +8,7 @@ import IssueCommit from './IssueCommit';
 import IssueWorkLog from './IssueWorkLog';
 import IssueLog from './IssueLog';
 import SubTask from './SubTask';
+import SubBug from './SubBug';
 import IssueLink from './IssueLink';
 import IssueBranch from './IssueBranch';
 import TestLink from './TestLink';
@@ -44,6 +45,9 @@ import TestLink from './TestLink';
             <IssueLog store={store} />
             {issueTypeDTO.typeCode && ['sub_task', 'feature'].indexOf(issueTypeDTO.typeCode) === -1
               ? <SubTask store={store} reloadIssue={reloadIssue} /> : ''
+             }
+            {issueTypeDTO.typeCode && ['story'].indexOf(issueTypeDTO.typeCode) !== -1
+              ? <SubBug store={store} reloadIssue={reloadIssue} /> : ''
              }
             {issueTypeDTO.typeCode && ['feature', 'sub_task'].indexOf(issueTypeDTO.typeCode) === -1
               ? <IssueLink store={store} reloadIssue={reloadIssue} /> : ''

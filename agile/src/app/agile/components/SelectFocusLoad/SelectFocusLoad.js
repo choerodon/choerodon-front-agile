@@ -57,7 +57,7 @@ class SelectFocusLoad extends Component {
       this.setState({
         loading: true,
       });
-      request().then((Data) => {
+      request().then((Data) => {    
         this.avoidShowError(Data);
         this.setState({
           List: Data,

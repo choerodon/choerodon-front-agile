@@ -4,6 +4,7 @@ import moment from 'moment';
 import { groupBy } from 'lodash';
 import { Tooltip } from 'choerodon-ui';
 import FeatureItem from './FeatureItem';
+import NoFeature from '../NoFeature';
 import { STATUS } from '../../../../../../common/Constant';
 import './PiCard.scss';
 
@@ -12,7 +13,7 @@ class PiCard extends Component {
     const { pi, onFeatureClick, currentFeature } = this.props;
     const { subFeatureDTOList } = pi;
     if (subFeatureDTOList.length === 0) {
-      return <div style={{ textAlign: 'center', color: 'rgba(0, 0, 0, 0.65)', paddingBottom: 10 }}>暂无数据</div>;
+      return <NoFeature />;
     }
     const groupedFeatures = groupBy(subFeatureDTOList, 'featureType');
     const enablerFeatures = groupedFeatures.enabler || [];

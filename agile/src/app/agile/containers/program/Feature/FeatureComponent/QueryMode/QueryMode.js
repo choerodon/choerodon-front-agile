@@ -1,3 +1,6 @@
+/* eslint-disable no-restricted-globals */
+/* eslint-disable react/no-access-state-in-setstate */
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import FileSaver from 'file-saver';
@@ -14,6 +17,7 @@ import { getMyFilters } from '../../../../../api/NewIssueApi';
 const { AppState } = stores;
 const getDefaultSearchDTO = () => ({
   advancedSearchArgs: {
+    featureTypeList: [],
     assigneeIds: [],
     statusList: [],
     issueTypeList: [],
@@ -34,8 +38,8 @@ const getDefaultSearchDTO = () => ({
   //   version: '',
   },
 });
-const filterConvert = (filters) => {
-  const searchDTO = getDefaultSearchDTO();
+const filterConvert = (filters, originSearchDTO = getDefaultSearchDTO()) => {
+  const searchDTO = { ...originSearchDTO };
   const setArgs = (field, filter) => {
     Object.assign(searchDTO[field], filter);
   };
@@ -46,6 +50,7 @@ const filterConvert = (filters) => {
       case 'assigneeIds':
       case 'statusList':
       case 'issueTypeList':
+      case 'featureTypeList':      
       case 'reporterList':
       case 'epicList':
         setArgs('advancedSearchArgs', { [key]: filters[key] });
@@ -90,9 +95,7 @@ class QueryMode extends Component {
     exportIssueVisible: false,
   }
 
-  advancedFilters = {}
-
-  tableFilters = {}
+  filters = {}
 
   componentDidMount() {
     this.refresh();
@@ -215,23 +218,33 @@ class QueryMode extends Component {
 
 
   handleAdvancedSearchChange = (type, values) => {
-    this.advancedFilters[type] = values;
-    this.reSearch();
+    let searchDTO;
+    // 对类型单独处理，因为特性的区分是用business,enabler , 但史诗是用id
+    if (type === 'issueTypeList') {
+      const issueTypeList = values.filter(value => !isNaN(value));
+      const featureTypeList = values.filter(value => isNaN(value));      
+      searchDTO = filterConvert({ issueTypeList, featureTypeList }, this.state.searchDTO);
+    } else {
+      searchDTO = filterConvert({ [type]: values }, this.state.searchDTO);
+    }
+   
+    this.loadFeatures({ searchDTO });
+    this.setState({
+      searchDTO,
+      selectedFilter: undefined,
+    });
   }
 
   handleTableChange = (pagination, filters) => {
-    this.tableFilters = filters;
-    this.reSearch(pagination);
-  }
-
-  reSearch = (pagination) => {
-    const searchDTO = filterConvert({ ...this.advancedFilters, ...this.tableFilters });
-    this.loadFeatures({ pagination, searchDTO });
+    this.filters = { ...this.filters, ...filters };  
+    const searchDTO = filterConvert(filters, this.state.searchDTO); 
+    this.loadFeatures({ searchDTO, pagination });
     this.setState({
-      selectedFilter: undefined,
       searchDTO,
+      selectedFilter: undefined,
     });
   }
+
 
   handleRow = record => ({
     onClick: (event) => { this.handleTableRowClick(record); },
@@ -246,9 +259,8 @@ class QueryMode extends Component {
   }
 
 
-  handleClearFilter = () => {
-    this.advancedFilters = {};
-    this.tableFilters = {};
+  handleClearFilter = () => {   
+    this.filters = {};
     this.reSearch();
   }
 

@@ -7,7 +7,7 @@ import _ from 'lodash';
 
 const navList = [
   'detail', 'des', 'attachment', 'wiki',
-  'commit', 'log', 'data_log', 'sub_task',
+  'commit', 'log', 'data_log', 'sub_task', 'bug',
   'link_task', 'branch',
 ];
 const navIcon = {
@@ -43,6 +43,10 @@ const navIcon = {
     name: '子任务',
     icon: 'filter_none',
   },
+  bug: {
+    name: '缺陷',
+    icon: 'bug_report',
+  },
   link_task: {
     name: '问题链接',
     icon: 'link',
@@ -54,8 +58,11 @@ const navIcon = {
 };
 
 const noDisplay = {
-  sub_task: ['sub_task', 'link_task', 'wiki'],
-  feature: ['sub_task', 'wiki', 'branch', 'log', 'link_task'],
+  sub_task: ['sub_task', 'bug', 'link_task', 'wiki'],
+  feature: ['sub_task', 'bug', 'wiki', 'branch', 'log', 'link_task'],
+  bug: ['bug'],
+  issue_epic: ['bug'],
+  task: ['bug'],
 };
 let sign = true;
 

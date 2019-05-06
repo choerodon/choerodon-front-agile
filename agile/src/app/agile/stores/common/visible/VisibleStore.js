@@ -15,6 +15,8 @@ class VisibleStore {
 
   @observable createSubTaskShow = false;
 
+  @observable createSubBugShow = false;
+
   @observable copyIssueShow = false;
 
   @observable transformSubIssueShow = false;
@@ -63,6 +65,14 @@ class VisibleStore {
 
   @computed get getCreateSubTaskShow() {
     return this.createSubTaskShow;
+  }
+
+  @action setCreateSubBugShow(data) {
+    this.createSubBugShow = data;
+  }
+
+  @computed get getCreateSubBugShow() {
+    return this.createSubBugShow;
   }
 
   @action setCopyIssueShow(data) {
