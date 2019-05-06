@@ -135,4 +135,27 @@ export default {
       </Option>
     ),
   },
+  issue_type_program_feature_epic: {
+    ...issue_type_program,
+    request: () => new Promise(resolve => loadIssueTypes('program').then((issueTypes) => {
+      const featureTypes = [{
+        id: 'business',
+        name: '特性',
+      }, {
+        id: 'enabler',
+        name: '使能',
+      }];
+      const epicType = find(issueTypes, { typeCode: 'issue_epic' });
+      resolve([...featureTypes, epicType]);
+    })),
+    render: issueType => (
+      <Option
+        key={issueType.id}
+        value={issueType.id}
+        name={issueType.name}
+      >
+        {issueType.name}
+      </Option>
+    ),
+  },
 };

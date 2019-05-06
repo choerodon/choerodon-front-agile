@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable react/no-access-state-in-setstate */
 /* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
@@ -16,6 +17,7 @@ import { getMyFilters } from '../../../../../api/NewIssueApi';
 const { AppState } = stores;
 const getDefaultSearchDTO = () => ({
   advancedSearchArgs: {
+    featureTypeList: [],
     assigneeIds: [],
     statusList: [],
     issueTypeList: [],
@@ -48,6 +50,7 @@ const filterConvert = (filters, originSearchDTO = getDefaultSearchDTO()) => {
       case 'assigneeIds':
       case 'statusList':
       case 'issueTypeList':
+      case 'featureTypeList':      
       case 'reporterList':
       case 'epicList':
         setArgs('advancedSearchArgs', { [key]: filters[key] });
@@ -215,7 +218,16 @@ class QueryMode extends Component {
 
 
   handleAdvancedSearchChange = (type, values) => {
-    const searchDTO = filterConvert({ [type]: values }, this.state.searchDTO);
+    let searchDTO;
+    // 对类型单独处理，因为特性的区分是用business,enabler , 但史诗是用id
+    if (type === 'issueTypeList') {
+      const issueTypeList = values.filter(value => !isNaN(value));
+      const featureTypeList = values.filter(value => isNaN(value));      
+      searchDTO = filterConvert({ issueTypeList, featureTypeList }, this.state.searchDTO);
+    } else {
+      searchDTO = filterConvert({ [type]: values }, this.state.searchDTO);
+    }
+   
     this.loadFeatures({ searchDTO });
     this.setState({
       searchDTO,
