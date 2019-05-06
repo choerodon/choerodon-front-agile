@@ -27,10 +27,11 @@ export default class SwimLaneHeader extends Component {
     if (mode === 'parent_child') {
       const bugLength = parentIssue.subIssueData.filter(issue => issue.typeCode === 'bug').length;
       const subTaskLength = parentIssue.subIssueData.filter(issue => issue.typeCode === 'sub_task').length;
+      const shouldShowDot = bugLength && subTaskLength;
       return (
         <div style={{ display: 'flex', alignItems: 'center' }}>
           {switchMap.get(mode)(parentIssue)}
-          <span className="c7n-parentIssue-count" style={{ whiteSpace: 'nowrap' }}>{`  (${subTaskLength} 子任务${bugLength ? `, ${bugLength} 缺陷` : ''})`}</span>
+          <span className="c7n-parentIssue-count" style={{ whiteSpace: 'nowrap' }}>{`  (${subTaskLength ? `${subTaskLength} 子任务` : ''}${shouldShowDot ? ', ' : ''}${bugLength ? `${bugLength} 缺陷` : ''})`}</span>
         </div>
       );
     } else {
