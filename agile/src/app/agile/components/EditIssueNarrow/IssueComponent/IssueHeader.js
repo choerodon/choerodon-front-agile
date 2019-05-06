@@ -88,7 +88,7 @@ const { confirm } = Modal;
     const urlParams = AppState.currentMenuType;
     const issue = store.getIssue;
     const {
-      parentIssueId, typeCode, parentIssueNum, issueNum,
+      parentIssueId, relateIssueId, typeCode, parentIssueNum, relateIssueNum, issueNum,
       issueId, createdBy, subIssueDTOList = [],
     } = issue;
 
@@ -169,13 +169,13 @@ const { confirm } = Modal;
             >
               {/* 问题编号 */}
               <IssueNumber
-                parentIssueId={parentIssueId}
+                parentIssueId={parentIssueId || relateIssueId}
                 resetIssue={resetIssue}
                 reloadIssue={reloadIssue}
                 urlParams={urlParams}
                 backUrl={backUrl}
                 typeCode={typeCode}
-                parentIssueNum={parentIssueNum}
+                parentIssueNum={parentIssueNum || relateIssueNum}
                 issueNum={issueNum}
                 issueId={issueId}
                 type={type}

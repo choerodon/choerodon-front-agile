@@ -38,7 +38,7 @@ import { withRouter } from 'react-router-dom';
     return (
       <div style={{ fontSize: 16, lineHeight: '28px', fontWeight: 500 }}>
         {
-          typeCode === 'sub_task' ? (
+          parentIssueNum ? (
             <span>
               <span
                 role="none"
@@ -52,7 +52,7 @@ import { withRouter } from 'react-router-dom';
           ) : null
         }
         {
-          type === 'wide' || typeCode === 'sub_task' ? (
+          type === 'wide' || (['sub_task', 'bug'].includes(typeCode) && parentIssueNum) ? (
             <span>
               {issueNum}
             </span>
