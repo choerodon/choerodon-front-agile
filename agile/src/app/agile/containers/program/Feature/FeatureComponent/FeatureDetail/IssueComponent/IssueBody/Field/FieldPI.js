@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import { injectIntl } from 'react-intl';
+import _ from 'lodash';
 import TextEditToggle from '../../../../../../../../components/TextEditToggle';
 
 const { Text, Edit } = TextEditToggle;
@@ -19,7 +20,7 @@ const { Text, Edit } = TextEditToggle;
   render() {
     const { store } = this.props;
     const issue = store.getIssue;
-    const { activePi = {} } = issue;
+    const { closePi = [], activePi = {} } = issue;
     const { name, code } = activePi || {};
     return (
       <div className="line-start mt-10">
@@ -28,30 +29,33 @@ const { Text, Edit } = TextEditToggle;
             {'PI：'}
           </span>
         </div>
-        <div className="c7n-value-wrapper">
-          <TextEditToggle
-            disabled
-            // formKey="pi"
-            // onSubmit={this.updateIssuePI}
-            originData={`${code}-${name}`}
-          >
-            <Text>
-              {
-                name ? (
-                  <div>
-                    {`${code}-${name}`}
-                  </div>
-                ) : (
-                  <div>
-                    {'无'}
-                  </div>
-                )
-              }
-            </Text>
-            <Edit>
-              <span>{`${code}-${name}`}</span>
-            </Edit>
-          </TextEditToggle>
+        <div className="c7n-value-wrapper" style={{ display: 'inline-block' }}>
+          {
+            closePi.length ? (
+              <div>
+                <span>已结束PI：</span>
+                <span>
+                  {_.map(closePi, pi => `${pi.name}-${pi.code}`).join(' , ')}
+                </span>
+                <br />
+              </div>
+            ) : null
+          }
+          {
+            code ? (
+              <div>
+                <span>活跃PI：</span>
+                <span>
+                  {`${name}-${code}`}
+                </span>
+              </div>
+            ) : null
+          }
+          {
+            !code && !closePi.length ? (
+              <div>无</div>
+            ) : null
+          }
         </div>
       </div>
     );
