@@ -286,6 +286,9 @@ export function ProgramBoardLink() {
 export function ProgramBoardSettingLink() { 
   return commonLink('/kanban/setting');
 }
+export function ProgramFeatureListLink() { 
+  return commonLink('/feature');
+}
 export const getProjectId = () => AppState.currentMenuType.id;
 export const getProjectName = () => AppState.currentMenuType.name;
 export const getOrganizationId = () => AppState.currentMenuType.organizationId;

@@ -221,11 +221,12 @@ class QueryMode extends Component {
 
   handleTableChange = (pagination, filters) => {
     this.tableFilters = filters;
+   
     this.reSearch(pagination);
   }
 
   reSearch = (pagination) => {
-    const searchDTO = filterConvert({ ...this.advancedFilters, ...this.tableFilters });
+    const searchDTO = filterConvert({ ...this.advancedFilters, ...this.tableFilters });    
     this.loadFeatures({ pagination, searchDTO });
     this.setState({
       selectedFilter: undefined,
