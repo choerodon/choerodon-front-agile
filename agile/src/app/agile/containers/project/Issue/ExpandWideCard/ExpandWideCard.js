@@ -17,49 +17,38 @@ class ExpandWideCard extends Component {
   render() {
     const { HeaderStore, onHideIssue } = this.props;
     return IssueStore.getExpand ? (
-      <div
-        style={{          
-          display: 'block',
-          position: 'absolute',
-          right: 0,
-          overflow: 'hidden',
-          borderTop: '1px solid rgb(211, 211, 211)',
-          height: HeaderStore.announcementClosed ? 'calc(100vh - 156px)' : 'calc(100vh - 208px)',
+      <EditIssue
+        {...this.props}
+        store={IssueStore}
+        issueId={IssueStore.getSelectedIssue && IssueStore.getSelectedIssue.issueId}
+        onCancel={() => {
+          onHideIssue();
+          IssueStore.setClickedRow({
+            expand: false,
+            selectedIssue: {},
+            checkCreateIssue: false,
+          });
         }}
-      >
-        <EditIssue
-          {...this.props}
-          store={IssueStore}
-          issueId={IssueStore.getSelectedIssue && IssueStore.getSelectedIssue.issueId}
-          onCancel={() => {
-            onHideIssue();
-            IssueStore.setClickedRow({
-              expand: false,
-              selectedIssue: {},
-              checkCreateIssue: false,
-            });
-          }}
-          onDeleteIssue={() => {
-            IssueStore.setClickedRow({
-              expand: false,
-              selectedIssue: {},
-            });
-            const filterControler = new IssueFilterControler();
-            filterControler.refresh('refresh').then((res) => {
-              IssueStore.refreshTrigger(res);
-              Promise.resolve();
-            });
-          }}
-          onUpdate={this.handleIssueUpdate.bind(this)}
-          onCopyAndTransformToSubIssue={() => {
-            const filterControler = new IssueFilterControler();
-            filterControler.refresh('refresh').then((res) => {
-              IssueStore.refreshTrigger(res);
-              Promise.resolve();
-            });
-          }}
-        />
-      </div>
+        onDeleteIssue={() => {
+          IssueStore.setClickedRow({
+            expand: false,
+            selectedIssue: {},
+          });
+          const filterControler = new IssueFilterControler();
+          filterControler.refresh('refresh').then((res) => {
+            IssueStore.refreshTrigger(res);
+            Promise.resolve();
+          });
+        }}
+        onUpdate={this.handleIssueUpdate.bind(this)}
+        onCopyAndTransformToSubIssue={() => {
+          const filterControler = new IssueFilterControler();
+          filterControler.refresh('refresh').then((res) => {
+            IssueStore.refreshTrigger(res);
+            Promise.resolve();
+          });
+        }}
+      /> 
     ) : null;
   }
 }

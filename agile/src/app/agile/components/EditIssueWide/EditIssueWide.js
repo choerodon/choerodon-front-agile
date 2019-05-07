@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { stores, axios } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import { Spin } from 'choerodon-ui';
-import './EditIssueWide.scss';
+import '../EditIssueNarrow/EditIssueNarrow.scss';
 import {
   loadBranchs, loadDatalogs, loadLinkIssues,
   loadIssue, loadWorklogs, loadWikies, getFieldAndValue,
@@ -173,22 +173,31 @@ let hasPermission;
     } = VisibleStore;
 
     return (
-      <ResizeAble
-        modes={['left']}
-        size={{
+      <div style={{
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        height: '100%',
+        zIndex: 101,
+        overflow: 'hidden',
+      }}
+      >
+        <ResizeAble
+          modes={['left']}
+          size={{
           // maxHeight: 500,
           // minWidth: 100,
-          maxWidth: 800,
-          minWidth: 440,
-        }}
-        defaultSize={{
-          width: localStorage.getItem('agile.EditIssueWide.width') || 800,
-          height: '100%',
-        }}
-        onResizeEnd={this.handleResizeEnd}
-      >
-        <div className="choerodon-modal-editIssue" style={style}>
-          {
+            maxWidth: 800,
+            minWidth: 440,
+          }}
+          defaultSize={{
+            width: localStorage.getItem('agile.EditIssueWide.width') || 800,
+            height: '100%',
+          }}
+          onResizeEnd={this.handleResizeEnd}
+        >
+          <div className="choerodon-modal-editIssue" style={style}>
+            {
             issueLoading ? (
               <div
                 style={{
@@ -208,34 +217,34 @@ let hasPermission;
               </div>
             ) : null
           }
-          <IssueSidebar
-            type="wide"
-            store={store}
-            reloadIssue={this.loadIssueDetail}
-            onUpdate={onUpdate}
-          />
-          <div className="c7n-content">
-            <IssueHeader
-              store={store}
-              reloadIssue={this.loadIssueDetail}
-              onDeleteIssue={onDeleteIssue}
-              backUrl={backUrl}
-              onCancel={onCancel}
-              loginUserId={loginUserId}
-              hasPermission={hasPermission}
-              onUpdate={onUpdate}
+            <IssueSidebar
               type="wide"
-            />
-            <IssueBody
-              isWide
               store={store}
               reloadIssue={this.loadIssueDetail}
               onUpdate={onUpdate}
-              loginUserId={loginUserId}
-              hasPermission={hasPermission}
             />
-          </div>
-          {
+            <div className="c7n-content">
+              <IssueHeader
+                store={store}
+                reloadIssue={this.loadIssueDetail}
+                onDeleteIssue={onDeleteIssue}
+                backUrl={backUrl}
+                onCancel={onCancel}
+                loginUserId={loginUserId}
+                hasPermission={hasPermission}
+                onUpdate={onUpdate}
+                type="wide"
+              />
+              <IssueBody
+                isWide
+                store={store}
+                reloadIssue={this.loadIssueDetail}
+                onUpdate={onUpdate}
+                loginUserId={loginUserId}
+                hasPermission={hasPermission}
+              />
+            </div>
+            {
             copyIssueShow ? (
               <CopyIssue
                 issueId={issueId}
@@ -249,7 +258,7 @@ let hasPermission;
               />
             ) : null
           }
-          {
+            {
             transformSubIssueShow ? (
               <TransformSubIssue
                 visible={transformSubIssueShow}
@@ -262,7 +271,7 @@ let hasPermission;
               />
             ) : null
           }
-          {
+            {
             relateStoryShow ? (
               <RelateStory
                 issueId={issueId}
@@ -272,7 +281,7 @@ let hasPermission;
               />
             ) : null
           }
-          {
+            {
             transformFromSubIssueShow ? (
               <TransformFromSubIssue
                 visible={transformFromSubIssueShow}
@@ -286,7 +295,7 @@ let hasPermission;
             ) : null
           }
 
-          {
+            {
             assigneeShow ? (
               <Assignee
                 issueId={issueId}
@@ -307,7 +316,7 @@ let hasPermission;
               />
             ) : null
           }
-          {
+            {
             changeParentShow ? (
               <ChangeParent
                 issueId={issueId}
@@ -324,8 +333,9 @@ let hasPermission;
               />
             ) : null
           }
-        </div>
-      </ResizeAble>
+          </div>
+        </ResizeAble>
+      </div>
     );
   }
 }

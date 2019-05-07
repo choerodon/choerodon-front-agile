@@ -98,25 +98,14 @@ class RoadMap extends Component {
             )
           }
           {
-            editFeatureVisible && (
-              <div style={{
-                position: 'fixed',
-                bottom: 0,
-                right: 0,
-                width: 440,
-                height: HeaderStore.announcementClosed ? 'calc(100% - 106px)' : 'calc(100% - 158px)',
-                background: 'white',
-                zIndex: 8,
-              }}
-              >
-                <EditFeature
-                  store={FeatureStore}
-                  issueId={currentFeature}
-                  onCancel={this.handleCancel}
-                  onUpdate={this.loadRoadMap}
-                  onDeleteIssue={this.handleDelete}
-                />
-              </div>
+            editFeatureVisible && (              
+            <EditFeature
+              store={FeatureStore}
+              issueId={currentFeature}
+              onCancel={this.handleCancel}
+              onUpdate={this.loadRoadMap}
+              onDeleteIssue={this.handleDelete}
+            />             
             )}
         </Content>
       </Page>

@@ -51,7 +51,7 @@ import DataLogs from '../../../../../../../components/EditIssueNarrow/Component/
 
   render() {
     return (
-      <div id="data_log" style={{ width: 352 }}>
+      <div id="data_log">
         <div className="c7n-title-wrapper">
           <div className="c7n-title-left">
             <Icon type="insert_invitation c7n-icon-title" />
