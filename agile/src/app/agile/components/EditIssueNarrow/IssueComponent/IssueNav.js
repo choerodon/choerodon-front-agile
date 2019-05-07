@@ -62,7 +62,7 @@ const noDisplay = {
   feature: ['sub_task', 'bug', 'wiki', 'branch', 'log', 'link_task'],
   bug: ['bug'],
   issue_epic: ['bug'],
-  task: ['bug'],
+  // task: ['bug'],
 };
 let sign = true;
 

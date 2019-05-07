@@ -37,27 +37,27 @@ import TestLink from './TestLink';
             <IssueAttachment store={store} reloadIssue={reloadIssue} />
             {issueTypeDTO.typeCode && ['sub_task', 'feature'].indexOf(issueTypeDTO.typeCode) === -1
               ? <IssueWiki store={store} /> : ''
-             }
+            }
             <IssueCommit store={store} reloadIssue={reloadIssue} />
             {issueTypeDTO.typeCode && ['feature'].indexOf(issueTypeDTO.typeCode) === -1
               ? <IssueWorkLog {...this.props} store={store} reloadIssue={reloadIssue} /> : ''
-             }
+            }
             <IssueLog store={store} />
             {issueTypeDTO.typeCode && ['sub_task', 'feature'].indexOf(issueTypeDTO.typeCode) === -1
               ? <SubTask store={store} reloadIssue={reloadIssue} /> : ''
-             }
-            {issueTypeDTO.typeCode && ['story'].indexOf(issueTypeDTO.typeCode) !== -1
+            }
+            {issueTypeDTO.typeCode && ['story', 'task'].indexOf(issueTypeDTO.typeCode) !== -1
               ? <SubBug store={store} reloadIssue={reloadIssue} /> : ''
-             }
+            }
             {issueTypeDTO.typeCode && ['feature', 'sub_task'].indexOf(issueTypeDTO.typeCode) === -1
               ? <IssueLink store={store} reloadIssue={reloadIssue} /> : ''
-             }
+            }
             {issueTypeDTO.typeCode && ['feature', 'sub_task'].indexOf(issueTypeDTO.typeCode) === -1
               ? <TestLink store={store} /> : ''
             }
             {issueTypeDTO.typeCode && ['feature'].indexOf(issueTypeDTO.typeCode) === -1
               ? <IssueBranch store={store} reloadIssue={reloadIssue} /> : ''
-             }
+            }
           </div>
         </section>
       </div>
