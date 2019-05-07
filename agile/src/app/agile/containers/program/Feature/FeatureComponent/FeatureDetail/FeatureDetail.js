@@ -23,30 +23,25 @@ class FeatureDetail extends Component {
   render() {
     const { refresh, store } = this.props;
     const visible = Object.keys(store.getClickIssueDetail).length > 0;
-    return (
-      <div
-        className={visible ? 'c7n-issueDetail-container' : ''}
-      >
-        {visible ? (
-          <EditIssue
-            store={store}
-            onRef={(ref) => {
-              this.editIssue = ref;
-            }}
-            issueId={store.getClickIssueId}
-            onCancel={() => {
-              store.setClickIssueDetail({});
-              store.clearMultiSelected();
-            }}
-            onDeleteIssue={() => {
-              store.setClickIssueDetail({});
-              refresh();
-            }}
-            onUpdate={refresh}
-          />
-        ) : ''}
-      </div>
-    );
+    return visible
+      && (
+      <EditIssue
+        store={store}
+        onRef={(ref) => {
+          this.editIssue = ref;
+        }}
+        issueId={store.getClickIssueId}
+        onCancel={() => {
+          store.setClickIssueDetail({});
+          store.clearMultiSelected();
+        }}
+        onDeleteIssue={() => {
+          store.setClickIssueDetail({});
+          refresh();
+        }}
+        onUpdate={refresh}
+      />
+      );
   }
 }
 

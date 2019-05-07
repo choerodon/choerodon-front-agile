@@ -3,18 +3,14 @@
 /* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import FileSaver from 'file-saver';
-import { stores } from 'choerodon-front-boot';
-import { findIndex } from 'lodash';
 import { observer } from 'mobx-react';
 import FeatureTable from '../FeatureTable';
 import SearchArea from '../SearchArea';
 import ExportIssue from '../ExportIssue';
-import { getFeatures, exportFeatures } from '../../../../../api/FeatureApi';
+import { getFeatures } from '../../../../../api/FeatureApi';
 import FeatureStore from '../../../../../stores/program/Feature/FeatureStore';
 import { getMyFilters } from '../../../../../api/NewIssueApi';
 
-const { AppState } = stores;
 const getDefaultSearchDTO = () => ({
   advancedSearchArgs: {
     featureTypeList: [],

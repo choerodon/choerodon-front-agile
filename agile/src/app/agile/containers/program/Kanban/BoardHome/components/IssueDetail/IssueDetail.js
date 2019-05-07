@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import EditIssue from '../../../../Feature/FeatureComponent/FeatureDetail/EditFeature';
+import EditFeature from '../../../../Feature/FeatureComponent/FeatureDetail/EditFeature';
 import KanbanStore from '../../../../../../stores/program/Kanban/KanbanStore';
 import './IssueDetail.scss';
 
@@ -18,15 +18,14 @@ class IssueDetail extends Component {
 
   render() {
     const { refresh, HeaderStore } = this.props;
-    return KanbanStore.getClickedIssue ? (
-      <EditIssue
+    return KanbanStore.getClickedIssue ? (      
+      <EditFeature
         key={KanbanStore.getClickIssueDetail.issueId}
         store={KanbanStore}
         onRef={this.onRef}
         backUrl="board"
         style={{
-          height: HeaderStore.announcementClosed ? 'calc(100vh - 156px)' : 'calc(100vh - 208px)',
-          width: '440px',
+          height: HeaderStore.announcementClosed ? 'calc(100vh - 156px)' : 'calc(100vh - 208px)',         
         }}
         issueId={KanbanStore.getClickIssueDetail.issueId}
         onCancel={() => {

@@ -122,20 +122,29 @@ let hasPermission;
     } = VisibleStore;
 
     return (
-      <ResizeAble
-        modes={['left']}
-        size={{
-          maxWidth: 800,
-          minWidth: 440,
-        }}
-        defaultSize={{
-          width: localStorage.getItem('agile.EditFeature.width') || 440,
-          height: '100%',
-        }}
-        onResizeEnd={this.handleResizeEnd}
+      <div style={{
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        height: '100%',
+        zIndex: 101,
+        overflow: 'hidden',
+      }}
       >
-        <div className="choerodon-modal-editIssue" style={style}>
-          {
+        <ResizeAble
+          modes={['left']}
+          size={{
+            maxWidth: 800,
+            minWidth: 440,
+          }}
+          defaultSize={{
+            width: localStorage.getItem('agile.EditFeature.width') || 440,
+            height: '100%',
+          }}
+          onResizeEnd={this.handleResizeEnd}
+        >
+          <div className="choerodon-modal-editIssue" style={style}>
+            {
           issueLoading ? (
             <div
               style={{
@@ -155,31 +164,31 @@ let hasPermission;
             </div>
           ) : null
         }
-          <IssueSidebar
-            store={store}
-            reloadIssue={this.loadIssueDetail}
-            onUpdate={onUpdate}
-          />
-          <div className="c7n-content">
-            <IssueHeader
-              store={store}
-              reloadIssue={this.loadIssueDetail}
-              backUrl={backUrl}
-              onCancel={onCancel}
-              loginUserId={loginUserId}
-              hasPermission={hasPermission}
-              onUpdate={onUpdate}
-              onDeleteIssue={onDeleteIssue}
-            />
-            <IssueBody
+            <IssueSidebar
               store={store}
               reloadIssue={this.loadIssueDetail}
               onUpdate={onUpdate}
-              loginUserId={loginUserId}
-              hasPermission={hasPermission}
             />
-          </div>
-          {
+            <div className="c7n-content">
+              <IssueHeader
+                store={store}
+                reloadIssue={this.loadIssueDetail}
+                backUrl={backUrl}
+                onCancel={onCancel}
+                loginUserId={loginUserId}
+                hasPermission={hasPermission}
+                onUpdate={onUpdate}
+                onDeleteIssue={onDeleteIssue}
+              />
+              <IssueBody
+                store={store}
+                reloadIssue={this.loadIssueDetail}
+                onUpdate={onUpdate}
+                loginUserId={loginUserId}
+                hasPermission={hasPermission}
+              />
+            </div>
+            {
           copyIssueShow ? (
             <CopyIssue
               issueId={issueId}
@@ -194,8 +203,9 @@ let hasPermission;
             />
           ) : null
         }
-        </div>
-      </ResizeAble>
+          </div>
+        </ResizeAble>
+      </div>
     );
   }
 }
