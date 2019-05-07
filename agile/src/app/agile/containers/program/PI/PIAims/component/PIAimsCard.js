@@ -97,7 +97,7 @@ const PIAimsCard = ({
                 </tr>
                 <tr>
                   <td />
-                  <td valign="top">{percent}</td>
+                  <td valign="top" style={{ overflow: 'visible' }}>{percent}</td>
                   <td />
                 </tr>
               </tbody>

@@ -32,17 +32,16 @@ const { TextArea } = Input;
     const {
       issueId, objectVersionNumber, [fieldCode]: value, featureDTO = {},
     } = issue;
-    const { id, objectVersionNumber: featureObjNum } = featureDTO;
     if (value !== newValue.trim()) {
       let obj = false;
-      if (feature) {
+      if (feature && featureDTO) {
         obj = {
           issueId,
           objectVersionNumber,
           featureDTO: {
-            id,
+            id: featureDTO.id,
             issueId,
-            objectVersionNumber: featureObjNum,
+            objectVersionNumber: featureDTO.objectVersionNumber,
             [fieldCode]: newValue.trim(),
           },
         };

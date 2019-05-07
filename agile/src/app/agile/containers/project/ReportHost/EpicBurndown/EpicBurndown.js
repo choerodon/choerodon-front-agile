@@ -846,7 +846,7 @@ class EpicBurndown extends Component {
         <Content
           title="史诗燃耗图"
           description="跟踪史诗完成速度预计所需冲刺数。这有助于您监控史诗能否按时发布，以便在工作落后时采取行动。"
-          // link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
+          // link="http://v0-16.choerodon.io/zh/docs/user-guide/agile/report/sprint/"
         >
           {
             !(!ES.epics.length && ES.epicFinishLoading) ? (

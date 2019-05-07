@@ -693,7 +693,7 @@ checkSearchNameRepeat = (rule, value, callback) => {
           }}
           title={`在项目“${AppState.currentMenuType.name}”中创建快速搜索`}
           description="通过定义快速搜索，可以在待办事项和活跃冲刺的快速搜索工具栏生效，帮助您更好的筛选过滤问题面板。"
-          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/setup/quick-search/"
+          link="http://v0-16.choerodon.io/zh/docs/user-guide/agile/setup/quick-search/"
         >
           <Form layout="vertical">
             <FormItem style={{ width: 520 }}>
