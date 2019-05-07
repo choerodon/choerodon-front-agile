@@ -23,6 +23,8 @@ class VisibleStore {
 
   @observable transformFromSubIssueShow = false;
 
+  @observable relateStoryShow = false;
+
   @observable assigneeShow = false;
 
   @observable changeParentShow = false;
@@ -97,6 +99,14 @@ class VisibleStore {
 
   @computed get getTransformFromSubIssueShow() {
     return this.transformFromSubIssueShow;
+  }
+
+  @action setRelateStoryShow(data) {
+    this.relateStoryShow = data;
+  }
+
+  @computed get getRelateStoryShow() {
+    return this.relateStoryShow;
   }
 
   @action setAssigneeShow(data) {

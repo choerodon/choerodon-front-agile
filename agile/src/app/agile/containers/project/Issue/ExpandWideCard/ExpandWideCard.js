@@ -18,9 +18,10 @@ class ExpandWideCard extends Component {
     const { HeaderStore, onHideIssue } = this.props;
     return IssueStore.getExpand ? (
       <div
-        style={{
-          width: IssueStore.getExpand ? '64%' : 0,
+        style={{          
           display: 'block',
+          position: 'absolute',
+          right: 0,
           overflow: 'hidden',
           borderTop: '1px solid rgb(211, 211, 211)',
           height: HeaderStore.announcementClosed ? 'calc(100vh - 156px)' : 'calc(100vh - 208px)',

@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { stores, axios } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import { Spin } from 'choerodon-ui';
-import './EditIssueNarrow.scss';
+import './EditIssueWide.scss';
 import {
   loadBranchs, loadDatalogs, loadLinkIssues,
   loadIssue, loadWorklogs, loadWikies, getFieldAndValue,
@@ -16,17 +16,16 @@ import TransformSubIssue from '../TransformSubIssue';
 import TransformFromSubIssue from '../TransformFromSubIssue';
 import Assignee from '../Assignee';
 import ChangeParent from '../ChangeParent';
-import IssueSidebar from './IssueComponent/IssueSidebar';
-import IssueHeader from './IssueComponent/IssueHeader';
-import IssueBody from './IssueComponent/IssueBody/IssueBody';
+import IssueSidebar from '../EditIssueNarrow/IssueComponent/IssueSidebar';
+import IssueHeader from '../EditIssueNarrow/IssueComponent/IssueHeader';
+import IssueBody from '../EditIssueNarrow/IssueComponent/IssueBody/IssueBody';
 import VisibleStore from '../../stores/common/visible/VisibleStore';
 
 const { AppState } = stores;
 
 let loginUserId;
 let hasPermission;
-@observer
-class EditIssueNarrow extends Component {
+@observer class EditIssueWide extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -96,10 +95,13 @@ class EditIssueNarrow extends Component {
   };
 
   handleCopyIssue = () => {
-    const { onUpdate } = this.props;
+    const { onUpdate, onCopyAndTransformToSubIssue } = this.props;
     VisibleStore.setCopyIssueShow(false);
     if (onUpdate) {
       onUpdate();
+    }
+    if (onCopyAndTransformToSubIssue) {
+      onCopyAndTransformToSubIssue();
     }
     this.loadIssueDetail();
   };
@@ -114,26 +116,32 @@ class EditIssueNarrow extends Component {
   }
 
   handleTransformSubIssue() {
-    const { onUpdate } = this.props;
+    const { onUpdate, onCopyAndTransformToSubIssue } = this.props;
     VisibleStore.setTransformSubIssueShow(false);
     if (onUpdate) {
       onUpdate();
+    }
+    if (onCopyAndTransformToSubIssue) {
+      onCopyAndTransformToSubIssue();
     }
     this.loadIssueDetail();
   }
 
   handleTransformFromSubIssue() {
-    const { onUpdate } = this.props;
+    const { onUpdate, onCopyAndTransformToSubIssue } = this.props;
     VisibleStore.setTransformFromSubIssueShow(false);
     if (onUpdate) {
       onUpdate();
+    }
+    if (onCopyAndTransformToSubIssue) {
+      onCopyAndTransformToSubIssue();
     }
     this.loadIssueDetail();
   }
 
   handleResizeEnd=(size) => {
     const { width } = size;
-    localStorage.setItem('agile.EditIssueNarrow.width', `${width}px`);
+    localStorage.setItem('agile.EditIssueWide.width', `${width}px`);
   }
 
   render() {
@@ -174,13 +182,12 @@ class EditIssueNarrow extends Component {
           minWidth: 440,
         }}
         defaultSize={{
-          width: localStorage.getItem('agile.EditIssueNarrow.width') || 440,
+          width: localStorage.getItem('agile.EditIssueWide.width') || 800,
           height: '100%',
         }}
         onResizeEnd={this.handleResizeEnd}
       >
         <div className="choerodon-modal-editIssue" style={style}>
-          {/* <div className="choerodon-modal-editIssue-divider" /> */}
           {
             issueLoading ? (
               <div
@@ -202,6 +209,7 @@ class EditIssueNarrow extends Component {
             ) : null
           }
           <IssueSidebar
+            type="wide"
             store={store}
             reloadIssue={this.loadIssueDetail}
             onUpdate={onUpdate}
@@ -210,13 +218,16 @@ class EditIssueNarrow extends Component {
             <IssueHeader
               store={store}
               reloadIssue={this.loadIssueDetail}
+              onDeleteIssue={onDeleteIssue}
               backUrl={backUrl}
               onCancel={onCancel}
               loginUserId={loginUserId}
               hasPermission={hasPermission}
-              onDeleteIssue={onDeleteIssue}
+              onUpdate={onUpdate}
+              type="wide"
             />
             <IssueBody
+              isWide
               store={store}
               reloadIssue={this.loadIssueDetail}
               onUpdate={onUpdate}
@@ -239,16 +250,6 @@ class EditIssueNarrow extends Component {
             ) : null
           }
           {
-            relateStoryShow ? (
-              <RelateStory
-                issue={issue}
-                visible={relateStoryShow}
-                onCancel={() => VisibleStore.setRelateStoryShow(false)}
-                onOk={this.handleRelateStory.bind(this)}
-              />
-            ) : null
-          }
-          {
             transformSubIssueShow ? (
               <TransformSubIssue
                 visible={transformSubIssueShow}
@@ -258,6 +259,16 @@ class EditIssueNarrow extends Component {
                 onCancel={() => VisibleStore.setTransformSubIssueShow(false)}
                 onOk={this.handleTransformSubIssue.bind(this)}
                 store={store}
+              />
+            ) : null
+          }
+          {
+            relateStoryShow ? (
+              <RelateStory
+                issueId={issueId}
+                visible={relateStoryShow}
+                onCancel={() => VisibleStore.setRelateStoryShow(false)}
+                onOk={this.handleRelateStory.bind(this)}
               />
             ) : null
           }
@@ -318,4 +329,4 @@ class EditIssueNarrow extends Component {
     );
   }
 }
-export default withRouter(EditIssueNarrow);
+export default withRouter(EditIssueWide);
