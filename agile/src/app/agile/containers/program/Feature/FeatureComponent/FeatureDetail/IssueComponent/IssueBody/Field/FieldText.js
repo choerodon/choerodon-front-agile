@@ -77,7 +77,7 @@ const { TextArea } = Input;
     const value = feature ? featureDTO[fieldCode] : issue[fieldCode];
 
     return (
-      <div className="line-start mt-10">
+      <div className="line-start mt-10" style={{ width: fieldCode === 'summary' && '100%' }}>
         {showTitle
           ? (
             <div className="c7n-property-wrapper">
