@@ -4,7 +4,8 @@ import { observer } from 'mobx-react';
 import { stores, axios } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import { Spin } from 'choerodon-ui';
-import './EditFeature.scss';
+// import './EditFeature.scss';
+import '../../../../../components/EditIssueNarrow/EditIssueNarrow.scss';
 import {
   loadDatalogs, loadLinkIssues, loadIssue, getFieldAndValue, loadWikies,
 } from '../../../../../api/NewIssueApi';
@@ -13,12 +14,13 @@ import IssueSidebar from './IssueComponent/IssueSidebar';
 import IssueHeader from './IssueComponent/IssueHeader';
 import IssueBody from './IssueComponent/IssueBody/IssueBody';
 import VisibleStore from '../../../../../stores/common/visible/VisibleStore';
+import ResizeAble from '../../../../../components/ResizeAble';
 
 const { AppState } = stores;
 
 let loginUserId;
 let hasPermission;
-@observer class CreateSprint extends Component {
+@observer class EditFeature extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -94,6 +96,11 @@ let hasPermission;
     this.loadIssueDetail();
   };
 
+  handleResizeEnd=(size) => {
+    const { width } = size;
+    localStorage.setItem('agile.EditFeature.width', `${width}px`);
+  }
+
   render() {
     const {
       store,
@@ -115,8 +122,20 @@ let hasPermission;
     } = VisibleStore;
 
     return (
-      <div className="choerodon-modal-editIssue" style={style}>
-        {
+      <ResizeAble
+        modes={['left']}
+        size={{
+          maxWidth: 800,
+          minWidth: 440,
+        }}
+        defaultSize={{
+          width: localStorage.getItem('agile.EditFeature.width') || 440,
+          height: '100%',
+        }}
+        onResizeEnd={this.handleResizeEnd}
+      >
+        <div className="choerodon-modal-editIssue" style={style}>
+          {
           issueLoading ? (
             <div
               style={{
@@ -136,31 +155,31 @@ let hasPermission;
             </div>
           ) : null
         }
-        <IssueSidebar
-          store={store}
-          reloadIssue={this.loadIssueDetail}
-          onUpdate={onUpdate}
-        />
-        <div className="c7n-content">
-          <IssueHeader
-            store={store}
-            reloadIssue={this.loadIssueDetail}
-            backUrl={backUrl}
-            onCancel={onCancel}
-            loginUserId={loginUserId}
-            hasPermission={hasPermission}
-            onUpdate={onUpdate}
-            onDeleteIssue={onDeleteIssue}
-          />
-          <IssueBody
+          <IssueSidebar
             store={store}
             reloadIssue={this.loadIssueDetail}
             onUpdate={onUpdate}
-            loginUserId={loginUserId}
-            hasPermission={hasPermission}
           />
-        </div>
-        {
+          <div className="c7n-content">
+            <IssueHeader
+              store={store}
+              reloadIssue={this.loadIssueDetail}
+              backUrl={backUrl}
+              onCancel={onCancel}
+              loginUserId={loginUserId}
+              hasPermission={hasPermission}
+              onUpdate={onUpdate}
+              onDeleteIssue={onDeleteIssue}
+            />
+            <IssueBody
+              store={store}
+              reloadIssue={this.loadIssueDetail}
+              onUpdate={onUpdate}
+              loginUserId={loginUserId}
+              hasPermission={hasPermission}
+            />
+          </div>
+          {
           copyIssueShow ? (
             <CopyIssue
               issueId={issueId}
@@ -175,8 +194,9 @@ let hasPermission;
             />
           ) : null
         }
-      </div>
+        </div>
+      </ResizeAble>
     );
   }
 }
-export default withRouter(CreateSprint);
+export default withRouter(EditFeature);

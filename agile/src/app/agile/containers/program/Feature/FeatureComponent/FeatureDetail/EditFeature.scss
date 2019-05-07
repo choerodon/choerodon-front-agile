@@ -5,6 +5,8 @@
   // flex-direction: column;
   flex: 1;
   position: relative;
+  z-index: 60;
+  background: white;
   p {
     margin-bottom: 0;
   }

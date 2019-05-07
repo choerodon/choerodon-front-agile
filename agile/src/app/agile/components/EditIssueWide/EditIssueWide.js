@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { stores, axios } from 'choerodon-front-boot';
 import { withRouter } from 'react-router-dom';
 import { Spin } from 'choerodon-ui';
-import './EditIssueWide.scss';
+import '../EditIssueNarrow/EditIssueNarrow.scss';
 import {
   loadBranchs, loadDatalogs, loadLinkIssues,
   loadIssue, loadWorklogs, loadWikies, getFieldAndValue,

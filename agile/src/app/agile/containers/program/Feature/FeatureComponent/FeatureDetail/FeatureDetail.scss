@@ -1,4 +1,6 @@
 .c7n-issueDetail-container {
-  width: 440px;
-  overflow: auto;
+  position: absolute;
+  right: 0;
+  height: 100%;
+  z-index: 50;
 }

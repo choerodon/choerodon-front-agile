@@ -81,7 +81,7 @@ import { updateIssue } from '../../../../../../../api/NewIssueApi';
           <WYSIWYGEditor
             bottomBar
             value={text2Delta(editDes)}
-            style={{ height: '100%', width: '352px' }}
+            style={{ height: '100%', width: '100%' }}
             onChange={(value) => {
               this.setState({ editDes: value });
             }}

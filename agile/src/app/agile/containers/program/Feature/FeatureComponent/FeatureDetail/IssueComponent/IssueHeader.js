@@ -12,7 +12,7 @@ import './IssueComponent.scss';
 const { confirm } = Modal;
 
 @inject('AppState', 'HeaderStore')
-@observer class SprintHeader extends Component {
+@observer class IssueHeader extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -141,7 +141,7 @@ const { confirm } = Modal;
               </div>
             </div>
             {/* 主题 */}
-            <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start', width: '360px' }}>
+            <div className="line-justify" style={{ marginBottom: 5, alignItems: 'flex-start' }}>
               <FieldText
                 {...this.props}
                 showTitle={false}
@@ -170,4 +170,4 @@ const { confirm } = Modal;
   }
 }
 
-export default SprintHeader;
+export default IssueHeader;
