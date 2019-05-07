@@ -83,7 +83,7 @@ const { Text, Edit } = TextEditToggle;
 
   render() {
     const { selectLoading, originUsers } = this.state;
-    const { store, loginUserId, hasPermission } = this.props;
+    const { store, loginUserId } = this.props;
     const issue = store.getIssue;
     const { assigneeId, assigneeName, assigneeImageUrl } = issue;
     const targetUser = _.find(originUsers, { id: assigneeId, enabled: true });
@@ -159,7 +159,7 @@ const { Text, Edit } = TextEditToggle;
               </Select>
             </Edit>
           </TextEditToggle>
-          {assigneeId !== loginUserId && hasPermission
+          {assigneeId !== loginUserId
             ? (
               <span
                 role="none"
