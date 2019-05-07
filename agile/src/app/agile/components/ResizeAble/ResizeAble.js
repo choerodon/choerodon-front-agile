@@ -69,6 +69,7 @@ const propTypes = {
     minHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   }),
+  onResizeEnd: PropTypes.func,
 };
 class ResizeAble extends Component {
   constructor(props) {
@@ -116,6 +117,10 @@ class ResizeAble extends Component {
   handleMouseUp = (e) => {
     document.removeEventListener('mousemove', this.handleMouseMove);
     document.removeEventListener('mouseup', this.handleMouseUp);
+    const { onResizeEnd } = this.props;
+    if (onResizeEnd) {
+      onResizeEnd(this.size);
+    }
     this.setState({
       resizing: false,
     });

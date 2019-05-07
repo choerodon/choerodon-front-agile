@@ -139,6 +139,11 @@ let hasPermission;
     this.loadIssueDetail();
   }
 
+  handleResizeEnd=(size) => {
+    const { width } = size;
+    localStorage.setItem('agile.EditIssueWide.width', `${width}px`);
+  }
+
   render() {
     const {
       store,
@@ -177,9 +182,10 @@ let hasPermission;
           minWidth: 440,
         }}
         defaultSize={{
-          width: 800,
+          width: localStorage.getItem('agile.EditIssueWide.width') || 800,
           height: '100%',
         }}
+        onResizeEnd={this.handleResizeEnd}
       >
         <div className="choerodon-modal-editIssue" style={style}>
           {

@@ -131,6 +131,11 @@ class EditIssueNarrow extends Component {
     this.loadIssueDetail();
   }
 
+  handleResizeEnd=(size) => {
+    const { width } = size;
+    localStorage.setItem('agile.EditIssueNarrow.width', `${width}px`);
+  }
+
   render() {
     const {
       store,
@@ -169,9 +174,10 @@ class EditIssueNarrow extends Component {
           minWidth: 440,
         }}
         defaultSize={{
-          width: 440,
+          width: localStorage.getItem('agile.EditIssueNarrow.width') || 440,
           height: '100%',
         }}
+        onResizeEnd={this.handleResizeEnd}
       >
         <div className="choerodon-modal-editIssue" style={style}>
           {/* <div className="choerodon-modal-editIssue-divider" /> */}
