@@ -72,40 +72,44 @@ import { updateIssue } from '../../../../../../../api/NewIssueApi';
     if (!description || editDesShow) {
       return (
         <div
-          className="line-start mt-10"
-          style={{
-            height: 190,
-            width: '100%',
-          }}
+          className="line-start mt-10 two-to-one"          
         >
-          <WYSIWYGEditor
-            bottomBar
-            value={text2Delta(editDes)}
-            style={{ height: '100%', width: '100%' }}
-            onChange={(value) => {
-              this.setState({ editDes: value });
-            }}
-            handleDelete={() => {
-              this.setState({
-                editDesShow: false,
-                editDes: description,
-              });
-            }}
-            handleSave={() => {
-              this.setState({
-                editDesShow: false,
-                description: editDes || '',
-              });
-              this.updateIssueDes();
-            }}
-            handleClickOutSide={() => {
-              this.setState({
-                editDesShow: false,
-                description: editDes || '',
-              });
-              this.updateIssueDes();
-            }}
-          />
+          <div style={{
+            width: '100%',
+            position: 'absolute',
+            top: 0,
+            bottom: 0, 
+          }}
+          >
+            <WYSIWYGEditor
+              bottomBar
+              value={text2Delta(editDes)}
+              style={{ height: '100%', width: '100%' }}
+              onChange={(value) => {
+                this.setState({ editDes: value });
+              }}
+              handleDelete={() => {
+                this.setState({
+                  editDesShow: false,
+                  editDes: description,
+                });
+              }}
+              handleSave={() => {
+                this.setState({
+                  editDesShow: false,
+                  description: editDes || '',
+                });
+                this.updateIssueDes();
+              }}
+              handleClickOutSide={() => {
+                this.setState({
+                  editDesShow: false,
+                  description: editDes || '',
+                });
+                this.updateIssueDes();
+              }}
+            />
+          </div>
         </div>
       );
     } else {
