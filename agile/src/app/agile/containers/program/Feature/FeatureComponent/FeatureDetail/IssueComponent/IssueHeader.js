@@ -28,12 +28,12 @@ const { confirm } = Modal;
     const { issueNum } = issue;
     confirm({
       width: 560,
-      title: `删除特性${issueNum}`,
+      title: `删除问题${issueNum}`,
       content:
         (
           <div>
-            <p style={{ marginBottom: 10 }}>请确认您要删除这个特性。</p>
-            <p style={{ marginBottom: 10 }}>这个特性将会被彻底删除。包括所有附件和评论。</p>
+            <p style={{ marginBottom: 10 }}>请确认您要删除这个问题。</p>
+            <p style={{ marginBottom: 10 }}>这个问题将会被彻底删除。包括所有附件和评论。</p>
             <p style={{ marginBottom: 10 }}>如果您完成了这个问题，通常是已解决或者已关闭，而不是删除。</p>
           </div>
         ),

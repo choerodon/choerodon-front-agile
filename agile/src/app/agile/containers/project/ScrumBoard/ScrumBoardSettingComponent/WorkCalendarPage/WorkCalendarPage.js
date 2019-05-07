@@ -44,7 +44,7 @@ class WorkCalendarPage extends Component {
     return (
       <Content
         description="工作日历是用于配置当前冲刺的实际工作时间，比如：在开启冲刺后，原定的法定节假日需要加班，这时可针对该冲刺进行日历修改，此工作日历的修改会导致当前冲刺报表数据的变动。"
-        link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/#工作日历"
+        link="http://v0-16.choerodon.io/zh/docs/user-guide/agile/sprint/manage-kanban/#工作日历"
         style={{
           padding: 0,
           height: '100%',

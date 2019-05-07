@@ -171,7 +171,7 @@ class EditComponent extends Component {
         <Content
           title={`在项目“${AppState.currentMenuType.name}”中修改模块`}
           description="请在下面输入模块名称、模块概要、负责人和默认经办人策略，修改模版。"
-          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/component/"
+          link="http://v0-16.choerodon.io/zh/docs/user-guide/agile/component/"
           style={{
             padding: 0,
           }}

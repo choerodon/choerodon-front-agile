@@ -1,4 +1,4 @@
-const docServer = 'http://v0-10.choerodon.io/zh/docs';
+const docServer = 'http://v0-16.choerodon.io/zh/docs';
 /*eslint-disable*/
 const pageDetail = {
   'branch.head': '项目\"{name}\"的分支管理',

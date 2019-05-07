@@ -131,7 +131,7 @@ class AddComponent extends Component {
           }}
           title={`在项目“${AppState.currentMenuType.name}”中创建模块`}
           description="请在下面输入模块名称、模块概要、负责人和默认经办人策略，创建新模版。"
-          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/component/"
+          link="http://v0-16.choerodon.io/zh/docs/user-guide/agile/component/"
         >
           <Form style={{
             width: 512,
