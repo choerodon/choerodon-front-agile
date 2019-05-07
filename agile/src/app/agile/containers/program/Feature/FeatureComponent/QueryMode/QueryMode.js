@@ -257,7 +257,11 @@ class QueryMode extends Component {
 
   handleClearFilter = () => {   
     this.filters = {};
-    this.reSearch();
+    this.loadFeatures({ searchDTO: getDefaultSearchDTO() });
+    this.setState({
+      searchDTO: getDefaultSearchDTO(),
+      selectedFilter: undefined,
+    });
   }
 
   handleMyFilterUpdate=() => {
