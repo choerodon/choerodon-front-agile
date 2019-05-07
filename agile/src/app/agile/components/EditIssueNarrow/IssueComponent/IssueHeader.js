@@ -77,6 +77,8 @@ const { confirm } = Modal;
       VisibleStore.setChangeParentShow(true);
     } else if (e.key === '9') {
       VisibleStore.setCreateSubBugShow(true);
+    } else if (e.key === '10') {  
+      VisibleStore.setRelateStoryShow(true);
     }
   };
 
@@ -154,6 +156,13 @@ const { confirm } = Modal;
           typeCode === 'sub_task' && (
             <Menu.Item key="8">
               {'修改父级'}
+            </Menu.Item>
+          )
+        }
+        {
+          typeCode === 'bug' && (
+            <Menu.Item key="10">
+              {'关联故事'}
             </Menu.Item>
           )
         }

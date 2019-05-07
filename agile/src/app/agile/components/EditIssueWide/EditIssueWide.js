@@ -9,6 +9,7 @@ import {
   loadBranchs, loadDatalogs, loadLinkIssues,
   loadIssue, loadWorklogs, loadWikies, getFieldAndValue,
 } from '../../api/NewIssueApi';
+import RelateStory from '../RelateStory';
 import CopyIssue from '../CopyIssue';
 import ResizeAble from '../ResizeAble';
 import TransformSubIssue from '../TransformSubIssue';
@@ -105,6 +106,15 @@ let hasPermission;
     this.loadIssueDetail();
   };
 
+  handleRelateStory = () => {
+    const { onUpdate } = this.props;
+    VisibleStore.setRelateStoryShow(false);
+    if (onUpdate) {
+      onUpdate();
+    }
+    this.loadIssueDetail();
+  }
+
   handleTransformSubIssue() {
     const { onUpdate, onCopyAndTransformToSubIssue } = this.props;
     VisibleStore.setTransformSubIssueShow(false);
@@ -154,6 +164,7 @@ let hasPermission;
       getCopyIssueShow: copyIssueShow,
       getTransformSubIssueShow: transformSubIssueShow,
       getTransformFromSubIssueShow: transformFromSubIssueShow,
+      getRelateStoryShow: relateStoryShow,
     } = VisibleStore;
 
     return (
@@ -172,25 +183,25 @@ let hasPermission;
       >
         <div className="choerodon-modal-editIssue" style={style}>
           {
-          issueLoading ? (
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                bottom: 0,
-                left: 0,
-                right: 0,
-                background: 'rgba(255, 255, 255, 0.65)',
-                zIndex: 9999,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <Spin />
-            </div>
-          ) : null
-        }
+            issueLoading ? (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  background: 'rgba(255, 255, 255, 0.65)',
+                  zIndex: 9999,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Spin />
+              </div>
+            ) : null
+          }
           <IssueSidebar
             type="wide"
             store={store}
@@ -219,84 +230,94 @@ let hasPermission;
             />
           </div>
           {
-          copyIssueShow ? (
-            <CopyIssue
-              issueId={issueId}
-              issueNum={issueNum}
-              issue={issue}
-              issueLink={linkIssues}
-              issueSummary={summary}
-              visible={copyIssueShow}
-              onCancel={() => VisibleStore.setCopyIssueShow(false)}
-              onOk={this.handleCopyIssue.bind(this)}
-            />
-          ) : null
-        }
+            copyIssueShow ? (
+              <CopyIssue
+                issueId={issueId}
+                issueNum={issueNum}
+                issue={issue}
+                issueLink={linkIssues}
+                issueSummary={summary}
+                visible={copyIssueShow}
+                onCancel={() => VisibleStore.setCopyIssueShow(false)}
+                onOk={this.handleCopyIssue.bind(this)}
+              />
+            ) : null
+          }
           {
-          transformSubIssueShow ? (
-            <TransformSubIssue
-              visible={transformSubIssueShow}
-              issueId={issueId}
-              issueNum={issueNum}
-              ovn={objectVersionNumber}
-              onCancel={() => VisibleStore.setTransformSubIssueShow(false)}
-              onOk={this.handleTransformSubIssue.bind(this)}
-              store={store}
-            />
-          ) : null
-        }
+            transformSubIssueShow ? (
+              <TransformSubIssue
+                visible={transformSubIssueShow}
+                issueId={issueId}
+                issueNum={issueNum}
+                ovn={objectVersionNumber}
+                onCancel={() => VisibleStore.setTransformSubIssueShow(false)}
+                onOk={this.handleTransformSubIssue.bind(this)}
+                store={store}
+              />
+            ) : null
+          }
           {
-          transformFromSubIssueShow ? (
-            <TransformFromSubIssue
-              visible={transformFromSubIssueShow}
-              issueId={issueId}
-              issueNum={issueNum}
-              ovn={objectVersionNumber}
-              onCancel={() => VisibleStore.setTransformFromSubIssueShow(false)}
-              onOk={this.handleTransformFromSubIssue.bind(this)}
-              store={store}
-            />
-          ) : null
-        }
+            relateStoryShow ? (
+              <RelateStory
+                issueId={issueId}
+                visible={relateStoryShow}
+                onCancel={() => VisibleStore.setRelateStoryShow(false)}
+                onOk={this.handleRelateStory.bind(this)}
+              />
+            ) : null
+          }
+          {
+            transformFromSubIssueShow ? (
+              <TransformFromSubIssue
+                visible={transformFromSubIssueShow}
+                issueId={issueId}
+                issueNum={issueNum}
+                ovn={objectVersionNumber}
+                onCancel={() => VisibleStore.setTransformFromSubIssueShow(false)}
+                onOk={this.handleTransformFromSubIssue.bind(this)}
+                store={store}
+              />
+            ) : null
+          }
 
           {
-          assigneeShow ? (
-            <Assignee
-              issueId={issueId}
-              issueNum={issueNum}
-              visible={assigneeShow}
-              assigneeId={assigneeId}
-              objectVersionNumber={objectVersionNumber}
-              onOk={() => {
-                VisibleStore.setAssigneeShow(false);
-                if (onUpdate) {
-                  onUpdate();
-                }
-                this.loadIssueDetail(issueId);
-              }}
-              onCancel={() => {
-                VisibleStore.setAssigneeShow(false);
-              }}
-            />
-          ) : null
-        }
+            assigneeShow ? (
+              <Assignee
+                issueId={issueId}
+                issueNum={issueNum}
+                visible={assigneeShow}
+                assigneeId={assigneeId}
+                objectVersionNumber={objectVersionNumber}
+                onOk={() => {
+                  VisibleStore.setAssigneeShow(false);
+                  if (onUpdate) {
+                    onUpdate();
+                  }
+                  this.loadIssueDetail(issueId);
+                }}
+                onCancel={() => {
+                  VisibleStore.setAssigneeShow(false);
+                }}
+              />
+            ) : null
+          }
           {
-          changeParentShow ? (
-            <ChangeParent
-              issueId={issueId}
-              issueNum={issueNum}
-              visible={changeParentShow}
-              objectVersionNumber={objectVersionNumber}
-              onOk={() => {
-                VisibleStore.setChangeParentShow(false);
-                this.loadIssueDetail(issueId);
-              }}
-              onCancel={() => {
-                VisibleStore.setChangeParentShow(false);
-              }}
-            />
-          ) : null
-        }
+            changeParentShow ? (
+              <ChangeParent
+                issueId={issueId}
+                issueNum={issueNum}
+                visible={changeParentShow}
+                objectVersionNumber={objectVersionNumber}
+                onOk={() => {
+                  VisibleStore.setChangeParentShow(false);
+                  this.loadIssueDetail(issueId);
+                }}
+                onCancel={() => {
+                  VisibleStore.setChangeParentShow(false);
+                }}
+              />
+            ) : null
+          }
         </div>
       </ResizeAble>
     );

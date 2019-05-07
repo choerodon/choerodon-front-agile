@@ -5,6 +5,7 @@
     white-space: nowrap;
   }
 }
+
 // 选择框的样式，支持单选和多选
 .SelectTheme {
   border-radius: 3px;
@@ -100,6 +101,10 @@
       .ant-select-clear {
         flex-shrink: 0;
         position: static !important;
+
+        .ant-ripple-wrapper {
+          display: none;
+        }
       }
 
       .ant-select-arrow {
