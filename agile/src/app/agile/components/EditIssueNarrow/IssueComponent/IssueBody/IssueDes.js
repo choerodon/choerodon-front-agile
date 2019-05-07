@@ -119,7 +119,7 @@ import { updateIssue } from '../../../../api/NewIssueApi';
       return (
         <div className="c7n-content-wrapper">
           <div
-            className="line-start mt-10 c7n-description"
+            className="mt-10 c7n-description"
             role="none"
           >
             <IssueDescription data={delta} />

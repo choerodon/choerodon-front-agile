@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import { injectIntl } from 'react-intl';
@@ -84,14 +84,17 @@ import {
     }
 
     return (
-      <div className="c7n-content-wrapper">
+      <div className="c7n-content-wrapper IssueField">
         { issueId ? fields.map(field => (
-          <span
-            className="c7n-content-item"
-            key={field.fieldCode}
-          >
-            {this.getFieldComponent(field)}
-          </span>
+          <Fragment>
+            <span
+              className="c7n-content-item"
+              key={field.fieldCode}
+            >
+              {this.getFieldComponent(field)}
+            </span>
+            {/* <div style={{ flex: 1 }} /> */}
+          </Fragment>
         )) : ''}
         {/* {isWide && issueId ? (
           <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
