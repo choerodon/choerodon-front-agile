@@ -165,23 +165,32 @@ class EditIssueNarrow extends Component {
     } = VisibleStore;
 
     return (
-      <ResizeAble
-        modes={['left']}
-        size={{
+      <div style={{
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        height: '100%',
+        zIndex: 101,
+        overflow: 'hidden',
+      }}
+      >
+        <ResizeAble
+          modes={['left']}
+          size={{
           // maxHeight: 500,
           // minWidth: 100,
-          maxWidth: 800,
-          minWidth: 440,
-        }}
-        defaultSize={{
-          width: localStorage.getItem('agile.EditIssueNarrow.width') || 440,
-          height: '100%',
-        }}
-        onResizeEnd={this.handleResizeEnd}
-      >
-        <div className="choerodon-modal-editIssue" style={style}>
-          {/* <div className="choerodon-modal-editIssue-divider" /> */}
-          {
+            maxWidth: 800,
+            minWidth: 440,
+          }}
+          defaultSize={{
+            width: localStorage.getItem('agile.EditIssueNarrow.width') || 440,
+            height: '100%',
+          }}
+          onResizeEnd={this.handleResizeEnd}
+        >
+          <div className="choerodon-modal-editIssue" style={style}>
+            {/* <div className="choerodon-modal-editIssue-divider" /> */}
+            {
             issueLoading ? (
               <div
                 style={{
@@ -201,30 +210,30 @@ class EditIssueNarrow extends Component {
               </div>
             ) : null
           }
-          <IssueSidebar
-            store={store}
-            reloadIssue={this.loadIssueDetail}
-            onUpdate={onUpdate}
-          />
-          <div className="c7n-content">
-            <IssueHeader
-              store={store}
-              reloadIssue={this.loadIssueDetail}
-              backUrl={backUrl}
-              onCancel={onCancel}
-              loginUserId={loginUserId}
-              hasPermission={hasPermission}
-              onDeleteIssue={onDeleteIssue}
-            />
-            <IssueBody
+            <IssueSidebar
               store={store}
               reloadIssue={this.loadIssueDetail}
               onUpdate={onUpdate}
-              loginUserId={loginUserId}
-              hasPermission={hasPermission}
             />
-          </div>
-          {
+            <div className="c7n-content">
+              <IssueHeader
+                store={store}
+                reloadIssue={this.loadIssueDetail}
+                backUrl={backUrl}
+                onCancel={onCancel}
+                loginUserId={loginUserId}
+                hasPermission={hasPermission}
+                onDeleteIssue={onDeleteIssue}
+              />
+              <IssueBody
+                store={store}
+                reloadIssue={this.loadIssueDetail}
+                onUpdate={onUpdate}
+                loginUserId={loginUserId}
+                hasPermission={hasPermission}
+              />
+            </div>
+            {
             copyIssueShow ? (
               <CopyIssue
                 issueId={issueId}
@@ -238,7 +247,7 @@ class EditIssueNarrow extends Component {
               />
             ) : null
           }
-          {
+            {
             relateStoryShow ? (
               <RelateStory
                 issue={issue}
@@ -248,7 +257,7 @@ class EditIssueNarrow extends Component {
               />
             ) : null
           }
-          {
+            {
             transformSubIssueShow ? (
               <TransformSubIssue
                 visible={transformSubIssueShow}
@@ -261,7 +270,7 @@ class EditIssueNarrow extends Component {
               />
             ) : null
           }
-          {
+            {
             transformFromSubIssueShow ? (
               <TransformFromSubIssue
                 visible={transformFromSubIssueShow}
@@ -275,7 +284,7 @@ class EditIssueNarrow extends Component {
             ) : null
           }
 
-          {
+            {
             assigneeShow ? (
               <Assignee
                 issueId={issueId}
@@ -296,7 +305,7 @@ class EditIssueNarrow extends Component {
               />
             ) : null
           }
-          {
+            {
             changeParentShow ? (
               <ChangeParent
                 issueId={issueId}
@@ -313,8 +322,9 @@ class EditIssueNarrow extends Component {
               />
             ) : null
           }
-        </div>
-      </ResizeAble>
+          </div>       
+        </ResizeAble>
+      </div>
     );
   }
 }

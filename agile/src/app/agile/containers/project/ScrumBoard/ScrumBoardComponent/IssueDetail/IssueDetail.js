@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import EditIssue from '../../../../../components/EditIssueNarrow';
-import '../../../Backlog/BacklogComponent/IssueDetailComponent/IssueDetail.scss';
 import ScrumBoardStore from '../../../../../stores/project/scrumBoard/ScrumBoardStore';
-// import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 
-@inject('AppState', 'HeaderStore')
+@inject('AppState')
 @observer
 class IssueDetail extends Component {
   constructor(props) {
@@ -18,16 +16,12 @@ class IssueDetail extends Component {
   };
 
   render() {
-    const { refresh, HeaderStore } = this.props;
+    const { refresh } = this.props;
     return ScrumBoardStore.getClickedIssue ? (
       <EditIssue
         store={ScrumBoardStore}
         onRef={this.onRef}
-        backUrl="scrumboard"
-        style={{
-          height: HeaderStore.announcementClosed ? 'calc(100vh - 156px)' : 'calc(100vh - 208px)',
-          width: '440px',
-        }}
+        backUrl="scrumboard"        
         issueId={ScrumBoardStore.getCurrentClickId}
         onCancel={() => {
           ScrumBoardStore.resetClickedIssue();

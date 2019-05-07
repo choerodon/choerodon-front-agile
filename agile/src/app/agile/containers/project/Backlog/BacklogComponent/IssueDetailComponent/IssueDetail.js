@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import EditIssue from '../../../../../components/EditIssueNarrow';
-import './IssueDetail.scss';
 import BacklogStore from '../../../../../stores/project/backlog/BacklogStore';
 
 @inject('AppState')
@@ -39,41 +38,38 @@ class IssueDetail extends Component {
     const { cancelCallback, refresh } = this.props;
     const visible = Object.keys(BacklogStore.getClickIssueDetail).length > 0;
     return (
-      <div
-        className={visible ? 'c7n-issueDetail-container' : ''}
-      >
-        {visible ? (
-          <EditIssue
-            store={BacklogStore}
-            onRef={(ref) => {
-              this.editIssue = ref;
-            }}
-            issueId={BacklogStore.getClickIssueId}
-            onCancel={() => {
-              BacklogStore.setClickIssueDetail({});
-              BacklogStore.setIsLeaveSprint(false);
-              BacklogStore.clearMultiSelected();
-              cancelCallback();
-            }}
-            onDeleteIssue={() => {
-              BacklogStore.setClickIssueDetail({});
-              BacklogStore.setIsLeaveSprint(false);
-              refresh();
-            }}
-            onCreateVersion={() => {
-              BacklogStore.axiosGetVersion().then((data2) => {
-                const newVersion = [...data2];
-                for (let index = 0, len = newVersion.length; index < len; index += 1) {
-                  newVersion[index].expand = false;
-                }
-                BacklogStore.setVersionData(newVersion);
-              }).catch((error) => {
-              });
-            }}
-            onUpdate={refresh}
-          />
-        ) : ''}
-      </div>
+
+      visible ? (
+        <EditIssue
+          store={BacklogStore}
+          onRef={(ref) => {
+            this.editIssue = ref;
+          }}
+          issueId={BacklogStore.getClickIssueId}
+          onCancel={() => {
+            BacklogStore.setClickIssueDetail({});
+            BacklogStore.setIsLeaveSprint(false);
+            BacklogStore.clearMultiSelected();
+            cancelCallback();
+          }}
+          onDeleteIssue={() => {
+            BacklogStore.setClickIssueDetail({});
+            BacklogStore.setIsLeaveSprint(false);
+            refresh();
+          }}
+          onCreateVersion={() => {
+            BacklogStore.axiosGetVersion().then((data2) => {
+              const newVersion = [...data2];
+              for (let index = 0, len = newVersion.length; index < len; index += 1) {
+                newVersion[index].expand = false;
+              }
+              BacklogStore.setVersionData(newVersion);
+            }).catch((error) => {
+            });
+          }}
+          onUpdate={refresh}
+        />
+      ) : ''
     );
   }
 }
