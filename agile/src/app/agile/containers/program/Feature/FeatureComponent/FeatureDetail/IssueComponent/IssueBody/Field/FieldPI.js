@@ -44,7 +44,7 @@ const { Text, Edit } = TextEditToggle;
           {
             code ? (
               <div>
-                <span>活跃PI：</span>
+                <span>当前PI：</span>
                 <span>
                   {`${name}-${code}`}
                 </span>
