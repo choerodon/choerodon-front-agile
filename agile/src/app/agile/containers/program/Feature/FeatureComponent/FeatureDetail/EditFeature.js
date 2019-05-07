@@ -98,7 +98,7 @@ let hasPermission;
 
   handleResizeEnd=(size) => {
     const { width } = size;
-    localStorage.setItem('agile.EditFeature.width', `${width}px`);
+    localStorage.setItem('agile.EditIssue.width', `${width}px`);
   }
 
   render() {
@@ -138,7 +138,7 @@ let hasPermission;
             minWidth: 440,
           }}
           defaultSize={{
-            width: localStorage.getItem('agile.EditFeature.width') || 440,
+            width: localStorage.getItem('agile.EditIssue.width') || 440,
             height: '100%',
           }}
           onResizeEnd={this.handleResizeEnd}

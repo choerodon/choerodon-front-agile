@@ -133,7 +133,7 @@ class EditIssueNarrow extends Component {
 
   handleResizeEnd=(size) => {
     const { width } = size;
-    localStorage.setItem('agile.EditIssueNarrow.width', `${width}px`);
+    localStorage.setItem('agile.EditIssue.width', `${width}px`);
   }
 
   render() {
@@ -183,7 +183,7 @@ class EditIssueNarrow extends Component {
             minWidth: 440,
           }}
           defaultSize={{
-            width: localStorage.getItem('agile.EditIssueNarrow.width') || 440,
+            width: localStorage.getItem('agile.EditIssue.width') || 440,
             height: '100%',
           }}
           onResizeEnd={this.handleResizeEnd}

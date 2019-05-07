@@ -76,7 +76,7 @@ import VisibleStore from '../../../../stores/common/visible/VisibleStore';
       <div id="bug">
         <div className="c7n-title-wrapper">
           <div className="c7n-title-left">
-            <Icon type="bug_report c7n-icon-title" />
+            <Icon type="classname c7n-icon-title" />
             <span>缺陷</span>
           </div>
           <div style={{

@@ -45,7 +45,7 @@ const navIcon = {
   },
   bug: {
     name: '缺陷',
-    icon: 'bug_report',
+    icon: 'classname',
   },
   link_task: {
     name: '问题链接',
