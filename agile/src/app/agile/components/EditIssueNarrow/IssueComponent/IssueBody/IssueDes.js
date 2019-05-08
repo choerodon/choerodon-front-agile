@@ -42,7 +42,7 @@ import { updateIssue } from '../../../../api/NewIssueApi';
 
   updateIssueDes = () => {
     const { editDes } = this.state;
-    const { store, onUpdate, reloadIssue } = this.props;
+    const { store, reloadIssue } = this.props;
     const { issueId, objectVersionNumber } = store.getIssue;
     const obj = {
       issueId,
@@ -51,9 +51,6 @@ import { updateIssue } from '../../../../api/NewIssueApi';
     if (editDes) {
       returnBeforeTextUpload(editDes, obj, updateIssue, 'description')
         .then(() => {
-          if (onUpdate) {
-            onUpdate();
-          }
           if (reloadIssue) {
             reloadIssue(issueId);
           }
