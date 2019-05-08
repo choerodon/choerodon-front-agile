@@ -19,6 +19,10 @@
     .line-start {
       width: 50%;
     }
+
+    .c7n-value-wrapper {
+      flex: 1;
+    }
   }
 
   p {
@@ -499,11 +503,11 @@
     margin-right: 2px;
   }
 
-  .ant-btn>.icon+span {
+  .ant-btn >.icon +span {
     margin-left: 0 !important;
   }
 
-  .ant-btn>.icon {
+  .ant-btn >.icon {
     margin-right: 0 !important;
   }
 }
