@@ -76,11 +76,11 @@ const hideFields = ['priority', 'component', 'label', 'fixVersion', 'sprint', 't
     return (
       <div className="c7n-content-wrapper">
         {issueId ? fields.filter(item => hideFields.indexOf(item.fieldCode) === -1).map(field => (
-          <span
-            key={field.code}
-          >
-            {this.getFieldComponent(field)}
-          </span>
+          // <span
+          //   key={field.code}
+          // >
+          this.getFieldComponent(field)
+          // </span>
         )) : ''}
       </div>
     );
