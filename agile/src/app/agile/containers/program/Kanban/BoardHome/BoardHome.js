@@ -155,7 +155,7 @@ class BoardHome extends Component {
     const piChange = piId !== issue.piId;
     if (piChange && activePi) {
       // eslint-disable-next-line prefer-destructuring
-      piId = activePi.piId;
+      piId = activePi.id;
     }
     // debugger;
     KanbanStore.updateIssue(issue, startStatus, startStatusIndex, destinationStatus, destinationStatusIndex, SwimLaneId, piId, rank, piChange).then((data) => {
