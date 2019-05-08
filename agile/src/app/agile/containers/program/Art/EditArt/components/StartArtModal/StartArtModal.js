@@ -38,7 +38,7 @@ const renderPIName = (props) => {
 const renderStartArtModalContent = (props) => {
   const { data, artList, startArtShowInfo } = props;
   const doingArt = artList.find(item => item.statusCode === 'doing');
-  const nonEmpty = Object.keys(_.pick(data, ['startDate', 'piCount', 'piCodePrefix', 'piCodeNumber', 'interationCount', 'interationWeeks', 'ipWeeks'])).every(key => data[key]);
+  const nonEmpty = Object.keys(_.pick(data, ['startDate', 'piCount', 'piCodePrefix', 'piCodeNumber', 'interationCount', 'interationWeeks', 'ipWeeks'])).every(key => data[key] !== undefined && data[key] !== null);
   canStart = nonEmpty && !doingArt;
   const showInfos = (
     <div>
@@ -48,7 +48,7 @@ const renderStartArtModalContent = (props) => {
             return (
               <p key={key} style={{ marginBottom: 5 }}>
                 <span>{`${startArtShowInfo[key].name}：`}</span>
-                <span style={{ fontWeight: 600, color: startArtShowInfo[key].empty ? 'red' : '#3f51b5' }}>{data[key] || 0}</span>
+                <span style={{ fontWeight: 600, color: startArtShowInfo[key].empty ? 'red' : '#3f51b5' }}>{data[key] !== undefined && data[key] !== null ? data[key] : '-'}</span>
               </p>
             );
           } else if (key === 'startDate') {

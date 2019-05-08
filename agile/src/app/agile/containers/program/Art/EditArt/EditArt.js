@@ -89,7 +89,7 @@ class EditArt extends Component {
       const {
         interationCount,
         interationWeeks,
-        ipWeeks = 1,
+        ipWeeks,
         piCodeNumber,
         piCodePrefix,
         startDate,
@@ -101,7 +101,7 @@ class EditArt extends Component {
       const formData = {
         interationCount,
         interationWeeks,
-        ipWeeks: ipWeeks || 1,
+        ipWeeks,
         piCodeNumber,
         piCodePrefix,
         rteId,
@@ -175,7 +175,7 @@ class EditArt extends Component {
       const {
         interationCount,
         interationWeeks,
-        ipWeeks = 1,
+        ipWeeks,
         piCodeNumber,
         piCodePrefix,
         startDate,
@@ -187,7 +187,7 @@ class EditArt extends Component {
       const formData = {
         interationCount,
         interationWeeks,
-        ipWeeks: ipWeeks || 1,
+        ipWeeks,
         piCodeNumber,
         piCodePrefix,
         rteId,
@@ -243,7 +243,7 @@ class EditArt extends Component {
     const { data, startArtShowInfo } = this.state;
     // eslint-disable-next-line array-callback-return
     Object.keys(startArtShowInfo).map((key) => {
-      if (data[key]) {
+      if (data[key] !== null && data[key] !== undefined) {
         startArtShowInfo[key].empty = false;
       } else {
         startArtShowInfo[key].empty = true;
