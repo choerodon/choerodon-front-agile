@@ -217,6 +217,10 @@ class ResizeAble extends Component {
       width,
       height,
     };
+    const { onResize } = this.props;
+    if (onResize) {
+      onResize(this.size);
+    }
   }
 
   render() {

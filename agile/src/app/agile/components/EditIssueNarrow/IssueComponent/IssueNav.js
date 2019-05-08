@@ -45,7 +45,7 @@ const navIcon = {
   },
   bug: {
     name: '缺陷',
-    icon: 'bug_report',
+    icon: 'classname',
   },
   link_task: {
     name: '问题链接',
@@ -62,7 +62,7 @@ const noDisplay = {
   feature: ['sub_task', 'bug', 'wiki', 'branch', 'log', 'link_task'],
   bug: ['bug'],
   issue_epic: ['bug'],
-  task: ['bug'],
+  // task: ['bug'],
 };
 let sign = true;
 

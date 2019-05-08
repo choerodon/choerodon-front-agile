@@ -77,7 +77,7 @@ const { confirm } = Modal;
       VisibleStore.setChangeParentShow(true);
     } else if (e.key === '9') {
       VisibleStore.setCreateSubBugShow(true);
-    } else if (e.key === '10') {  
+    } else if (e.key === '10') {
       VisibleStore.setRelateStoryShow(true);
     }
   };
@@ -115,7 +115,7 @@ const { confirm } = Modal;
           )
         }
         {
-          ['story'].indexOf(typeCode) !== -1 && (
+          ['story', 'task'].indexOf(typeCode) !== -1 && (
             <Menu.Item key="9">
               {'创建缺陷'}
             </Menu.Item>
