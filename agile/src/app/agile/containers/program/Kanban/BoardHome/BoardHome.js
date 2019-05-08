@@ -99,11 +99,11 @@ class BoardHome extends Component {
       }
     }
     return values.join(', ');
-  }
+  };
 
   handleCreateFeatureClick = () => {
     KanbanStore.setCreateFeatureVisible(true);
-  }
+  };
 
   handleQuickSearchChange = (featureTypeList) => {    
     KanbanStore.addQuickSearchFilter(featureTypeList);
@@ -113,7 +113,7 @@ class BoardHome extends Component {
   handleSettingClick = () => {
     const { history } = this.props;
     history.push(ProgramBoardSettingLink());
-  }
+  };
 
   onDragStart = (result) => {
     const { headerStyle } = this.props;
