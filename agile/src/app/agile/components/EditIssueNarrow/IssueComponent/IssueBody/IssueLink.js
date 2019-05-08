@@ -20,13 +20,10 @@ import LinkList from '../../Component/LinkList';
   }
 
   handleCreateLinkIssue() {
-    const { onUpdate, reloadIssue } = this.props;
+    const { reloadIssue } = this.props;
     this.setState({
       createLinkTaskShow: false,
     });
-    if (onUpdate) {
-      onUpdate();
-    }
     if (reloadIssue) {
       reloadIssue();
     }

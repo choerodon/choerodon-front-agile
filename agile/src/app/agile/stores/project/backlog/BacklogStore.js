@@ -619,7 +619,8 @@ class BacklogStore {
 
   @action initBacklogData(quickSearchData, issueTypesData, priorityArrData, { backlogData, sprintData }) {
     this.issueCantDrag = false;
-    this.multiSelected = observable.map();
+    this.onBlurClick();
+    // this.multiSelected = observable.map();
     this.quickSearchList = quickSearchData;
     if (issueTypesData && !issueTypesData.failed) {
       this.issueTypes = issueTypesData;
