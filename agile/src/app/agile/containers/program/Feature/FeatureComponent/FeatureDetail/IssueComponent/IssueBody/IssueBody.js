@@ -18,7 +18,7 @@ import IssueWiki from './IssueWiki';
 
   render() {
     const {
-      store, reloadIssue,
+      store,
     } = this.props;
     const issue = store.getIssue;
     const { issueTypeDTO = {} } = issue;
@@ -28,13 +28,13 @@ import IssueWiki from './IssueWiki';
         <section className="c7n-body-editIssue">
           <div className="c7n-content-editIssue">
             <IssueDetail {...this.props} />
-            <IssueDes store={store} />
-            <IssueAttachment store={store} reloadIssue={reloadIssue} />
+            <IssueDes {...this.props} />
+            <IssueAttachment {...this.props} />
             {issueTypeDTO.typeCode && issueTypeDTO.typeCode === 'issue_epic'
-              ? <IssueWiki store={store} /> : ''
+              ? <IssueWiki {...this.props} /> : ''
             }
-            <IssueCommit store={store} reloadIssue={reloadIssue} />
-            <IssueLog store={store} />
+            <IssueCommit {...this.props} />
+            <IssueLog {...this.props} />
             {/* <IssueLink store={store} reloadIssue={reloadIssue} /> */}
           </div>
         </section>

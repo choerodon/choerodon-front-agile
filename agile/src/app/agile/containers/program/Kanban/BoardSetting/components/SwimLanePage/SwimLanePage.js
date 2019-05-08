@@ -35,7 +35,7 @@ class SwimLanePage extends Component {
     const defaultSelect = KanbanStore.getBoardList.get(KanbanStore.getSelectedBoard);
     return (
       <Content
-        description="请在下面输入列名，选择列的类别。可以添加、删除、重新排序和重命名一个列。状态为 待处理 的特性卡片可以在项目中显示。"
+        description="泳道是指看板中一横排的主板，基于横排对问题进行状态的流转。泳道类型可以在下面进行修改，并将自动保存。注意：修改泳道会修改看板的分组维度，同时修改看板样式。"
         style={{
           padding: 0,         
           height: '100%',
