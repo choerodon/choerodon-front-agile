@@ -87,12 +87,12 @@ import {
       <div className="c7n-content-wrapper IssueField">
         { issueId ? fields.map(field => (
           <Fragment>
-            <span
+            {/* <span
               className="c7n-content-item"
               key={field.fieldCode}
-            >
-              {this.getFieldComponent(field)}
-            </span>
+            > */}
+            {this.getFieldComponent(field)}
+            {/* </span> */}
             {/* <div style={{ flex: 1 }} /> */}
           </Fragment>
         )) : ''}

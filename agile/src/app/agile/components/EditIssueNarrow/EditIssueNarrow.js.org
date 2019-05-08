@@ -2197,7 +2197,7 @@ class CreateSprint extends Component {
                                   // onBlur={e => this.statusOnChange(e)}
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   tokenSeparators={[',']}
-                                  style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
+                                  style={{ width: '150px', marginTop: 0, paddingTop: 0 }}
                                   onFocus={() => {
                                     this.setState({
                                       selectLoading: true,
@@ -2285,7 +2285,7 @@ class CreateSprint extends Component {
                               }}
                               tokenSeparators={[',']}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
-                              style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
+                              style={{ width: '150px', marginTop: 0, paddingTop: 0 }}
                               // onBlur={() => this.statusOnChange()}
                               onFocus={() => {
                                 this.setState({
@@ -2362,7 +2362,7 @@ class CreateSprint extends Component {
                                   loading={selectLoading}
                                   getPopupContainer={triggerNode => triggerNode.parentNode}
                                   tokenSeparators={[',']}
-                                  style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
+                                  style={{ width: '150px', marginTop: 0, paddingTop: 0 }}
                                   onFocus={() => {
                                     this.setState({
                                       selectLoading: true,
@@ -2443,7 +2443,7 @@ class CreateSprint extends Component {
                               }}
                               tokenSeparators={[',']}
                               getPopupContainer={triggerNode => triggerNode.parentNode}
-                              style={{ width: '200px', marginTop: 0, paddingTop: 0 }}
+                              style={{ width: '150px', marginTop: 0, paddingTop: 0 }}
                               onFocus={() => {
                                 this.setState({
                                   selectLoading: true,
@@ -2756,7 +2756,7 @@ class CreateSprint extends Component {
                               >
                                 <TextArea
                                   maxLength={10}
-                                  style={{ width: '200px' }}
+                                  style={{ width: '150px' }}
                                   value={epicName}
                                   size="small"
                                   autosize={{ minRows: 2, maxRows: 6 }}

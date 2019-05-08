@@ -42,12 +42,13 @@ const { Text, Edit } = TextEditToggle;
         </div>
         <div className="c7n-value-wrapper">
           <TextEditToggle
+          style={{width:'100%'}}
             disabled
           >
             <Text>
               <div>
                 <Progress
-                  style={{ width: 100 }}
+                  // style={{ width: 100 }}
                   percent={
                     workloads !== 0
                       ? (workloads * 100)
@@ -63,7 +64,9 @@ const { Text, Edit } = TextEditToggle;
                   {workloads + (remainingTime || 0)}
                   {'小时'}
                 </span>
-                <div
+                
+              </div>
+              <div
                   role="none"
                   style={{
                     marginLeft: '8px',
@@ -76,7 +79,6 @@ const { Text, Edit } = TextEditToggle;
                 >
                   {'登记工作'}
                 </div>
-              </div>
             </Text>
             <Edit>
               <div>{remainingTime}</div>
