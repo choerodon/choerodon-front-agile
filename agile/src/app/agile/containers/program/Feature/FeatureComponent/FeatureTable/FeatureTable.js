@@ -142,6 +142,7 @@ const getColumns = (filters, getFilteredValue) => ([
     key: 'benfitHypothesis',
     sorterId: 'benfitHypothesis',
     width: 134,   
+    render: benfitHypothesis => <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{benfitHypothesis}</div>,
     hidden: true, 
   },
   {
@@ -151,6 +152,7 @@ const getColumns = (filters, getFilteredValue) => ([
     key: 'acceptanceCritera',
     sorterId: 'acceptanceCritera',
     width: 134,   
+    render: acceptanceCritera => <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{acceptanceCritera}</div>,
     hidden: true, 
   },
 ]);

@@ -201,7 +201,7 @@ class CreateLinkTask extends Component {
                       key={issue.issueId}
                       value={issue.issueNum}
                     >
-                      <div style={{ display: 'inline-block' }}>
+                      <div style={{ display: 'inline-block', width: '100%' }}>
                         <div style={{
                           display: 'flex',
                           width: '100%',
