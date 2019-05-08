@@ -39,6 +39,7 @@ const zh_CN = {
   "issue.sub_task": '子任务',
   "issue.bug": '缺陷',
   "issue.link_task": '问题链接',
+  "issue.link_test": '测试用例',
   "issue.branch": '开发',
   "issue.branch.create": '创建分支',
   "issue.commit.create": '添加评论',
