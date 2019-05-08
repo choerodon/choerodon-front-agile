@@ -100,9 +100,10 @@ class PiItem extends Component {
       startDate, endDate, code, name, statusCode, sprintCalendarDTOList, isLast,
     } = pi;
     const flex = moment.range(startDate, endDate).diff('days');
-    const ipStartDate = sprintCalendarDTOList && sprintCalendarDTOList.length > 0 ? sprintCalendarDTOList[sprintCalendarDTOList.length - 1].endDate : moment();
+    const SprintList = sprintCalendarDTOList.sort((a, b) => a.sprintId - b.sprintId);
+    const ipStartDate = SprintList && SprintList.length > 0 ? SprintList[SprintList.length - 1].endDate : moment();
     const ipEndDate = endDate;
-    const ipWeeks = sprintCalendarDTOList && sprintCalendarDTOList.length > 0 ? moment.range(sprintCalendarDTOList[sprintCalendarDTOList.length - 1].endDate, endDate).diff('days') : 0;
+    const ipWeeks = SprintList && SprintList.length > 0 ? moment.range(SprintList[SprintList.length - 1].endDate, endDate).diff('days') : 0;
 
     const style = STATUS[statusCode];    
     return (
@@ -128,7 +129,7 @@ class PiItem extends Component {
             </Popover>
           </div>
           <div className="PiItem-pi-sprints">
-            {sprintCalendarDTOList.map((sprint) => {
+            {SprintList.map((sprint) => {
               const todayIsBetween = moment().isBetween(sprint.startDate, sprint.endDate);
               return <SprintItem borderColor={style.sprintBorder} sprint={sprint} todayIsBetween={todayIsBetween} />;
             })}
