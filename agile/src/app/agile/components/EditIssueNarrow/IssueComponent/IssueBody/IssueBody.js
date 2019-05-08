@@ -23,7 +23,7 @@ import TestLink from './TestLink';
 
   render() {
     const {
-      store, reloadIssue,
+      store,
     } = this.props;
     const issue = store.getIssue;
     const { issueTypeDTO = {} } = issue;
@@ -33,31 +33,31 @@ import TestLink from './TestLink';
         <section className="c7n-body-editIssue">
           <div className="c7n-content-editIssue">
             <IssueDetail {...this.props} />
-            <IssueDes store={store} />
-            <IssueAttachment store={store} reloadIssue={reloadIssue} />
+            <IssueDes {...this.props} />
+            <IssueAttachment {...this.props} />
             {issueTypeDTO.typeCode && ['sub_task', 'feature'].indexOf(issueTypeDTO.typeCode) === -1
-              ? <IssueWiki store={store} /> : ''
-            }
-            <IssueCommit store={store} reloadIssue={reloadIssue} />
+              ? <IssueWiki {...this.props} /> : ''
+             }
+            <IssueCommit {...this.props} />
             {issueTypeDTO.typeCode && ['feature'].indexOf(issueTypeDTO.typeCode) === -1
-              ? <IssueWorkLog {...this.props} store={store} reloadIssue={reloadIssue} /> : ''
-            }
-            <IssueLog store={store} />
+              ? <IssueWorkLog {...this.props} /> : ''
+             }
+            <IssueLog {...this.props} />
             {issueTypeDTO.typeCode && ['sub_task', 'feature'].indexOf(issueTypeDTO.typeCode) === -1
-              ? <SubTask store={store} reloadIssue={reloadIssue} /> : ''
-            }
+              ? <SubTask {...this.props} /> : ''
+             }
             {issueTypeDTO.typeCode && ['story', 'task'].indexOf(issueTypeDTO.typeCode) !== -1
-              ? <SubBug store={store} reloadIssue={reloadIssue} /> : ''
+              ? <SubBug {...this.props} /> : ''
             }
             {issueTypeDTO.typeCode && ['feature', 'sub_task'].indexOf(issueTypeDTO.typeCode) === -1
-              ? <IssueLink store={store} reloadIssue={reloadIssue} /> : ''
-            }
+              ? <IssueLink {...this.props} /> : ''
+             }
             {issueTypeDTO.typeCode && ['feature', 'sub_task'].indexOf(issueTypeDTO.typeCode) === -1
-              ? <TestLink store={store} /> : ''
+              ? <TestLink {...this.props} /> : ''
             }
             {issueTypeDTO.typeCode && ['feature'].indexOf(issueTypeDTO.typeCode) === -1
-              ? <IssueBranch store={store} reloadIssue={reloadIssue} /> : ''
-            }
+              ? <IssueBranch {...this.props} /> : ''
+             }
           </div>
         </section>
       </div>
