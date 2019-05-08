@@ -82,13 +82,13 @@ class CreateArt extends Component {
             {getFieldDecorator('startDate', {
               rules: [{
                 required: true,
-                message: '请选择日期!',
+                message: '请选择火车开始时间!',
               }],
             })(
               <DatePicker
                 format="YYYY-MM-DD"
                 style={{ width: 500 }}
-                label="开始日期"
+                label="火车开始时间"
                 disabledDate={current => current < moment().subtract(1, 'days')}
               />,
             )}

@@ -34,6 +34,11 @@ class ArtForm extends Component {
   componentDidMount() {
     const { form, initValue } = this.props;
     form.setFieldsValue(initValue);
+    const values = { ...initValue };
+    if (values.ipWeeks !== undefined && values.ipWeeks !== null) {
+      values.ipWeeks = String(values.ipWeeks);
+    }    
+    form.setFieldsValue(values);    
     ee.addListener('setCurrentTab', this.handleSetCurrentTab);
   }
 
@@ -41,7 +46,11 @@ class ArtForm extends Component {
   componentDidUpdate(prevProps, prevState) {
     const { form, initValue } = this.props;
     if (prevProps.initValue !== initValue) {
-      form.setFieldsValue(initValue);
+      const values = { ...initValue };
+      if (values.ipWeeks !== undefined && values.ipWeeks !== null) {
+        values.ipWeeks = String(values.ipWeeks);
+      }        
+      form.setFieldsValue(values);      
     }
   }
 
@@ -68,7 +77,11 @@ class ArtForm extends Component {
     const { form, initValue } = this.props;
     const values = {};
     fields.forEach((field) => {
-      values[field] = initValue[field];
+      if (field === 'ipWeeks') {
+        values[field] = initValue[field] !== undefined && initValue[field] !== null ? String(initValue[field]) : undefined;
+      } else {
+        values[field] = initValue[field];
+      }     
     });
     form.setFieldsValue(values);
   }
@@ -109,7 +122,7 @@ class ArtForm extends Component {
               {getFieldDecorator('startDate', {
                 rules: [{
                   required: true,
-                  message: '请选择日期!',
+                  message: '请选择火车开始时间!',
                 }],
                 normalize: value => value && moment(value),
               })(
@@ -117,7 +130,7 @@ class ArtForm extends Component {
                   allowClear={false}
                   format="YYYY-MM-DD"
                   style={{ width: 500 }}
-                  label="开始日期"
+                  label="火车开始时间"
                   disabledDate={current => current < moment()}
                 />,
               )}
@@ -172,9 +185,12 @@ class ArtForm extends Component {
                 rules: [{
                   required: true, message: '请选择IP时长!',
                 }],
-                initialValue: 1,
+                normalize: value => (value === null || value === undefined ? undefined : String(value)),
               })(
-                <Input style={{ width: 500 }} label="IP时长（周）" disabled />,
+                <Select style={{ width: 500 }} label="IP时长（周）">
+                  <Option value="0">0</Option>
+                  <Option value="1">1</Option>
+                </Select>,
               )}
             </FormItem>
           </TabPane>
