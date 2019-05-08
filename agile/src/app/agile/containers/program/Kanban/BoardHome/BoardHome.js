@@ -153,6 +153,10 @@ class BoardHome extends Component {
 
     const [type, parentId] = SwimLaneId.split('-');
     const piChange = piId !== issue.piId;
+    if (piChange && activePi) {
+      // eslint-disable-next-line prefer-destructuring
+      piId = activePi.piId;
+    }
     // debugger;
     KanbanStore.updateIssue(issue, startStatus, startStatusIndex, destinationStatus, destinationStatusIndex, SwimLaneId, piId, rank, piChange).then((data) => {
       if (data.failed) {
@@ -163,7 +167,7 @@ class BoardHome extends Component {
         //   KanbanStore.judgeMoveParentToDone(destinationStatus, SwimLaneId, +parentId, KanbanStore.getStatusMap.get(destinationStatus).categoryCode === 'done');
         // }
         if (data.issueId === KanbanStore.getCurrentClickId) {
-          KanbanStore.getEditRef.reloadIssue();
+          KanbanStore.getEditRef.loadIssueDetail();
         }
         if (startColumn !== destinationColumn) {
           KanbanStore.resetHeaderData(startColumn, destinationColumn, issue.issueTypeDTO.typeCode);

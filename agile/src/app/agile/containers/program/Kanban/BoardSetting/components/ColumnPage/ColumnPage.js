@@ -26,7 +26,9 @@ class ColumnPage extends Component {
   // source: {droppableId: "todo,2537,null,null", index: 0}
   // type: "status"
   handleDragStart = (draging) => {
-    KanbanStore.setCurrentDrag(draging);
+    setTimeout(() => {
+      KanbanStore.setCurrentDrag(draging);
+    });
   }
 
   handleAddStatus() {
