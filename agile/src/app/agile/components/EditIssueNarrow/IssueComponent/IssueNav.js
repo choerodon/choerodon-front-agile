@@ -8,7 +8,7 @@ import _ from 'lodash';
 const navList = [
   'detail', 'des', 'attachment', 'wiki',
   'commit', 'log', 'data_log', 'sub_task', 'bug',
-  'link_task', 'branch',
+  'link_task', 'link_test', 'branch',
 ];
 const navIcon = {
   detail: {
@@ -45,11 +45,15 @@ const navIcon = {
   },
   bug: {
     name: '缺陷',
-    icon: 'classname',
+    icon: 'bug_report',
   },
   link_task: {
     name: '问题链接',
     icon: 'link',
+  },
+  link_test: {
+    name: '测试用例',
+    icon: 'classname',
   },
   branch: {
     name: '开发',

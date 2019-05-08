@@ -79,7 +79,7 @@ import LinkList from '../../Component/LinkList';
     const { issueId } = issue;
 
     return (
-      <div id="link_test">
+      <div id="link_task">
         <div className="c7n-title-wrapper">
           <div className="c7n-title-left">
             <Icon type="link c7n-icon-title" />
