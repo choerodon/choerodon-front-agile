@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import { stores } from 'choerodon-front-boot';
 import { Icon } from 'choerodon-ui';
-import _ from 'lodash';
+import { map } from 'lodash';
 import { injectIntl } from 'react-intl';
 import LinkList from '../../Component/LinkList';
 
@@ -36,18 +36,10 @@ const { AppState } = stores;
   renderLinkIssues() {
     const { store } = this.props;
     const linkIssues = store.getLinkIssues;
-    const group = _.groupBy(linkIssues.filter(i => i.applyType === 'test'), 'ward');
     return (
       <div className="c7n-tasks">
         {
-          _.map(group, (v, k) => (
-            <div key={k}>
-              <div style={{ margin: '7px auto' }}>{k}</div>
-              {
-                _.map(v, (linkIssue, i) => this.renderLinkList(linkIssue, i))
-              }
-            </div>
-          ))
+          map(linkIssues, (linkIssue, i) => this.renderLinkList(linkIssue, i))
         }
       </div>
     );

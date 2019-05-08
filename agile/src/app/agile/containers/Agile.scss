@@ -82,6 +82,10 @@
       margin-top: 4px;
       padding: 0 !important;
 
+      ul >li {
+        height: 23px;
+      }
+
       // 单选多选内容框
       ul,
       .ant-select-selection-selected-value {

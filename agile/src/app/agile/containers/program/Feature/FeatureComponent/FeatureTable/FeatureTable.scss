@@ -15,7 +15,7 @@
   }
 
   .ant-table-footer {
-    border-top: none;
+    border-top-color: transparent;
     background: none;
     border-bottom: 1px solid #e8e8e8;
   }
@@ -24,7 +24,7 @@
     text-align: right;
   }
 
-  .ant-spin-nested-loading .ant-spin-container {
-    overflow: hidden;
-  }
+  // .ant-spin-nested-loading .ant-spin-container {
+  //   overflow: hidden;
+  // }
 }

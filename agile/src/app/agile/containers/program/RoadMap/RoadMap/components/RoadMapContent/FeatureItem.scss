@@ -3,6 +3,11 @@
   align-items: flex-start;
   padding: 5px 15px;
   cursor: pointer;
+
+  &:hover {
+    background: rgba(63, 81, 181, 0.04);
+  }
+
   &-summary {
     flex: 1;
     overflow: hidden;

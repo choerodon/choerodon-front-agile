@@ -175,7 +175,7 @@ class RelateStory extends Component {
                     <Option                
                       value={issue.issueId}
                     >
-                      <div style={{ display: 'inline-block' }}>
+                      <div style={{ display: 'inline-block', width: '100%' }}>
                         <div style={{
                           display: 'flex',
                           width: '100%',
