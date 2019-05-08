@@ -47,10 +47,10 @@ const { AppState } = stores;
 
   render() {
     return (
-      <div id="link_task">
+      <div id="link_test">
         <div className="c7n-title-wrapper">
           <div className="c7n-title-left">
-            <Icon type="link c7n-icon-title" />
+            <Icon type="classname c7n-icon-title" />
             <span>测试用例</span>
           </div>
           <div style={{
