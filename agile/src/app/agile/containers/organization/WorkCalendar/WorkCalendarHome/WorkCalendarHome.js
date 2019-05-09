@@ -91,7 +91,7 @@ class WorkCalendarHome extends Component {
         <Content
           title="工作日历"
           description="这里可以为您的组织设置全年的工作日历，该设置将应用到组织下所有项目中，每个项目也可根据实际的工作情况进行修改。勾选自动更新法定节假日后，系统会自动更新并设定法定节假日到工作日历中。"
-          link="http://v0-10.choerodon.io/zh/docs/user-guide/system-configuration/tenant/working_calendar/"
+          link="http://v0-16.choerodon.io/zh/docs/user-guide/system-configuration/tenant/working_calendar/"
         >
           <Form layout="vertical">
             <FormItem style={{ width: 512 }}>

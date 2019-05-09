@@ -105,7 +105,7 @@ class PiItem extends Component {
     const ipEndDate = endDate;
     const ipWeeks = SprintList && SprintList.length > 0 ? moment.range(SprintList[SprintList.length - 1].endDate, endDate).diff('days') : 0;
 
-    const style = STATUS[statusCode];
+    const style = STATUS[statusCode];    
     return (
       <div
         className="PiItem"
@@ -133,29 +133,31 @@ class PiItem extends Component {
               const todayIsBetween = moment().isBetween(sprint.startDate, sprint.endDate);
               return <SprintItem borderColor={style.sprintBorder} sprint={sprint} todayIsBetween={todayIsBetween} />;
             })}
-            <div className="PiItem-pi-sprint" style={{ flex: ipWeeks, borderColor: style.sprintBorder }}>
-              <Popover
-                className="PiItem-pi-sprintPopover"
-                getPopupContainer={triggerNode => document.getElementsByClassName('c7nagile-ArtCalendar-scroller')[0]}
-                content={(
-                  <CardTitle
-                    data={{
-                      type: 'sprint',
-                      sprintName: 'IP',
-                      startDate: ipStartDate,
-                      endDate: ipEndDate,
-                    }}
-                    type="sprint"
-                  />
+            {ipWeeks ? (
+              <div className="PiItem-pi-sprint" style={{ flex: ipWeeks, borderColor: style.sprintBorder }}>
+                <Popover
+                  className="PiItem-pi-sprintPopover"
+                  getPopupContainer={triggerNode => document.getElementsByClassName('c7nagile-ArtCalendar-scroller')[0]}
+                  content={(
+                    <CardTitle
+                      data={{
+                        type: 'sprint',
+                        sprintName: 'IP',
+                        startDate: ipStartDate,
+                        endDate: ipEndDate,
+                      }}
+                      type="sprint"
+                    />
                 )}
-                title={null}
-                placement="bottomLeft"
-              >
-                <div style={{ padding: '0 10px', backgroundColor: '#E5E5E5' }}>
-                  {'IP'}
-                </div>
-              </Popover>
-            </div>
+                  title={null}
+                  placement="bottomLeft"
+                >
+                  <div style={{ padding: '0 10px', backgroundColor: '#E5E5E5' }}>
+                    {'IP'}
+                  </div>
+                </Popover>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

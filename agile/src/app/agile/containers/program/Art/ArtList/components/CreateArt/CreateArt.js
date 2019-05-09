@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Form, Input, Modal, DatePicker, Select,
+  Form, Input, Modal, DatePicker,
 } from 'choerodon-ui';
 import moment from 'moment';
 import SelectFocusLoad from '../../../../../../components/SelectFocusLoad';
@@ -10,7 +10,6 @@ import './CreateArt.scss';
 
 const FormItem = Form.Item;
 const { Sidebar } = Modal;
-const { Option } = Select;
 
 const propTypes = {
   visible: PropTypes.bool.isRequired,
@@ -71,7 +70,7 @@ class CreateArt extends Component {
                 validator: this.checkArtNameRepeat,
               }],
             })(
-              <Input style={{ width: 500 }} maxLength={30} label="名称" placeholder="请输入ART名称" />,
+              <Input style={{ width: 500 }} maxLength={15} label="名称" placeholder="请输入ART名称" />,
             )}
           </FormItem>
           <FormItem>
@@ -83,35 +82,17 @@ class CreateArt extends Component {
             {getFieldDecorator('startDate', {
               rules: [{
                 required: true,
-                message: '请选择日期!',
+                message: '请选择火车开始时间!',
               }],
             })(
               <DatePicker
                 format="YYYY-MM-DD"
                 style={{ width: 500 }}
-                label="开始日期"
+                label="火车开始时间"
                 disabledDate={current => current < moment().subtract(1, 'days')}
               />,
             )}
           </FormItem>
-          {/* PI先默认创建三个 */}
-          {/* <FormItem> */}
-          {/* { */}
-          {/* getFieldDecorator('piCount', { */}
-          {/* rules: [{ */}
-          {/* required: true, */}
-          {/* message: '请选择PI生成个数', */}
-          {/* }], */}
-          {/* })( */}
-          {/* <Select style={{ width: 500, marginBottom: 15 }} label="PI生成个数"> */}
-          {/* { */}
-          {/* [3, 4, 5, 6, 7, 8].map(value => <Option key={value} value={value}>{value}</Option>) */}
-          {/* } */}
-          {/* </Select>, */}
-          {/* ) */}
-          {/* } */}
-          {/* </FormItem> */}
-
         </Form>
       </Sidebar>
     );

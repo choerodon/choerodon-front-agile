@@ -110,7 +110,7 @@ class CreateEpic extends Component {
           }}
           title={`创建项目“${AppState.currentMenuType.name}”的史诗`}
           description="请在下面输入史诗名称、概要，创建新史诗。"
-          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/backlog/epic/"
+          link="http://v0-16.choerodon.io/zh/docs/user-guide/agile/backlog/epic/"
         >
           <Form style={{ width: 512 }}>
             <FormItem>

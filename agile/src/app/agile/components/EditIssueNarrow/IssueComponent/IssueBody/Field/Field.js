@@ -270,7 +270,7 @@ const { Text, Edit } = TextEditToggle;
             // ]}
           >
             <Text key="text">
-              <div style={{ maxWidth: 200, wordBreak: 'break-all' }}>
+              <div style={{ maxWidth: 200, wordBreak: 'break-all', whiteSpace: 'pre-line' }}>
                 {valueStr || '无'}
               </div>
             </Text>

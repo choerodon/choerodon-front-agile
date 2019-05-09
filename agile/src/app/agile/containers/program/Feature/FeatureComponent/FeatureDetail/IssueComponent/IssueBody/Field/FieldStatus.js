@@ -40,14 +40,19 @@ const { Text, Edit } = TextEditToggle;
     } = issue;
     const typeId = issueTypeDTO.id;
     loadStatus(statusId, issueId, typeId, 'program').then((res) => {
-      if (activePi && activePi.id) {
+      if (activePi && activePi.statusCode === 'doing') {
         this.setState({
           originStatus: res,
           selectLoading: false,
         });
-      } else {
+      } else if (activePi && activePi.statusCode === 'todo') {
         this.setState({
           originStatus: res.filter(item => item.statusDTO && ['prepare', 'todo'].indexOf(item.statusDTO.type) !== -1),
+          selectLoading: false,
+        });
+      } else {
+        this.setState({
+          originStatus: res.filter(item => item.statusDTO && ['prepare'].indexOf(item.statusDTO.type) !== -1),
           selectLoading: false,
         });
       }

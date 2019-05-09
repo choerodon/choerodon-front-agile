@@ -549,7 +549,7 @@ class ReleaseDetail extends Component {
         <Content
           title="统计图"
           description="根据指定字段以统计图呈现项目或筛选器下的问题，这可以使您一目了然地了解问题详情。"
-          link="https://v0-10.choerodon.io/zh/docs/user-guide/report/agile-report/statistical/"
+          link="https://v0-16.choerodon.io/zh/docs/user-guide/report/agile-report/statistical/"
         >
           <Spin spinning={VersionReportStore.pieLoading}>
             <div className="c7n-pieChart-filter">

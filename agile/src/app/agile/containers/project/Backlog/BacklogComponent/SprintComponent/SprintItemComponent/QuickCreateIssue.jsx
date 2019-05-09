@@ -4,11 +4,7 @@ import {
   Button, Icon, Dropdown, Input, Menu, Form,
 } from 'choerodon-ui';
 import TypeTag from '../../../../../../components/TypeTag';
-// import '';
-import BacklogStore from '../../../../../../stores/project/backlog/BacklogStore';
-import { deBounce } from '../Utils';
 
-const shouldContainTypeCode = ['issue_epic', 'sub_task'];
 const FormItem = Form.Item;
 
 @Form.create({})
@@ -47,7 +43,7 @@ const FormItem = Form.Item;
 
   render() {
     const {
-      issueType, form, backlog, defaultType,
+      issueType, form, defaultType,
     } = this.props;
     const { getFieldDecorator } = form;
     const { expand, currentType, loading } = this.state;
@@ -103,7 +99,7 @@ const FormItem = Form.Item;
                     </Dropdown>
                     <FormItem label="summary" style={{ flex: 1 }}>
                       {getFieldDecorator('summary', {
-                        rules: [{ required: true, message: '请输入任务概要！' }],
+                        rules: [{ required: true, message: '请输入问题概要！' }],
                       })(
                         <Input
                           autoFocus

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Modal, Select } from 'choerodon-ui';
+import {
+  Modal, Select, Tooltip, Icon,
+} from 'choerodon-ui';
 import { Content, stores } from 'choerodon-front-boot';
 import _ from 'lodash';
 import FeatureStore from '../../../../../stores/program/Feature/FeatureStore';
@@ -23,7 +25,7 @@ class ClosePI extends Component {
     this.setState({
       targetStatus: value,
     });
-  }
+  };
 
   /**
    *完成PI事件
@@ -80,7 +82,6 @@ class ClosePI extends Component {
             }}
             title={`完成PI“${data.name}”`}
             description="请在下面选择未完成特性的去向，以完成一个PI计划。注意：完成当前PI后会自动为您开启下一个PI。"
-            link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/pi/close-pi/"
           >
             <p className="c7n-closeSprint-message">
               <span>{!_.isNull(completeMessage) ? completeMessage.completedCount : ''}</span>
@@ -108,15 +109,29 @@ class ClosePI extends Component {
               ) : ''}
               <Option value="0">特性列表</Option>
             </Select>
-            <br />            
-            <Select 
-              style={{ marginTop: 24, width: 512 }}
-              label="目标状态"
-              onChange={this.handleTargetStatusChange}
-              defaultValue={todoStatusList[0].id}
-            >
-              {todoStatusList.map(status => <Option value={status.id}>{status.name}</Option>)}
-            </Select>          
+            <br />
+            {selectChose !== '0'
+              ? (
+                <React.Fragment>
+                  <Select
+                    style={{ marginTop: 24, width: 512 }}
+                    label="目标状态"
+                    onChange={this.handleTargetStatusChange}
+                    defaultValue={todoStatusList[0].id}
+                  >
+                    {todoStatusList.map(status => <Option value={status.id}>{status.name}</Option>)}
+                  </Select>
+                  <Tooltip title="自动开启下一个PI时，处于准备阶段状态的问题将会转换到该状态。" placement="top">
+                    <Icon
+                      type="help"
+                      style={{
+                        fontSize: 16, color: '#bdbdbd', height: 20, lineHeight: 1.25, marginLeft: 2,
+                      }}
+                    />
+                  </Tooltip>
+                </React.Fragment>
+              ) : ''
+            }
           </Content>
         </Sidebar>
       ) : null;

@@ -207,7 +207,7 @@ class ProjectSetting extends Component {
         <Content
           title="项目设置"
           description="可修改项目编码、默认经办人策略、经办人，修改项目设置后，项目中所有的问题编号前缀、经办人策略、经办人将随之改变。"
-          link="http://v0-10.choerodon.io/zh/docs/user-guide/agile/setup/project-setting/"
+          link="http://v0-16.choerodon.io/zh/docs/user-guide/agile/setup/project-setting/"
         >
           <div style={{ marginTop: 8 }}>
             <Form layout="vertical">

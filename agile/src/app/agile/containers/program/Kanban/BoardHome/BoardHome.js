@@ -167,7 +167,7 @@ class BoardHome extends Component {
         //   KanbanStore.judgeMoveParentToDone(destinationStatus, SwimLaneId, +parentId, KanbanStore.getStatusMap.get(destinationStatus).categoryCode === 'done');
         // }
         if (data.issueId === KanbanStore.getCurrentClickId) {
-          KanbanStore.getEditRef.reloadIssue();
+          KanbanStore.getEditRef.loadIssueDetail();
         }
         if (startColumn !== destinationColumn) {
           KanbanStore.resetHeaderData(startColumn, destinationColumn, issue.issueTypeDTO.typeCode);
