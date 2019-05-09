@@ -60,7 +60,7 @@ const noDisplay = {
 let sign = true;
 
 @inject('AppState')
-@observer class IssueNumber extends Component {
+@observer class IssueNav extends Component {
   constructor(props) {
     super(props);
     this.sign = false;
@@ -144,4 +144,4 @@ let sign = true;
   }
 }
 
-export default withRouter(injectIntl(IssueNumber));
+export default withRouter(injectIntl(IssueNav));
