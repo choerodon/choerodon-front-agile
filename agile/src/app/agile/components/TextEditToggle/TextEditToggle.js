@@ -191,7 +191,7 @@ class TextEditToggle extends Component {
     const { editing, newData } = this.state;
     const { disabled, simpleMode, noButton } = this.props;
     const {
-      originData, formKey, rules, fieldProps, 
+      originData, formKey, rules, fieldProps, editExtraContent,
     } = this.props;
     const { getFieldDecorator } = this.props.form;
     // 拿到不同模式下对应的子元素
@@ -203,6 +203,7 @@ class TextEditToggle extends Component {
         className="c7ntest-TextEditToggle-edit"
         onMouseDown={this.handlePortalMouseDown} // Portal的事件会冒泡回父组件
       >
+        {editExtraContent}
         { // 采用form模式就进行form包装,否则
           formKey ? (
             <Form layout="vertical">
