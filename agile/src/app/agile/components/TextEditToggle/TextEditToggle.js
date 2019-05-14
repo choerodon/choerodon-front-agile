@@ -188,10 +188,10 @@ class TextEditToggle extends Component {
   }
 
   renderChild = () => {
-    const { editing, newData } = this.state;
-    const { disabled, simpleMode, noButton } = this.props;
+    const { editing } = this.state;
     const {
       originData, formKey, rules, fieldProps, editExtraContent,
+      disabled, simpleMode, noButton,
     } = this.props;
     const { getFieldDecorator } = this.props.form;
     // 拿到不同模式下对应的子元素

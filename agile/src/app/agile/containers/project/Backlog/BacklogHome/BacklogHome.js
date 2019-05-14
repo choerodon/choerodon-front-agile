@@ -47,7 +47,8 @@ class BacklogHome extends Component {
   componentWillUnmount() {
     const { BacklogStore } = this.props;
     BacklogStore.resetData();
-    BacklogStore.clearMultiSelected();   
+    BacklogStore.clearMultiSelected();
+    BacklogStore.resetFilter();
   }
 
   /**

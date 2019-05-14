@@ -28,6 +28,10 @@ class FeatureList extends Component {
     this.refresh();
   }
 
+  componentWillUnmount() {
+    FeatureStore.resetFilter();
+  }
+
   saveRef = name => (ref) => {
     this[name] = ref;
   };
