@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { find } from 'lodash';
+import BoardStore from '../../../../../../stores/program/Board/BoardStore';
+
 import Cell from './Cell';
 import './BoardBody.scss';
 
@@ -10,6 +12,7 @@ const dataMap = new Map([[1, new Map([[2, new Map([[3, []]])]])]]);
 @observer
 class BoardBody extends Component {
   render() {
+    const { resizing } = BoardStore;
     const { sprints, projects } = this.props;
     return (
       <div className="c7nagile-BoardBody">
@@ -27,13 +30,13 @@ class BoardBody extends Component {
           <tbody>
             {
               projects.map((project) => {
-                const { sprints, projectName } = project;
+                const { sprints: Sprints, projectName } = project;
                 return (
                   <tr>
                     <td style={{ width: 140, minWidth: 140, textAlign: 'center' }}>
                       {projectName}
                     </td>
-                    {sprints.map((sprint, i) => (
+                    {Sprints.map((sprint, i) => (
                       <td>
                         <Cell project={project} data={sprint} sprintIndex={i} />
                       </td>
@@ -44,6 +47,18 @@ class BoardBody extends Component {
             }
           </tbody>
         </table>
+        {resizing && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+            zIndex: 9999,
+            cursor: 'col-resize',
+          }}
+          />
+        )}
       </div>
     );
   }

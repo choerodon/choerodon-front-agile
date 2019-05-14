@@ -1,3 +1,4 @@
+/*eslint-disable */
 import {
   observable, action, computed, toJS, extendObservable,
 } from 'mobx';
@@ -162,6 +163,8 @@ const connections = [{
   },
 }];
 class BoardStore {
+  @observable resizing = false;
+
   @observable projects = [];
 
   @observable sprints = [];
@@ -297,9 +300,6 @@ class BoardStore {
       }],
     }];
     this.connections = connections;
-    // this.issueRefs = new Map(projects.map((project => ([project.id, new Map(project.sprints.map(sprint => [sprint.id, new Map()]))]))));
-    
-    console.log(this.issueRefs);
   }
 
   // @action setIssueRef({
@@ -322,8 +322,19 @@ class BoardStore {
     this.sprints[0].width = 3 - this.sprints[0].width;
   }
 
+  @action setResizing(resizing) {
+    this.resizing = resizing;
+  }
+
   @action setCurrentSprint(currentSprint) {
     this.currentSprint = currentSprint;
+  }
+
+  @action setSprintWidth(index, width) {
+    if (width !== this.sprints[index].width) {
+      // console.log(index, width);
+      this.sprints[index].width = width;
+    }
   }
 
   // getIssueRef({ projectId, sprintId, issueId }) {
