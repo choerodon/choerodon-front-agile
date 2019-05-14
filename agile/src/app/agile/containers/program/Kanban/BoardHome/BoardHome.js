@@ -166,7 +166,7 @@ class BoardHome extends Component {
     const rank = destinationColumnStatusCode !== 'prepare';
     let piId;
 
-    if (destinationColumnStatusCode === 'prepare' && destinationColumnStatusCode === 'prepare') {
+    if (['prepare', 'todo'].includes(destinationColumnStatusCode)) {
       piId = undefined;
     } else if (destinationSwimLineData.length > 0) {
       // eslint-disable-next-line prefer-destructuring
