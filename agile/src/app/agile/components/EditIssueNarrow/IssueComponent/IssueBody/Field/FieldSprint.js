@@ -80,6 +80,16 @@ const { Text, Edit } = TextEditToggle;
             formKey="sprint"
             onSubmit={this.updateIssueSprint}
             originData={sprintId}
+            editExtraContent={
+              closeSprint.length ? (
+                <div>
+                  <span>已结束冲刺：</span>
+                  <span>
+                    {_.map(closeSprint, 'sprintName').join(' , ')}
+                  </span>
+                </div>
+              ) : null
+            }
           >
             <Text>
               <Tooltip
