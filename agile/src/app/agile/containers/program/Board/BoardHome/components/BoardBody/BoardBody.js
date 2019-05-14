@@ -33,9 +33,9 @@ class BoardBody extends Component {
                     <td style={{ width: 140, minWidth: 140, textAlign: 'center' }}>
                       {projectName}
                     </td>
-                    {sprints.map(sprint => (
+                    {sprints.map((sprint, i) => (
                       <td>
-                        <Cell project={project} data={sprint} />
+                        <Cell project={project} data={sprint} sprintIndex={i} />
                       </td>
                     ))}
                   </tr>

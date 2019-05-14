@@ -10,67 +10,21 @@ import Connectors from './components/Connectors';
 import BoardBody from './components/BoardBody';
 import './BoardHome.scss';
 
-const connections = [{
-  from: {
-    projectIndex: 1,
-    sprintIndex: 1,
-    columnIndex: 0,
-    issueIndex: 0,
-  },
-  to: {
-    projectIndex: 0,
-    sprintIndex: 0,
-    columnIndex: 0,
-    issueIndex: 0,
-  },  
-}, {
-  from: {
-    projectIndex: 1,
-    sprintIndex: 2,
-    columnIndex: 0,
-    issueIndex: 0,
-  },
-  to: {
-    projectIndex: 0,
-    sprintIndex: 0,
-    columnIndex: 0,
-    issueIndex: 0,
-  },  
-}, {
-  from: {
-    projectIndex: 1,
-    sprintIndex: 0,
-    columnIndex: 0,
-    issueIndex: 0,
-  },
-  to: {
-    projectIndex: 0,
-    sprintIndex: 1,
-    columnIndex: 0,
-    issueIndex: 0,
-  },  
-}, {
-  from: {
-    projectIndex: 1,
-    sprintIndex: 0,
-    columnIndex: 0,
-    issueIndex: 0,
-  },
-  to: {
-    projectIndex: 0,
-    sprintIndex: 2,
-    columnIndex: 0,
-    issueIndex: 0,
-  },  
-}];
+
 @observer
 class BoardHome extends Component {
   componentDidMount() {
     BoardStore.loadData();
   }
-  
+
+  handleRefresh=() => {
+    BoardStore.test();
+  }
+
   render() {
-    const { projects, sprints } = BoardStore;
+    const {
+      projects, sprints, connections,  
+    } = BoardStore;
 
     return (
       <Page

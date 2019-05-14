@@ -1,36 +1,26 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { sumBy } from 'lodash';
+import {
+  sumBy, findIndex, max, sum,
+} from 'lodash';
 import { observer } from 'mobx-react';
 import Connector from './Connector';
 import {
   CardHeight, CardWidth, CardMargin, ColumnMinHeight, ColumnWidth, basePosX, basePosY,
 } from '../Constants';
 import './Connectors.scss';
+import BoardStore from '../../../../../../stores/program/Board/BoardStore';
 
 
-const sprints = [
-  {
-    width: 2,
-  }, {
-    width: 1,
-  }, {
-    width: 1,
-  }];
-const projects = [{
-  height: 1,
-}, {
-  height: 1,
-}];
 @observer
 class Connectors extends Component {
   getLeapWidth = ({
     sprintIndex,
     columnIndex,
-    issueIndex,
+    rowIndex,
   }) => {
+    const { sprints } = BoardStore;
     const preSprintsWidth = sumBy(sprints.slice(0, sprintIndex), 'width');
-    console.log(preSprintsWidth);
     return preSprintsWidth * ColumnWidth + columnIndex * ColumnWidth + sprintIndex * 3;
   }
 
@@ -38,33 +28,73 @@ class Connectors extends Component {
     projectIndex,
     sprintIndex,
     columnIndex,
-    issueIndex,
+    rowIndex,
   }) => {
-    console.log(preProjectsHeight);
-    const preProjectsHeight = sumBy(projects.slice(0, projectIndex), 'height');
-    return preProjectsHeight * ColumnMinHeight + issueIndex * ColumnMinHeight;
+    const { projects } = BoardStore;
+    const projectHeights = BoardStore.getProjectsHeight;
+    const preProjectsHeight = sum(projectHeights.slice(0, projectIndex));
+    return preProjectsHeight * ColumnMinHeight + rowIndex * ColumnMinHeight;
   }
 
   calulatePoint = (connection) => {
-    const {
-      from: {
-        projectIndex: fromProjectIndex,
-        sprintIndex: fromSprintIndex,
-        columnIndex: fromColumnIndex,
-        issueIndex: fromIssueIndex,
-      },
-      to: {
-        projectIndex: toProjectIndex,
-        sprintIndex: toSprintIndex,
-        columnIndex: toColumnIndex,
-        issueIndex: toIssueIndex,
-      },
-    } = connection;
-    const isToLeft = toSprintIndex < fromSprintIndex;
+    const { from, to } = connection;
+    
+    const [fromXAxis, fromYAxis] = this.getAxis(from);
+    const [toXAxis, toYAxis] = this.getAxis(to);
+    console.log([fromXAxis, fromYAxis], [toXAxis, toYAxis]);
+    const [fromPosition, toPosition] = this.getPositionByAxis({
+      fromXAxis, fromYAxis, toXAxis, toYAxis,
+    });
+    console.log([fromPosition, toPosition]);
     return {
-      from: isToLeft ? this.getRightPoint(connection.from) : this.getLeftPoint(connection.from),
-      to: isToLeft ? this.getLeftPoint(connection.to) : this.getRightPoint(connection.to),
+      from: this.getPoint(from, fromPosition),
+      to: this.getPoint(to, toPosition),
     };
+  }
+
+  getPositionByAxis=({
+    fromXAxis, fromYAxis, toXAxis, toYAxis,
+  }) => {
+    if (fromXAxis === toXAxis) {
+      if (fromYAxis === toYAxis) {
+        return ['bottom', 'top'];
+      } else if (fromYAxis > toYAxis) {
+        return ['top', 'bottom'];
+      } else {
+        return ['bottom', 'top'];
+      }
+    } else if (fromXAxis > toXAxis) {
+      if (fromYAxis === toYAxis) {
+        return [];
+      } else if (fromYAxis > toYAxis) {
+        return ['left', 'right'];
+      } else {
+        return ['right', 'right'];
+      }
+    } else if (fromXAxis < toXAxis) {
+      if (fromYAxis === toYAxis) {
+        return [];
+      } else if (fromYAxis > toYAxis) {
+        return ['left', 'right'];
+      } else {
+        return ['right', 'left'];
+      }
+    }
+    return ['bottom', 'top'];
+  }
+
+  // 获取横纵坐标
+  getAxis=({
+    projectIndex,
+    sprintIndex,
+    columnIndex,
+    rowIndex,
+  }) => {
+    const { sprints } = BoardStore;
+    const projectHeights = BoardStore.getProjectsHeight;
+    const xAxis = sumBy(sprints.slice(0, sprintIndex), 'width') + columnIndex;
+    const yAxis = sum(projectHeights.slice(0, projectIndex)) + rowIndex;
+    return [xAxis, yAxis];
   }
 
   getLeftPoint = left => ({
@@ -76,6 +106,65 @@ class Connectors extends Component {
     x: basePosX + this.getLeapWidth(right) + 2 + CardMargin,
     y: basePosY + this.getLeapHeight(right) + CardHeight / 2,
   })
+
+
+  getPoint = (point, position) => {
+    const middleX = basePosX + this.getLeapWidth(point) + ColumnWidth / 2;
+    const middleY = basePosY + this.getLeapHeight(point) + CardHeight / 2;
+
+    switch (position) {
+      case 'top':
+        return ({
+          x: middleX,
+          y: middleY - CardHeight / 2,
+        });
+      case 'bottom':
+        return ({
+          x: middleX,
+          y: middleY + CardHeight / 2,
+        });
+      case 'left':
+        return ({
+          x: middleX - CardWidth / 2,
+          y: middleY,
+        });
+      case 'right':
+        return ({
+          x: middleX + CardWidth / 2,
+          y: middleY,
+        });
+        
+      default:
+        return {
+          x: 0,
+          y: 0,
+        };
+    }
+  }
+
+  getIndex = (info) => {
+    const { projectId, sprintId, issueId } = info;
+    const { sprints, projects } = BoardStore;
+
+    const projectIndex = findIndex(projects, { id: projectId });
+    const sprintIndex = findIndex(sprints, { id: sprintId });
+    const issueIndex = findIndex(projects[projectIndex].sprints[sprintIndex].issues, { issueId });
+    const { width } = sprints[sprintIndex];
+    const columnIndex = issueIndex % width;
+    const rowIndex = Math.ceil(issueIndex + 1 / width) - 1;
+    // console.log({
+    //   projectIndex,
+    //   sprintIndex,
+    //   columnIndex,
+    //   rowIndex,
+    // });
+    return {
+      projectIndex,
+      sprintIndex,
+      columnIndex,
+      rowIndex,
+    };
+  }
 
   render() {
     const { connections } = this.props;
@@ -99,7 +188,9 @@ class Connectors extends Component {
         <g fill="none" stroke="#BEC4E5" strokeWidth="1.5">
           {
             connections.map((connection) => {
-              const { from, to, isToLeft } = this.calulatePoint(connection);
+              const fromP = this.getIndex(connection.from);
+              const toP = this.getIndex(connection.to);
+              const { from, to, isToLeft } = this.calulatePoint({ from: fromP, to: toP });
               return <Connector from={from} to={to} />;
             })
           }
@@ -132,7 +223,7 @@ class Connectors extends Component {
             refX="5"
             refY="6"
             markerWidth="8"
-            markerHeight="8"             
+            markerHeight="8"
             fill="white"
             stroke="#BEC4E5"
             orient="auto"

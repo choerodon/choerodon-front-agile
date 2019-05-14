@@ -47,6 +47,7 @@
         &:first-child {
           position: sticky;
           left: 0;
+          z-index: 2;
           padding: 0 1px;
           box-shadow: inset -1px 0 0 #D8D8D8;
         }
