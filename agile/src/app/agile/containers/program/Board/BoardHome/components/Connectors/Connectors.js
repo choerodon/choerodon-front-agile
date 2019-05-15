@@ -20,7 +20,7 @@ class Connectors extends Component {
     rowIndex,
   }) => {
     const { sprints } = BoardStore;
-    const preSprintsWidth = sumBy(sprints.slice(0, sprintIndex), 'width');
+    const preSprintsWidth = sumBy(sprints.slice(0, sprintIndex), 'columnWidth');
     return preSprintsWidth * ColumnWidth + columnIndex * ColumnWidth + sprintIndex * 3;
   }
 
@@ -41,11 +41,13 @@ class Connectors extends Component {
     
     const [fromXAxis, fromYAxis] = this.getAxis(from);
     const [toXAxis, toYAxis] = this.getAxis(to);
-    // console.log([fromXAxis, fromYAxis], [toXAxis, toYAxis]);
+    console.log([fromXAxis, fromYAxis], [toXAxis, toYAxis]);
     const [fromPosition, toPosition] = this.getPositionByAxis({
       fromXAxis, fromYAxis, toXAxis, toYAxis,
     });
-    // console.log([fromPosition, toPosition]);
+    console.log([fromPosition, toPosition]);
+    console.log([this.getPoint(from, fromPosition), this.getPoint(to, toPosition)]);
+
     return {
       from: this.getPoint(from, fromPosition),
       to: this.getPoint(to, toPosition),
@@ -65,7 +67,7 @@ class Connectors extends Component {
       }
     } else if (fromXAxis > toXAxis) {
       if (fromYAxis === toYAxis) {
-        return [];
+        return ['left', 'right'];
       } else if (fromYAxis > toYAxis) {
         return ['left', 'right'];
       } else {
@@ -73,7 +75,7 @@ class Connectors extends Component {
       }
     } else if (fromXAxis < toXAxis) {
       if (fromYAxis === toYAxis) {
-        return [];
+        return ['right', 'left'];
       } else if (fromYAxis > toYAxis) {
         return ['left', 'right'];
       } else {
@@ -92,7 +94,7 @@ class Connectors extends Component {
   }) => {
     const { sprints } = BoardStore;
     const projectHeights = BoardStore.getProjectsHeight;
-    const xAxis = sumBy(sprints.slice(0, sprintIndex), 'width') + columnIndex;
+    const xAxis = sumBy(sprints.slice(0, sprintIndex), 'columnWidth') + columnIndex;
     const yAxis = sum(projectHeights.slice(0, projectIndex)) + rowIndex;
     return [xAxis, yAxis];
   }
@@ -143,21 +145,21 @@ class Connectors extends Component {
   }
 
   getIndex = (info) => {
-    const { projectId, sprintId, issueId } = info;
+    const { teamProjectId, sprintId, id } = info;
     const { sprints, projects } = BoardStore;
 
-    const projectIndex = findIndex(projects, { id: projectId });
-    const sprintIndex = findIndex(sprints, { id: sprintId });
-    const issueIndex = findIndex(projects[projectIndex].sprints[sprintIndex].issues, { issueId });
-    const { width } = sprints[sprintIndex];
-    const columnIndex = issueIndex % width;
-    const rowIndex = Math.ceil(issueIndex + 1 / width) - 1;
-    // console.log({
-    //   projectIndex,
-    //   sprintIndex,
-    //   columnIndex,
-    //   rowIndex,
-    // });
+    const projectIndex = findIndex(projects, { projectId: teamProjectId });
+    const sprintIndex = findIndex(sprints, { sprintId });
+    const issueIndex = findIndex(projects[projectIndex].teamSprints[sprintIndex].boardFeatures, { id });
+    const { columnWidth } = sprints[sprintIndex];
+    const columnIndex = issueIndex % columnWidth;
+    const rowIndex = Math.ceil((issueIndex + 1) / columnWidth) - 1;
+    console.log({
+      projectIndex,
+      sprintIndex,
+      columnIndex,
+      rowIndex,
+    });
     return {
       projectIndex,
       sprintIndex,
@@ -188,8 +190,8 @@ class Connectors extends Component {
         <g fill="none" stroke="#BEC4E5" strokeWidth="1.5">
           {
             connections.map((connection) => {
-              const fromP = this.getIndex(connection.from);
-              const toP = this.getIndex(connection.to);
+              const fromP = this.getIndex(connection.boardFeature);
+              const toP = this.getIndex(connection.dependBoardFeature);
               const { from, to, isToLeft } = this.calulatePoint({ from: fromP, to: toP });
               return <Connector from={from} to={to} />;
             })

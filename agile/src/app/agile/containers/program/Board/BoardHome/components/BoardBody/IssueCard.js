@@ -12,7 +12,7 @@ import './IssueCard.scss';
 class IssueCard extends Component {
   render() {
     const {
-      issue, isDragging, connectDragSource, connectDropTarget, 
+      issue, isDragging, connectDragSource, connectDropTarget,
     } = this.props;
     const opacity = isDragging ? 0 : 1;
     return (
@@ -23,13 +23,13 @@ class IssueCard extends Component {
               // opacity, 
               height: CardHeight,
               width: CardWidth,
-              margin: CardMargin, 
+              margin: CardMargin,
             }}
             className="c7nagile-IssueCard"
           >
             <div className="c7nagile-IssueCard-inner">
               {issue.summary}
-            </div>        
+            </div>
           </div>,
         ),
       )
@@ -45,7 +45,7 @@ export default DropTarget(
   'card',
   {
     canDrop: (props, monitor) => {
-      const source = monitor.getItem(); 
+      const source = monitor.getItem();
       const same = find(props.issues, { featureId: source.issue.featureId || source.issue.issueId });
       if (same && source.issue.id !== same.id) {
         return false;
@@ -70,7 +70,7 @@ export default DropTarget(
       if (!monitor.canDrop()) {
         return;
       }
-      const source = monitor.getItem();      
+      const source = monitor.getItem();
       const { issue: { id } } = props;
       // console.log(source.boardFeatureId, boardFeatureId);
       if (source.id !== id) {
@@ -93,26 +93,29 @@ export default DropTarget(
       beginDrag: props => ({
         id: props.issue.id,
         issue: props.issue,
+        index: props.index,
         sprintId: props.sprintId,
-        projectId: props.projectId,   
+        projectId: props.projectId,
       }),
       endDrag(props, monitor) {
-        const { issue } = monitor.getItem();
+        const source = monitor.getItem();
         const didDrop = monitor.didDrop();
         const result = monitor.getDropResult();
         if (result) {
           const {
-            dropType, teamProjectId, sprintId, index, 
+            dropType, teamProjectId, sprintId, index,
           } = result;
-  
+
           BoardStore.featureBoardMove({
             dropType,
             index,
-            teamProjectId, 
-            sprintId, 
-            issue,
-          });     
-        }       
+            teamProjectId,
+            sprintId,
+            issue: source.issue,
+          });
+        } else {
+          BoardStore.resetMovingIssue(source);
+        }
       },
     },
     (connect, monitor) => ({

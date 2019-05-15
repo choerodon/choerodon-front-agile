@@ -5,7 +5,7 @@ import {
 import axios from 'axios';
 import { find, findIndex, max } from 'lodash';
 import { stores } from 'choerodon-front-boot';
-import { getBoard, featureToBoard, featureBoardMove,getSideFeatures } from '../../../api/BoardFeatureApi'
+import { getBoard, featureToBoard, featureBoardMove, getSideFeatures } from '../../../api/BoardFeatureApi'
 
 const { AppState } = stores;
 
@@ -56,7 +56,7 @@ class BoardStore {
       piId,
       sprints,
       teamProjects
-    }) => {     
+    }) => {
       this.init({
         boardDepends,
         piCode,
@@ -82,7 +82,7 @@ class BoardStore {
       piCode,
       piId,
     }
-    // this.connections = boardDepends;
+    this.connections = boardDepends;
   }
 
 
@@ -117,8 +117,7 @@ class BoardStore {
   }) => {
     this.projects.forEach(project => {
       project.teamSprints.forEach(sprint => {
-        sprint.boardFeatures.forEach((issue, i) => {
-          console.log(id, issue.id)
+        sprint.boardFeatures.forEach((issue, i) => {        
           if (issue.id === id) {
             sprint.boardFeatures.splice(i, 1)
             this.projects[projectIndex].teamSprints[sprintIndex].boardFeatures.splice(atIndex, 0, insertIssue);
@@ -127,9 +126,27 @@ class BoardStore {
         })
       })
     })
-    // this.projects[projectIndex].teamSprints[sprintIndex].boardFeatures.splice(index, 1);
+  }
+  @action clearMovingIssue = (id) => {
+    this.projects.forEach(project => {
+      project.teamSprints.forEach(sprint => {
+        sprint.boardFeatures.forEach((issue, i) => {          
+          if (issue.id === id) {
+            sprint.boardFeatures.splice(i, 1)
+          }
+        })
+      })
+    })
+  }
+  @action resetMovingIssue = ({
+    issue, sprintId, projectId, index
+  }) => {
 
-
+    this.clearMovingIssue(issue.id);
+    const dropIssues = this.findIssuesByProjectAndSprint(projectId, sprintId);
+    if (!find(dropIssues, { id: issue.id })) {
+      dropIssues.splice(index, 0, issue)
+    }
   }
   @action addIssueToBoard = ({
     issue: insertIssue, atIndex, projectIndex, sprintIndex,
@@ -256,7 +273,7 @@ class BoardStore {
   @computed get getProjectsHeight() {
     return this.projects.map((project) => {
       const { teamSprints } = project;
-      const maxHeight = max(teamSprints.map((sprint, i) => Math.ceil(sprint.boardFeatures.length / this.teamSprints[i].width)));
+      const maxHeight = max(teamSprints.map((sprint, i) => Math.ceil(sprint.boardFeatures.length / this.sprints[i].width)));
       return maxHeight;
     });
   }

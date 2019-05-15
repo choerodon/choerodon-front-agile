@@ -64,7 +64,7 @@ export default DropTarget(
           });
           // }
         } else {
-          
+          BoardStore.clearMovingIssue();
         }
         if (!didDrop) {
           // props.moveCard(source, { index: props.index });
