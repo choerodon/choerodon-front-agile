@@ -114,7 +114,7 @@ const { Text, Edit } = TextEditToggle;
             originData={this.transToArr(fixVersions, 'name', 'array')}
             editExtraContent={
               fixVersionsFixed.length ? (
-                <div>
+                <div style={{ maxWidth: 170 }}>
                   <span>已归档版本：</span>
                   <span>
                     {_.map(fixVersionsFixed, 'name').join(' , ')}
