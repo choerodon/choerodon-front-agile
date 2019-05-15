@@ -83,7 +83,7 @@ const { Text, Edit } = TextEditToggle;
             originData={sprintId}
             editExtraContent={
               closeSprint.length ? (
-                <div>
+                <div style={{ maxWidth: 170 }}>
                   <span>已结束冲刺：</span>
                   <span>
                     {_.map(closeSprint, 'sprintName').join(' , ')}
