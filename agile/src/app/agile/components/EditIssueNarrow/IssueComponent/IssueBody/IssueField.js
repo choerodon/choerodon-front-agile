@@ -22,6 +22,9 @@ import {
   }
 
   getFieldComponent = (field) => {
+    const { store } = this.props;
+    const issue = store.getIssue;
+    const { typeCode } = issue;
     switch (field.fieldCode) {
       case 'assignee':
         return (<FieldAssignee {...this.props} />);
@@ -30,7 +33,11 @@ import {
       case 'status':
         return (<FieldStatus {...this.props} />);
       case 'sprint':
-        return (<FieldSprint {...this.props} />);
+        if (typeCode !== 'sub_task') {
+          return (<FieldSprint {...this.props} />);
+        } else {
+          return (<FieldSprint {...this.props} disabled />);
+        }
       case 'reporter':
         return (<FieldReporter {...this.props} />);
       case 'priority':
@@ -40,12 +47,19 @@ import {
       case 'fixVersion':
         return (<FieldFixVersion {...this.props} />);
       case 'epic':
-        return (<FieldEpic {...this.props} />);
+        // 子任务、史诗不显示史诗
+        if (['issue_epic', 'sub_task'].indexOf(typeCode) === -1) {
+          return (<FieldEpic {...this.props} />);
+        }
+        return '';
       case 'creationDate':
       case 'lastUpdateDate':
         return (<FieldDateTime {...this.props} field={field} />);
       case 'component':
-        return (<FieldComponent {...this.props} />);
+        if (typeCode !== 'sub_task') {
+          return (<FieldComponent {...this.props} />);
+        }
+        return '';
       case 'timeTrace':
         return (<FieldTimeTrace {...this.props} />);
       case 'pi':
