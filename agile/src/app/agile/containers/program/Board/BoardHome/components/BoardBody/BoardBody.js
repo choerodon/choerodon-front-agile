@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { find } from 'lodash';
+import { ColumnWidth, CardHeight, CardMargin } from '../Constants';
 import BoardStore from '../../../../../../stores/program/Board/BoardStore';
 
 import Cell from './Cell';
@@ -12,7 +13,7 @@ const dataMap = new Map([[1, new Map([[2, new Map([[3, []]])]])]]);
 @observer
 class BoardBody extends Component {
   render() {
-    const { resizing } = BoardStore;
+    const { resizing, activePi } = BoardStore;
     const { sprints, projects } = this.props;
     return (
       <div className="c7nagile-BoardBody">
@@ -20,25 +21,35 @@ class BoardBody extends Component {
           <thead>
             <tr>
               <th style={{ width: 140, minWidth: 140, textAlign: 'center' }}>
-                PI-1
+                {activePi.piCode}
               </th>
               {
-                sprints.map(sprint => <th>{sprint.name}</th>)
+                sprints.map(sprint => <th style={{ width: ColumnWidth * sprint.columnWidth }}>{sprint.sprintName}</th>)
               }
             </tr>
           </thead>
           <tbody>
             {
-              projects.map((project) => {
-                const { sprints: Sprints, projectName } = project;
+              projects.map((project, i) => {
+                const { teamSprints, projectName } = project;
                 return (
                   <tr>
-                    <td style={{ width: 140, minWidth: 140, textAlign: 'center' }}>
+                    <td style={{
+                      width: 140, minWidth: 140, textAlign: 'center', 
+                    }}
+                    >          
                       {projectName}
                     </td>
-                    {Sprints.map((sprint, i) => (
+                    {teamSprints.map((sprint, j) => (
                       <td>
-                        <Cell project={project} data={sprint} sprintIndex={i} />
+                        <Cell
+                          project={project}
+                          data={sprint}
+                          sprintIndex={j}
+                          projectIndex={i}
+                          sprintId={sprint.sprintId}
+                          teamProjectId={project.projectId}
+                        />
                       </td>
                     ))}
                   </tr>

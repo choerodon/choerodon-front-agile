@@ -41,11 +41,11 @@ class Connectors extends Component {
     
     const [fromXAxis, fromYAxis] = this.getAxis(from);
     const [toXAxis, toYAxis] = this.getAxis(to);
-    console.log([fromXAxis, fromYAxis], [toXAxis, toYAxis]);
+    // console.log([fromXAxis, fromYAxis], [toXAxis, toYAxis]);
     const [fromPosition, toPosition] = this.getPositionByAxis({
       fromXAxis, fromYAxis, toXAxis, toYAxis,
     });
-    console.log([fromPosition, toPosition]);
+    // console.log([fromPosition, toPosition]);
     return {
       from: this.getPoint(from, fromPosition),
       to: this.getPoint(to, toPosition),

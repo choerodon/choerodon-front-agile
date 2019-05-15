@@ -5,20 +5,23 @@ import {
   Page, Header, stores, Content,
 } from 'choerodon-front-boot';
 import { Button, Spin } from 'choerodon-ui';
+import { DragDropContextProvider } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 import BoardStore from '../../../../stores/program/Board/BoardStore';
 import Connectors from './components/Connectors';
 import BoardBody from './components/BoardBody';
+import SideFeatureList from './components/SideFeatureList';
 import './BoardHome.scss';
 
 
 @observer
 class BoardHome extends Component {
   componentDidMount() {
-    BoardStore.loadData();
+    BoardStore.loadData(); 
   }
 
   handleRefresh=() => {
-    BoardStore.test();
+    BoardStore.loadData();
   }
 
   render() {
@@ -38,9 +41,10 @@ class BoardHome extends Component {
           刷新
           </Button>
         </Header>
-        <Content style={{ padding: 0 }}>
-          <BoardBody projects={projects} sprints={sprints} />          
-          <Connectors connections={connections} />
+        <Content style={{ padding: 0 }}>         
+          <BoardBody projects={projects} sprints={sprints} />       
+          <SideFeatureList />       
+          <Connectors connections={connections} />          
         </Content>
       </Page>
     );
@@ -51,4 +55,8 @@ BoardHome.propTypes = {
 
 };
 
-export default BoardHome;
+export default ({ ...props }) => (
+  <DragDropContextProvider backend={HTML5Backend}>    
+    <BoardHome {...props} /> 
+  </DragDropContextProvider>
+);

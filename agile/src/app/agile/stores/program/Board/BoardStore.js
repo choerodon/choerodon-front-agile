@@ -5,139 +5,10 @@ import {
 import axios from 'axios';
 import { find, findIndex, max } from 'lodash';
 import { stores } from 'choerodon-front-boot';
+import { getBoard, featureToBoard, featureBoardMove,getSideFeatures } from '../../../api/BoardFeatureApi'
 
 const { AppState } = stores;
-const sprints = [{
-  id: 1,
-  name: 'Sprint-20',
-  width: 2,
-}, {
-  id: 2,
-  name: 'Sprint-21',
-  width: 1,
-}, {
-  id: 3,
-  name: 'Sprint-22',
-  width: 1,
-}];
-const data = [{
-  id: 1,
-  projectName: '产品运营',
-  sprints: [{
-    id: 1,
-    name: 'Sprint-20',
-    width: 2,
-    issues: [{
-      issueId: 1,
-      summary: '1',
-    }, {
-      issueId: 1,
-      summary: '2',
-    }, {
-      issueId: 1,
-      summary: '3',
-    }],
-  }, {
-    id: 2,
-    name: 'Sprint-20',
-    width: 1,
-    issues: [{
-      issueId: 1,
-      summary: '1',
-    }],
-  }, {
-    id: 3,
-    name: 'Sprint-20',
-    width: 1,
-    issues: [{
-      issueId: 1,
-      summary: '1',
-    }],
-  }],
-}, {
-  id: 2,
-  projectName: '产品运营',
-  sprints: [{
-    id: 1,
-    name: 'Sprint-20',
-    width: 1,
-    issues: [{
-      issueId: 1,
-      summary: '1',
-    }],
-  }, {
-    id: 2,
-    name: 'Sprint-20',
-    width: 1,
-    issues: [{
-      issueId: 1,
-      summary: '1',
-    }],
-  }, {
-    id: 3,
-    name: 'Sprint-20',
-    issues: [{
-      issueId: 1,
-      summary: '1',
-    }],
-  }],
-}, {
-  id: 3,
-  projectName: '产品运营',
-  sprints: [{
-    id: 1,
-    name: 'Sprint-20',
-    width: 1,
-    issues: [{
-      issueId: 1,
-      summary: '1',
-    }],
-  }, {
-    id: 2,
-    name: 'Sprint-20',
-    width: 1,
-    issues: [{
-      issueId: 1,
-      summary: '1',
-    }],
-  }, {
-    id: 3,
-    name: 'Sprint-20',
-    width: 1,
-    issues: [{
-      issueId: 1,
-      summary: '1',
-    }],
-  }],
-}, {
-  id: 4,
-  projectName: '产品运营',
-  sprints: [{
-    id: 1,
-    name: 'Sprint-20',
-    width: 1,
-    issues: [{
-      issueId: 1,
-      summary: '1',
-    }],
-  }, {
-    id: 2,
-    name: 'Sprint-20',
-    width: 1,
-    issues: [{
-      issueId: 1,
-      summary: '1',
-    }],
-  }, {
-    id: 3,
-    name: 'Sprint-20',
-    width: 1,
-    issues: [{
-      issueId: 1,
-      summary: '1',
-    }],
-  }],
-}];
+
 
 const connections = [{
   from: {
@@ -165,161 +36,66 @@ const connections = [{
 class BoardStore {
   @observable resizing = false;
 
+  @observable activePi = {};
+
+  @observable featureList = [];
+
   @observable projects = [];
 
   @observable sprints = [];
 
   @observable connections = [];
 
-  @observable issueRefs = null;
-
   @observable currentSprint = {};
 
   loadData = () => {
-    this.init(data, sprints, connections);
+
+    getBoard().then(({
+      boardDepends,
+      piCode,
+      piId,
+      sprints,
+      teamProjects
+    }) => {     
+      this.init({
+        boardDepends,
+        piCode,
+        piId,
+        sprints,
+        teamProjects
+      });
+      this.loadFeatureList()
+    })
+
   }
 
-  @action init = (projects, sprints, connections) => {
+  @action init = ({
+    boardDepends,
+    piCode,
+    piId,
+    sprints,
+    teamProjects: projects
+  }) => {
     this.sprints = sprints;
-    this.projects = [{
-      id: 1,
-      projectName: '产品运营',
-      sprints: [{
-        id: 1,
-        name: 'Sprint-20',
-        width: 2,
-        issues: [{
-          issueId: 1,
-          summary: '1',
-        }, {
-          issueId: 2,
-          summary: '2',
-        }, {
-          issueId: 3,
-          summary: '3',
-        }],
-      }, {
-        id: 2,
-        name: 'Sprint-20',
-        width: 1,
-        issues: [{
-          issueId: 1,
-          summary: '1',
-        }],
-      }, {
-        id: 3,
-        name: 'Sprint-20',
-        width: 1,
-        issues: [{
-          issueId: 1,
-          summary: '1',
-        }],
-      }],
-    }, {
-      id: 2,
-      projectName: '产品运营',
-      sprints: [{
-        id: 1,
-        name: 'Sprint-20',
-        width: 1,
-        issues: [{
-          issueId: 1,
-          summary: '1',
-        }],
-      }, {
-        id: 2,
-        name: 'Sprint-20',
-        width: 1,
-        issues: [{
-          issueId: 1,
-          summary: '1',
-        }],
-      }, {
-        id: 3,
-        name: 'Sprint-20',
-        issues: [{
-          issueId: 1,
-          summary: '1',
-        }],
-      }],
-    }, {
-      id: 3,
-      projectName: '产品运营',
-      sprints: [{
-        id: 1,
-        name: 'Sprint-20',
-        width: 1,
-        issues: [{
-          issueId: 1,
-          summary: '1',
-        }],
-      }, {
-        id: 2,
-        name: 'Sprint-20',
-        width: 1,
-        issues: [{
-          issueId: 1,
-          summary: '1',
-        }],
-      }, {
-        id: 3,
-        name: 'Sprint-20',
-        width: 1,
-        issues: [{
-          issueId: 1,
-          summary: '1',
-        }],
-      }],
-    }, {
-      id: 4,
-      projectName: '产品运营',
-      sprints: [{
-        id: 1,
-        name: 'Sprint-20',
-        width: 1,
-        issues: [{
-          issueId: 1,
-          summary: '1',
-        }],
-      }, {
-        id: 2,
-        name: 'Sprint-20',
-        width: 1,
-        issues: [{
-          issueId: 1,
-          summary: '1',
-        }],
-      }, {
-        id: 3,
-        name: 'Sprint-20',
-        width: 1,
-        issues: [{
-          issueId: 1,
-          summary: '1',
-        }],
-      }],
-    }];
-    this.connections = connections;
+    this.projects = projects;
+    this.activePi = {
+      piCode,
+      piId,
+    }
+    // this.connections = boardDepends;
   }
 
-  // @action setIssueRef({
-  //   projectId, sprintId, issueId, element,
-  // }) {
-  //   this.issueRefs.get(projectId).get(sprintId).set(issueId, element);
-  //   // console.log(this.issueRefs.get(projectId).get(sprintId).get(issueId));
-  //   const targetProject = find(this.projects, { id: projectId });
-  //   const targetSprint = find(targetProject.sprints, { id: sprintId });
-  //   const targetIssue = find(targetSprint.issues, { issueId });
-  //   // console.log(targetIssue);
-  //   if (targetIssue.element) {
-  //     targetIssue.element = element;
-  //   } else {
-  //     extendObservable(targetIssue, { element });
-  //   }
-  // }
 
+  loadFeatureList = () => {
+    getSideFeatures(this.activePi.piId, {}).then(feature => {
+      this.setFeatureList(feature)
+    })
+  }
+  @action setFeatureList(featureList) {
+    this.featureList = featureList;
+  }
   @action test() {
-    this.sprints[0].width = 3 - this.sprints[0].width;
+    this.sprints[0].columnWidth = 3 - this.sprints[0].columnWidth;
   }
 
   @action setResizing(resizing) {
@@ -331,24 +107,156 @@ class BoardStore {
   }
 
   @action setSprintWidth(index, width) {
-    if (width !== this.sprints[index].width) {
+    if (width !== this.sprints[index].columnWidth) {
       // console.log(index, width);
-      this.sprints[index].width = width;
+      this.sprints[index].columnWidth = width;
     }
   }
+  @action sortIssues = ({
+    projectIndex, sprintIndex, index, issue: insertIssue, atIndex, id
+  }) => {
+    this.projects.forEach(project => {
+      project.teamSprints.forEach(sprint => {
+        sprint.boardFeatures.forEach((issue, i) => {
+          console.log(id, issue.id)
+          if (issue.id === id) {
+            sprint.boardFeatures.splice(i, 1)
+            this.projects[projectIndex].teamSprints[sprintIndex].boardFeatures.splice(atIndex, 0, insertIssue);
+            console.log(toJS(this.projects[projectIndex].teamSprints[sprintIndex].boardFeatures))
+          }
+        })
+      })
+    })
+    // this.projects[projectIndex].teamSprints[sprintIndex].boardFeatures.splice(index, 1);
 
-  // getIssueRef({ projectId, sprintId, issueId }) {
-  //   return this.issueRefs.get(projectId).get(sprintId).get(issueId);
-  //   const targetProject = find(this.projects, { id: projectId });
-  //   const targetSprint = find(targetProject.sprints, { id: sprintId });
-  //   const targetIssue = find(targetSprint.issues, { issueId });
-  //   return targetIssue;
-  // }
 
+  }
+  @action addIssueToBoard = ({
+    issue: insertIssue, atIndex, projectIndex, sprintIndex,
+  }) => {
+    this.projects.forEach(project => {
+      project.teamSprints.forEach(sprint => {
+        sprint.boardFeatures.forEach((issue, i) => {
+          // 找到之前不在板上的，删掉
+          if (!issue.id && issue.issueId === insertIssue.issueId) {
+            sprint.boardFeatures.splice(i, 1)
+          }
+        })
+      })
+    })
+    this.projects[projectIndex].teamSprints[sprintIndex].boardFeatures.splice(atIndex, 0, insertIssue);
+  }
+  // feature列表移动到板子上
+  fromSideToBoard = ({
+    dropType, index, teamProjectId, sprintId, featureId
+  }) => {
+    let insertIndex = index;
+    const data = {
+      // dropType,
+      // index,
+      teamProjectId,
+      sprintId,
+      piId: this.activePi.piId,  //piId
+      before: true,  //是否拖动到第一个
+      teamProjectId,  //团队项目id
+      featureId,
+      outsetId: 0  //before：true，在当前移动的值之后，false，在当前移动的值之前，若为0L则为第一次创建
+    }
+
+    const dropIssues = this.findIssuesByProjectAndSprint(teamProjectId, sprintId)
+    console.log(dropIssues)
+    // 内部有卡片
+    if (dropType === 'inner') {
+      // 拖动到第一个，传第二个的值
+      if (index === 0) {
+        data.before = true;
+        data.outsetId = dropIssues[1].id
+      } else {
+        data.before = false;
+        data.outsetId = dropIssues[index - 1].id
+      }
+    } else {
+      // 目标各自如果有issue，放在最后一个
+      if (dropIssues.length > 0) {
+        data.before = false;
+        data.outsetId = dropIssues[dropIssues.length - 1].id;
+        insertIndex = dropIssues.length - 1;
+      } else {
+        data.before = true;
+        insertIndex = 0;
+      }
+    }
+    console.log(data)
+    featureToBoard(data).then(res => {
+      if (res.failed) {
+        return;
+      }
+      action(() => {
+        dropIssues[insertIndex] = res;
+        console.log(dropIssues)
+      })()
+    })
+  }
+
+  // feature在板子上移动
+  featureBoardMove = ({
+    dropType, index, teamProjectId, sprintId, issue
+  }) => {
+    let insertIndex = index;
+    const data = {
+      objectVersionNumber: issue.objectVersionNumber,  //乐观锁
+      piId: this.activePi.piId,  //piId
+      sprintId,  //冲刺id
+      before: true,  //是否拖动到第一个
+      teamProjectId,
+      outsetId: 0,
+    }
+
+    const dropIssues = this.findIssuesByProjectAndSprint(teamProjectId, sprintId)
+    console.log(dropIssues)
+    // 内部有卡片
+    if (dropType === 'inner') {
+      // 拖动到第一个，传第二个的值
+      if (index === 0) {
+        data.before = true;
+        data.outsetId = dropIssues[1].id
+      } else {
+        data.before = false;
+        data.outsetId = dropIssues[index - 1].id
+      }
+    } else {
+      // 目标各自如果有issue，放在最后一个
+      if (dropIssues.length > 0) {
+        data.before = false;
+        data.outsetId = dropIssues[dropIssues.length - 1].id;
+        insertIndex = dropIssues.length - 1;
+      } else {
+        data.before = true;
+        insertIndex = 0;
+      }
+    }
+    console.log(data, issue)
+    featureBoardMove(issue.id, data).then(res => {
+      if (res.failed) {
+        return;
+      }
+      action(() => {
+        dropIssues[insertIndex] = res;
+        console.log(dropIssues)
+      })()
+    })
+  }
+
+
+  findIssuesByProjectAndSprint(projectId, sprintId) {
+    const targetProject = find(this.projects, { projectId })
+    const targetSprint = find(targetProject.teamSprints, { sprintId })
+    return targetSprint.boardFeatures
+  }
   @computed get getProjectsHeight() {
     return this.projects.map((project) => {
-      const { sprints } = project;
-      const maxHeight = max(sprints.map((sprint, i) => Math.ceil(sprint.issues.length / this.sprints[i].width)));
+      const { teamSprints } = project;
+      const maxHeight = max(teamSprints.map((sprint, i) => Math.ceil(sprint.boardFeatures.length / this.teamSprints[i].width)));
       return maxHeight;
     });
   }

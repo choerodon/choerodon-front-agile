@@ -1,10 +1,14 @@
+/* eslint-disable consistent-return */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { find, findIndex } from 'lodash';
 import { findDOMNode } from 'react-dom';
+import { DropTarget } from 'react-dnd';
 import { observer } from 'mobx-react';
+import { changeSprintWidth } from '../../../../../../api/BoardFeatureApi';
 import BoardStore from '../../../../../../stores/program/Board/BoardStore';
 import IssueCard from './IssueCard';
-import { ColumnWidth } from '../Constants';
+import { ColumnWidth, CardHeight, CardMargin } from '../Constants';
 import './Cell.scss';
 
 const AUTOSCROLL_RATE = 7;
@@ -23,7 +27,7 @@ function findScroller(n) {
 }
 @observer
 class Cell extends Component {
-  state={
+  state = {
     resizing: false,
   }
 
@@ -89,19 +93,19 @@ class Cell extends Component {
    * @parameter multiple 变几个 => 1
    */
   handleItemResize = (mode, multiple) => {
-    const { sprintIndex } = this.props;    
-    let width = this.initWidth;    
+    const { sprintIndex } = this.props;
+    let width = this.initWidth;
     switch (mode) {
       case 'right': {
-        width += multiple;       
+        width += multiple;
         break;
-      }     
+      }
       default: break;
     }
 
     // 最小为一
     if (width > 0) {
-      BoardStore.setSprintWidth(sprintIndex, width); 
+      BoardStore.setSprintWidth(sprintIndex, width);
     }
   }
 
@@ -109,12 +113,12 @@ class Cell extends Component {
     e.stopPropagation();
     e.preventDefault();
     const { sprintIndex } = this.props;
-    this.initWidth = BoardStore.sprints[sprintIndex].width;
+    this.initWidth = BoardStore.sprints[sprintIndex].columnWidth;
     // 为自动滚动做准备
     this.prepareForScroll();
     // console.log(this[mode].getBoundingClientRect().left, e.clientX);
     this.setState({
-      resizing: true, 
+      resizing: true,
     });
     const { scroller } = this.autoScroll;
     this.initScrollPosition = {
@@ -147,13 +151,13 @@ class Cell extends Component {
   }
 
   // 触发item的宽度变化
-  fireResize = (clientX) => { 
+  fireResize = (clientX) => {
     if (this.initScrollPosition) {
       // resize的变化量
       const { x, scrollPos } = this.initScrollPosition;
       const posX = clientX - this.initScrollPosition.x + scrollPos;
-    
-     
+
+
       // 一个所占宽度
       if (Math.abs(posX) > (ColumnWidth / 2)) {
         // 变化的倍数 当达到宽度1/2的倍数的时候触发变化        
@@ -181,48 +185,121 @@ class Cell extends Component {
     this.setState({
       resizing: false,
     });
-    const { sprintIndex } = this.props;
-    const { width } = BoardStore.sprints[sprintIndex].width;
+    const { sprintIndex, sprintId } = this.props;
+    const { columnWidth } = BoardStore.sprints[sprintIndex];
     // 只在数据变化时才请求
-    if (this.initWidth !== width) {
+    if (this.initWidth !== columnWidth) {
       // console.log('change');
+      changeSprintWidth(sprintId, columnWidth).then((res) => {
+        if (res.failed) {
+          BoardStore.setSprintWidth(sprintIndex, this.initWidth);
+        }
+      }).catch((err) => {
+        BoardStore.setSprintWidth(sprintIndex, this.initWidth);
+      });
     }
   }
 
+  moveCard = (source, target) => {
+    const { projectIndex, sprintIndex } = this.props;
+    const {
+      type, issue, originalIndex, id,
+    } = source;
+    console.log(source, target);
+    if (type === 'side') {
+      BoardStore.addIssueToBoard({
+        issue,
+        atIndex: target.index,
+        projectIndex,
+        sprintIndex,
+      });
+    } else {
+      BoardStore.sortIssues({
+        projectIndex,
+        sprintIndex,
+        originalIndex,
+        issue,
+        atIndex: target.index,
+        id,
+      });
+    }
+  }
+
+  dropCard = (source, target) => {
+    const { projectIndex, sprintIndex } = this.props;
+    const { issue, originalIndex, id } = source;
+    console.log(source, target);
+    BoardStore.dropIssue({
+      projectIndex,
+      sprintIndex,
+      originalIndex,
+      issue,
+      atIndex: target.index,
+      id,
+    });
+  }
+
+  findCard = (id) => {
+    const { data: { boardFeatures: issues } } = this.props;
+
+    const issue = find(issues, { issueId: id });
+    const index = findIndex(issues, { issueId: id });
+    console.log(id, issue, index);
+    return {
+      issue,
+      index,
+    };
+  }
+
+
   render() {
-    const { data, project, sprintIndex } = this.props;
-    const { width } = BoardStore.sprints[sprintIndex];
-    const { issues, id } = data;
+    const {
+      data, project, sprintIndex, connectDropTarget,
+    } = this.props;
+    const { columnWidth } = BoardStore.sprints[sprintIndex];
+    const { boardFeatures: issues, sprintId } = data;
     const { resizing } = this.state;
     return (
-      <div className="c7nagile-Cell" style={{ width: ColumnWidth * width }}>
-        {issues.map(issue => <IssueCard issue={issue} sprintId={id} projectId={project.id} />)}
-        {resizing && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            bottom: 0,
-            right: 0,
-            zIndex: 9999,
-            cursor: 'col-resize',
-          }}
+      connectDropTarget(
+        <div className="c7nagile-Cell" style={{ width: ColumnWidth * columnWidth, minHeight: CardHeight + CardMargin * 2 }}>
+          {issues.map((issue, i) => (
+            <IssueCard
+              index={i}
+              issue={issue}
+              issues={issues}
+              sprintId={sprintId}
+              projectId={project.projectId}
+              findCard={this.findCard}
+              moveCard={this.moveCard}
+            />
+          ))}
+          {resizing && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+              zIndex: 9999,
+              cursor: 'col-resize',
+            }}
+            />
+          )}
+          <div
+            style={{
+              top: 0,
+              height: '100%',
+              width: 20,
+              position: 'absolute',
+              zIndex: 2,
+              cursor: 'col-resize',
+              right: -10,
+            }}
+            onMouseDown={this.handleMouseDown.bind(this, 'right')}
+            role="none"
           />
-        )}
-        <div
-          style={{
-            top: 0,
-            height: '100%',
-            width: 20,
-            position: 'absolute',
-            zIndex: 2,
-            cursor: 'col-resize',
-            right: -10,
-          }}
-          onMouseDown={this.handleMouseDown.bind(this, 'right')}
-          role="none"
-        />
-      </div>
+        </div>,
+      )
     );
   }
 }
@@ -231,4 +308,25 @@ Cell.propTypes = {
 
 };
 
-export default Cell;
+export default DropTarget('card', {
+  canDrop: (props, monitor) => {
+    const source = monitor.getItem();    
+    const same = find(props.data.boardFeatures, { featureId: source.issue.featureId || source.issue.issueId });
+    if (same && source.issue.id !== same.id) {
+      return false;
+    }
+    return true;
+  },
+  drop: (props, monitor, component) => {
+    if (monitor.didDrop()) {
+      return;
+    }
+    return {
+      dropType: 'outer',
+      teamProjectId: props.teamProjectId,
+      sprintId: props.sprintId,
+    };
+  },
+}, connect => ({
+  connectDropTarget: connect.dropTarget(),
+}))(Cell);
