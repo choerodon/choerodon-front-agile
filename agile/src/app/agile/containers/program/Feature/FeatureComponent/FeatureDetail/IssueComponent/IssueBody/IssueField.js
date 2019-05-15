@@ -26,6 +26,9 @@ const hideFields = ['priority', 'component', 'label', 'fixVersion', 'sprint', 't
   }
 
   getFieldComponent = (field) => {
+    const { store } = this.props;
+    const issue = store.getIssue;
+    const { typeCode } = issue;
     switch (field.fieldCode) {
       case 'assignee':
         return (<FieldAssignee {...this.props} />);
@@ -44,7 +47,11 @@ const hideFields = ['priority', 'component', 'label', 'fixVersion', 'sprint', 't
       case 'fixVersion':
         return (<FieldFixVersion {...this.props} />);
       case 'epic':
-        return (<FieldEpic {...this.props} />);
+        // 子任务、史诗不显示史诗
+        if (['issue_epic', 'sub_task'].indexOf(typeCode) === -1) {
+          return (<FieldEpic {...this.props} />);
+        }
+        return '';
       case 'creationDate':
       case 'lastUpdateDate':
         return (<FieldDateTime {...this.props} field={field} />);
