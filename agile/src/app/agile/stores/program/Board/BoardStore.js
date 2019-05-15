@@ -117,22 +117,41 @@ class BoardStore {
   }) => {
     this.projects.forEach(project => {
       project.teamSprints.forEach(sprint => {
-        sprint.boardFeatures.forEach((issue, i) => {        
+        sprint.boardFeatures.forEach((issue, i) => {
           if (issue.id === id) {
             sprint.boardFeatures.splice(i, 1)
             this.projects[projectIndex].teamSprints[sprintIndex].boardFeatures.splice(atIndex, 0, insertIssue);
-            console.log(toJS(this.projects[projectIndex].teamSprints[sprintIndex].boardFeatures))
+            // console.log(toJS(this.projects[projectIndex].teamSprints[sprintIndex].boardFeatures))
+            this.setConnectionsWhenDrag({
+              ...insertIssue,
+              sprintId: this.sprints[sprintIndex].sprintId,
+              teamProjectId: this.projects[projectIndex].projectId
+            })
           }
         })
       })
     })
   }
+  @action setConnectionsWhenDrag(issue) {
+    this.connections.forEach(connection => {
+      const { boardFeature, dependBoardFeature } = connection;
+      if (boardFeature.id === issue.id) {
+        boardFeature.sprintId = issue.sprintId
+        boardFeature.teamProjectId = issue.teamProjectId
+      }
+      if (dependBoardFeature.id === issue.id) {
+        boardFeature.sprintId = issue.sprintId
+        boardFeature.teamProjectId = issue.teamProjectId
+      }
+    })
+  }
   @action clearMovingIssue = (id) => {
     this.projects.forEach(project => {
       project.teamSprints.forEach(sprint => {
-        sprint.boardFeatures.forEach((issue, i) => {          
+        sprint.boardFeatures.forEach((issue, i) => {
           if (issue.id === id) {
             sprint.boardFeatures.splice(i, 1)
+            this.setConnectionsWhenDrag(issue)
           }
         })
       })
@@ -273,7 +292,7 @@ class BoardStore {
   @computed get getProjectsHeight() {
     return this.projects.map((project) => {
       const { teamSprints } = project;
-      const maxHeight = max(teamSprints.map((sprint, i) => Math.ceil(sprint.boardFeatures.length / this.sprints[i].width)));
+      const maxHeight = max(teamSprints.map((sprint, i) => Math.ceil(sprint.boardFeatures.length / this.sprints[i].columnWidth)));
       return maxHeight;
     });
   }
