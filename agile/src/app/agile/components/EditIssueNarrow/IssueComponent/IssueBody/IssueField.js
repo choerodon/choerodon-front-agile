@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import { toJS } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import { injectIntl } from 'react-intl';
@@ -8,6 +9,7 @@ import {
   FieldEpic, FieldDateTime, FieldComponent, FieldTimeTrace, FieldStoryPoint,
   FieldSummary, FieldInput,
 } from './Field';
+import VisibleStore from '../../../../stores/common/visible/VisibleStore';
 
 @inject('AppState')
 @observer class IssueField extends Component {
@@ -68,62 +70,16 @@ import {
   render() {
     const { store, isWide = false } = this.props;
     const issue = store.getIssue;
-    const fields = store.getFields;
+    let fields = toJS(store.getFields);
     const { issueId } = issue;
-
-    const left = [];
-    const right = [];
-    if (issueId && isWide) {
-      fields.forEach((item, index) => {
-        if (index < fields.length / 2) {
-          left.push(item);
-        } else {
-          right.push(item);
-        }
-      });
+    
+    if (!VisibleStore.detailShow) {
+      fields = fields.slice(0, 3);
     }
 
     return (
       <div className="c7n-content-wrapper IssueField">
-        { issueId ? fields.map(field => (
-          <Fragment>
-            {/* <span
-              className="c7n-content-item"
-              key={field.fieldCode}
-            > */}
-            {this.getFieldComponent(field)}
-            {/* </span> */}
-            {/* <div style={{ flex: 1 }} /> */}
-          </Fragment>
-        )) : ''}
-        {/* {isWide && issueId ? (
-          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-            <span style={{ flex: 1 }}>
-              {
-                left.map(field => (
-                  <span
-                    className="c7n-content-item"
-                    key={field.fieldCode}
-                  >
-                    {this.getFieldComponent(field)}
-                  </span>
-                ))
-              }
-            </span>
-            <span style={{ flex: 1 }}>
-              {
-                right.map(field => (
-                  <span
-                    className="c7n-content-item"
-                    key={field.fieldCode}
-                  >
-                    {this.getFieldComponent(field)}
-                  </span>
-                ))
-              }
-            </span>
-          </div>
-        ) : ''} */}
+        { issueId ? fields.map(field => this.getFieldComponent(field)) : ''}
       </div>
     );
   }
