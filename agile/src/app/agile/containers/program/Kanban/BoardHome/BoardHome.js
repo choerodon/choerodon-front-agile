@@ -99,11 +99,11 @@ class BoardHome extends Component {
       }
     }
     return values.join(', ');
-  }
+  };
 
   handleCreateFeatureClick = () => {
     KanbanStore.setCreateFeatureVisible(true);
-  }
+  };
 
   handleQuickSearchChange = (featureTypeList) => {    
     KanbanStore.addQuickSearchFilter(featureTypeList);
@@ -113,7 +113,7 @@ class BoardHome extends Component {
   handleSettingClick = () => {
     const { history } = this.props;
     history.push(ProgramBoardSettingLink());
-  }
+  };
 
   onDragStart = (result) => {
     const { headerStyle } = this.props;
@@ -166,7 +166,7 @@ class BoardHome extends Component {
     const rank = destinationColumnStatusCode !== 'prepare';
     let piId;
 
-    if (destinationColumnStatusCode === 'prepare' && destinationColumnStatusCode === 'prepare') {
+    if (['prepare', 'todo'].includes(destinationColumnStatusCode)) {
       piId = undefined;
     } else if (destinationSwimLineData.length > 0) {
       // eslint-disable-next-line prefer-destructuring

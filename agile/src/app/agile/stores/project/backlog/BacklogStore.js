@@ -988,6 +988,10 @@ class BacklogStore {
     this.epicFilter = 'all';
     this.quickFilters = [];
     this.assigneeFilterIds = [];
+    this.chosenEpic = 'all';
+    this.chosenVersion = 'all';
+    this.filterSelected = false;
+    this.chosenFeature = 'all';
   }
 
   @computed get hasFilter() {
@@ -995,7 +999,6 @@ class BacklogStore {
   }
 
   @action clearSprintFilter() {
-    this.filterSelected = false;
     this.resetFilter();
     this.axiosGetSprint().then(action('fetchSuccess', (res) => {
       this.setSprintData(res);

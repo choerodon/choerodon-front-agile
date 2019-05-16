@@ -29,6 +29,7 @@ class QuickSearch extends Component {
   componentDidMount() {
     QuickSearchEvent.addListener('clearQuickSearchSelect', this.clearQuickSearch);
     QuickSearchEvent.addListener('setSelectQuickSearch', this.setSelectQuickSearch);
+    QuickSearchEvent.addListener('unSelectStory', this.unSelectStory);
     const { AppState } = this.props;
     const axiosGetFilter = axios.post(`/agile/v1/projects/${AppState.currentMenuType.id}/quick_filter/query_all`, {
       contents: [
@@ -112,6 +113,15 @@ class QuickSearch extends Component {
       selectQuickSearch,
     });
     this.handleQuickSearchChange(selectQuickSearch);
+  }
+
+  unSelectStory=() => {
+    const { selectQuickSearch } = this.state;
+    const newSelect = selectQuickSearch.filter(search => search.key !== -2);    
+    this.setState({
+      selectQuickSearch: newSelect,
+    });
+    this.handleQuickSearchChange(newSelect);
   }
 
   render() {
