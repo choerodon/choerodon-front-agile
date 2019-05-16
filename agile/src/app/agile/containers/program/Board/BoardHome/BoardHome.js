@@ -17,34 +17,45 @@ import './BoardHome.scss';
 @observer
 class BoardHome extends Component {
   componentDidMount() {
-    BoardStore.loadData(); 
+    BoardStore.loadData();
   }
 
-  handleRefresh=() => {
+  handleRefresh = () => {
     BoardStore.loadData();
+  }
+
+  handleClickFeatureList = () => {
+    BoardStore.setFeatureListVisible(!BoardStore.featureListVisible);
   }
 
   render() {
     const {
-      projects, sprints, connections,  
+      projects, sprints, connections, featureListVisible, activePi,
     } = BoardStore;
 
     return (
       <Page
         className="c7nagile-BoardHome"
       >
-        <Header title="项目群公告板">         
-          <Button        
+        <Header title="项目群公告板">
+          <Button
             icon="refresh"
             onClick={this.handleRefresh}
           >
-          刷新
+            刷新
+          </Button>
+          <Button
+            disabled={!activePi.piId}
+            icon="refresh"
+            onClick={this.handleClickFeatureList}
+          >
+            特性列表
           </Button>
         </Header>
-        <Content style={{ padding: 0 }}>         
-          <BoardBody projects={projects} sprints={sprints} />       
-          <SideFeatureList />       
-          <Connectors connections={connections} />          
+        <Content style={{ padding: 0 }}>
+          <BoardBody projects={projects} sprints={sprints} />
+          {featureListVisible && <SideFeatureList />}
+          <Connectors connections={connections} />
         </Content>
       </Page>
     );
@@ -56,7 +67,7 @@ BoardHome.propTypes = {
 };
 
 export default ({ ...props }) => (
-  <DragDropContextProvider backend={HTML5Backend}>    
-    <BoardHome {...props} /> 
+  <DragDropContextProvider backend={HTML5Backend}>
+    <BoardHome {...props} />
   </DragDropContextProvider>
 );

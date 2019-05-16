@@ -82,14 +82,14 @@
       margin-top: 4px;
       padding: 0 !important;
 
-      ul >li {
+      ul>li {
         height: 23px;
       }
 
       // 单选多选内容框
       ul,
       .ant-select-selection-selected-value {
-        width: calc(100% - 50px);
+        width: calc(100% - 26px);
         overflow: hidden;
       }
 
@@ -99,9 +99,6 @@
         position: static !important;
       }
 
-      //   li {
-      //     margin-bottom: 0;
-      //   }
       .ant-select-clear {
         flex-shrink: 0;
         position: static !important;
@@ -113,23 +110,17 @@
 
       .ant-select-arrow {
         position: static !important;
-        // top: 50%;
-        // transform: translateY(-50%)
       }
+    }
+  }
 
-      //   .ant-select-selection__choice__content {   
-      //     overflow: hidden;
-      //     white-space: nowrap;
-      //     text-overflow: ellipsis;
-      //     // width: 64px;
-      //     width: calc(100% - 50px);
-      //     height: 24px;
-      //   }
+  &.ant-select-allow-clear {
+    .ant-select-selection__rendered {
 
-      //   .ant-select-selection__placeholder {
-      //     margin-top: 3px;
-      //     color: #3f51b5;
-      //   }
+      ul,
+      .ant-select-selection-selected-value {
+        width: calc(100% - 50px) !important;
+      }
     }
   }
 }

@@ -8,33 +8,10 @@ import { stores } from 'choerodon-front-boot';
 import { getBoard, featureToBoard, featureBoardMove, getSideFeatures } from '../../../api/BoardFeatureApi'
 
 const { AppState } = stores;
-
-
-const connections = [{
-  from: {
-    projectId: 1,
-    sprintId: 1,
-    issueId: 1,
-  },
-  to: {
-    projectId: 2,
-    sprintId: 1,
-    issueId: 1,
-  },
-}, {
-  from: {
-    projectId: 1,
-    sprintId: 1,
-    issueId: 1,
-  },
-  to: {
-    projectId: 2,
-    sprintId: 2,
-    issueId: 1,
-  },
-}];
 class BoardStore {
   @observable resizing = false;
+
+  @observable featureListVisible = false;
 
   @observable activePi = {};
 
@@ -64,7 +41,6 @@ class BoardStore {
         sprints,
         teamProjects
       });
-      this.loadFeatureList()
     })
 
   }
@@ -91,6 +67,11 @@ class BoardStore {
       this.setFeatureList(feature)
     })
   }
+
+  @action setFeatureListVisible(featureListVisible) {
+    this.featureListVisible = featureListVisible;
+  }
+
   @action setFeatureList(featureList) {
     this.featureList = featureList;
   }

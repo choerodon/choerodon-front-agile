@@ -1,24 +1,37 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
+import { Tooltip } from 'choerodon-ui';
 import { DragSource, DropTarget } from 'react-dnd';
+import TypeTag from '../../../../../../components/TypeTag';
 import BoardStore from '../../../../../../stores/program/Board/BoardStore';
-// import './FeatureItem.scss';
+import './FeatureItem.scss';
 
 
+const preFix = 'c7nagile-SideFeatureList-FeatureItem';
 @observer
 class FeatureItem extends Component {
   render() {
     const {
-      feature, connectDragSource, connectDropTarget, 
+      feature, connectDragSource, connectDropTarget,
     } = this.props;
+    const {
+      issueTypeDTO, summary, issueNum, featureType, 
+    } = feature;
     // const opacity = isDragging ? 0 : 1;
     return (
       connectDragSource(
-        connectDropTarget(          
-          <div>
-            {feature.summary}
-          </div>, 
+        connectDropTarget(
+          <div className={preFix}>
+            {/* <TypeTag data={issueTypeDTO} featureType={featureType} /> */}
+            <span style={{ color: '#3F51B5', marginRight: 10 }}>{issueNum}</span>
+            
+            <div className={`${preFix}-summary`}>
+              <Tooltip title={summary}>
+                {summary}
+              </Tooltip>
+            </div>
+          </div>,
         ),
       )
     );
@@ -43,7 +56,7 @@ export default DropTarget(
     {
       beginDrag: props => ({
         type: 'side',
-        issue: props.feature,        
+        issue: props.feature,
       }),
       endDrag(props, monitor) {
         const source = monitor.getItem();
@@ -52,14 +65,14 @@ export default DropTarget(
         const result = monitor.getDropResult();
         if (result) {
           const {
-            dropType, teamProjectId, sprintId, index, 
+            dropType, teamProjectId, sprintId, index,
           } = result;
           // if (dropType === 'outer') {
           BoardStore.fromSideToBoard({
             dropType,
             index,
-            teamProjectId, 
-            sprintId, 
+            teamProjectId,
+            sprintId,
             featureId: props.feature.issueId,
           });
           // }
