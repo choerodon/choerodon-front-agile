@@ -155,14 +155,21 @@ export function handleFileUpload(propFileList, func, config) {
 }
 
 export function text2Delta(description) {
-  if (
-    description
-    && description.indexOf('[') === 0
-    && description[description.length - 1] === ']'
-  ) {
-    return JSON.parse(description);
+  let temp = description;
+  try {    
+    temp = JSON.parse(description.replace(/\\n/g, '\\n')
+      .replace(/\\'/g, "\\'")
+      .replace(/\\"/g, '\\"')
+      .replace(/\\&/g, '\\&')
+      .replace(/\\r/g, '\\r')
+      .replace(/\\t/g, '\\t')
+      .replace(/\\b/g, '\\b')
+      .replace(/\\f/g, '\\f'));
+  } catch (error) {    
+    temp = description;
   }
-  return description || '';
+  // return temp;
+  return temp || '';
 }
 
 /**
